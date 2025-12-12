@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import '../widgets/game_button.dart';
+import '../widgets/fight_animation.dart';
 import '../models/game_state.dart';
 
 class MudFightScreen extends StatelessWidget {
@@ -43,6 +44,19 @@ class MudFightScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
+              // Fight Animation - Two animated gang bangers fighting to the death
+              FightAnimation(
+                playerName: gameProvider.gameState.playerName,
+                gangName: gameProvider.gameState.gangName,
+                enemyType: combatData.enemyType,
+                playerHealth: gameProvider.gameState.health,
+                enemyHealth: combatData.enemyHealth.toInt(),
+                playerMaxHealth: gameProvider.gameState.maxHealth.toDouble(),
+                enemyMaxHealth: combatData.enemyHealth * combatData.enemyCount,
+              ),
+
+              const SizedBox(height: 20),
+
               // Combat Info Card
               Card(
                 elevation: 5,
