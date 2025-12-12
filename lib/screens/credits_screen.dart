@@ -1,0 +1,152 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/game_provider.dart';
+import '../widgets/game_button.dart';
+
+class CreditsScreen extends StatelessWidget {
+  const CreditsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final gameProvider = Provider.of<GameProvider>(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Credits - Droid Gangwar'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => gameProvider.navigateToScreen('city'),
+          ),
+        ],
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.teal.shade900,
+              Colors.teal.shade700,
+              Colors.deepPurple.shade600,
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Card(
+                elevation: 5,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      const Text(
+                        '🎬 CREDITS',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.teal,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Game information and credits',
+                        style: TextStyle(fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Droid Gangwar - Flutter Edition',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      const Text(
+                        'Original Game: Gang War MUD by timotheuzi@hotmail.com',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Flutter Adaptation: Cross-platform Flutter implementation',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Features:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text('• Cross-platform: Android, iOS, Linux, Windows, macOS, Web'),
+                      const Text('• Modern UI with Flutter widgets'),
+                      const Text('• Full game logic migration from Kotlin to Dart'),
+                      const Text('• State management with Provider'),
+                      const Text('• Persistent game saves'),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Special Thanks:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text('• Original Gang War community'),
+                      const Text('• Flutter development team'),
+                      const Text('• All beta testers and contributors'),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Version: 1.0',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      const Text(
+                        'Built with ❤️ for gang warfare enthusiasts',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Technologies Used:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text('• Flutter 3.38.4'),
+                      const Text('• Dart 3.10.3'),
+                      const Text('• Provider for state management'),
+                      const Text('• Shared Preferences for persistence'),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              GameButton(
+                text: 'Return to City',
+                onPressed: () => gameProvider.navigateToScreen('city'),
+                icon: Icons.arrow_back,
+                backgroundColor: Colors.brown,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
