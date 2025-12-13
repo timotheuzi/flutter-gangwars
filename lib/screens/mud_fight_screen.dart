@@ -53,6 +53,9 @@ class MudFightScreen extends StatelessWidget {
                 enemyHealth: combatData.enemyHealth.toInt(),
                 playerMaxHealth: gameProvider.gameState.maxHealth.toDouble(),
                 enemyMaxHealth: combatData.enemyHealth * combatData.enemyCount,
+                currentWeapon: 'pistol', // Default weapon, will need to track actual weapon
+                showBloodEffects: (gameProvider.gameState.health < gameProvider.gameState.maxHealth * 0.5) ||
+                                 (combatData.enemyHealth < combatData.enemyHealth * combatData.enemyCount * 0.5),
               ),
 
               const SizedBox(height: 20),
