@@ -8,6 +8,8 @@ class FightAnimation extends StatefulWidget {
   final int enemyHealth;
   final double playerMaxHealth;
   final double enemyMaxHealth;
+  final int playerMembers;
+  final int enemyCount;
   final String? currentWeapon;
   final bool showBloodEffects;
 
@@ -20,12 +22,40 @@ class FightAnimation extends StatefulWidget {
     required this.enemyHealth,
     required this.playerMaxHealth,
     required this.enemyMaxHealth,
+    required this.playerMembers,
+    required this.enemyCount,
     this.currentWeapon,
     this.showBloodEffects = false,
   });
 
   @override
   FightAnimationState createState() => FightAnimationState();
+}
+
+class BloodSplatterPainter extends CustomPainter {
+  final double animationValue;
+
+  BloodSplatterPainter(this.animationValue);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.red.withOpacity(0.3 + animationValue * 0.4)
+      ..style = PaintingStyle.fill;
+
+    // Draw some random blood splatters
+    final random = Offset(size.width * 0.2, size.height * 0.3);
+    canvas.drawCircle(random, 15 + animationValue * 10, paint);
+
+    final random2 = Offset(size.width * 0.7, size.height * 0.6);
+    canvas.drawCircle(random2, 8 + animationValue * 6, paint);
+
+    final random3 = Offset(size.width * 0.4, size.height * 0.8);
+    canvas.drawCircle(random3, 12 + animationValue * 8, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
 class FightAnimationState extends State<FightAnimation>
@@ -37,6 +67,10 @@ class FightAnimationState extends State<FightAnimation>
   late Animation<Color?> _enemyColorAnimation;
   late Animation<double> _bloodSplashAnimation;
   late Animation<double> _weaponSwingAnimation;
+  late Animation<double> _bloodDripAnimation;
+  late Animation<double> _woundPulseAnimation;
+  late Animation<double> _bloodParticleAnimation;
+  late Animation<double> _goreEffectAnimation;
 
   @override
   void initState() {
@@ -44,11 +78,11 @@ class FightAnimationState extends State<FightAnimation>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
 
     // Player animation - moves left and right
-    _playerAnimation = Tween<double>(begin: -30.0, end: 30.0).animate(
+    _playerAnimation = Tween<double>(begin: -40.0, end: 40.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: const Interval(0.0, 0.5, curve: Curves.easeInOut),
@@ -56,7 +90,7 @@ class FightAnimationState extends State<FightAnimation>
     );
 
     // Enemy animation - moves right and left (opposite of player)
-    _enemyAnimation = Tween<double>(begin: 30.0, end: -30.0).animate(
+    _enemyAnimation = Tween<double>(begin: 40.0, end: -40.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: const Interval(0.5, 1.0, curve: Curves.easeInOut),
@@ -85,19 +119,51 @@ class FightAnimationState extends State<FightAnimation>
       ),
     );
 
-    // Blood splash animation
+    // Enhanced blood splash animation
     _bloodSplashAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.6, 1.0, curve: Curves.elasticOut),
+      ),
+    );
+
+    // Blood drip animation
+    _bloodDripAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 1.0, curve: Curves.bounceIn),
+      ),
+    );
+
+    // Wound pulse animation
+    _woundPulseAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 1.0, curve: Curves.easeInOut),
+      ),
+    );
+
+    // Blood particle animation
+    _bloodParticleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: const Interval(0.7, 1.0, curve: Curves.easeOut),
       ),
     );
 
-    // Weapon swing animation
-    _weaponSwingAnimation = Tween<double>(begin: -0.2, end: 0.2).animate(
+    // Gore effect animation
+    _goreEffectAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeInOut),
+        curve: const Interval(0.8, 1.0, curve: Curves.elasticOut),
+      ),
+    );
+
+    // Weapon swing animation
+    _weaponSwingAnimation = Tween<double>(begin: -0.5, end: 0.5).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.5, curve: Curves.elasticOut),
       ),
     );
   }
@@ -114,28 +180,28 @@ class FightAnimationState extends State<FightAnimation>
   }
 
   String _getWeaponIcon(String? weapon) {
-    if (weapon == null) return '✊'; // Fists
+    if (weapon == null) return '👊💥'; // Bloody fists
 
     return switch (weapon.toLowerCase()) {
-      'pistol' => '🔫',
-      'uzi' => '🔫🔫',
-      'ar15' => '🪖',
-      'grenade' => '💣',
-      'knife' => '🔪',
-      'sword' => '🗡️',
-      'barbed_wire_bat' => '⚾💢',
-      'brass_knuckles' => '🥊',
-      'axe' => '🪓',
-      'fists' => '✊',
+      'pistol' => '🔫💥',
+      'uzi' => '🔫🔫💥',
+      'ar15' => '🪖⚡',
+      'grenade' => '💣💥',
+      'knife' => '🔪🩸',
+      'sword' => '🗡️⚔️',
+      'barbed_wire_bat' => '⚾💢🩸',
+      'brass_knuckles' => '🥊💥',
+      'axe' => '🪓⚡',
+      'fists' => '👊💥',
       'ghost_gun' => '👻🔫',
-      'vampire_bat' => '🦇⚾',
-      'missile_launcher' => '🚀',
-      'machine_gun' => '🔫🔫🔫',
-      'rocket_launcher' => '🚀🚀',
-      'submachine_gun' => '🔫🔫',
-      'flamethrower' => '🔥',
-      'golden_gun' => '💰🔫',
-      _ => '✊',
+      'vampire_bat' => '🦇⚾💥',
+      'missile_launcher' => '🚀💥',
+      'machine_gun' => '🔫🔫🔫💥',
+      'rocket_launcher' => '🚀🚀💥',
+      'submachine_gun' => '🔫🔫⚡',
+      'flamethrower' => '🔥💥',
+      'golden_gun' => '💰🔫✨',
+      _ => '👊💥',
     };
   }
 
@@ -158,37 +224,27 @@ class FightAnimationState extends State<FightAnimation>
 
   @override
   Widget build(BuildContext context) {
-    final playerHealthPercentage = widget.playerHealth / widget.playerMaxHealth;
-    final enemyHealthPercentage = widget.enemyHealth / widget.enemyMaxHealth;
-    final isPlayerLosing = playerHealthPercentage < enemyHealthPercentage;
-
     return Container(
-      height: 220,
+      height: 200,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
+            Colors.black.withOpacity(0.95),
+            Colors.red.shade900.withOpacity(0.8),
             Colors.black.withOpacity(0.9),
-            Colors.red.shade900.withOpacity(0.7),
           ],
         ),
         border: Border.all(
-          color: Colors.red.shade700,
-          width: 3,
+          color: Colors.red.shade600,
+          width: 2,
         ),
         borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.red.shade900.withOpacity(0.5),
-            blurRadius: 10,
-            spreadRadius: 2,
-          ),
-        ],
       ),
       child: Stack(
         children: [
-          // Battlefield background with gritty texture
+          // Muddy battlefield background
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -196,491 +252,28 @@ class FightAnimationState extends State<FightAnimation>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Colors.red.shade900.withOpacity(0.3),
-                    Colors.black.withOpacity(0.4),
-                    Colors.red.shade800.withOpacity(0.3),
+                    Colors.brown.shade900.withOpacity(0.6),
+                    Colors.black.withOpacity(0.8),
+                    Colors.red.shade900.withOpacity(0.4),
                   ],
-                  stops: const [0.0, 0.5, 1.0],
                 ),
               ),
             ),
           ),
 
-          // Blood splatter effects for losing fighter
+          // Player gang members (left side)
+          ..._buildGangMembers(true),
+
+          // Enemy gang members (right side)
+          ..._buildGangMembers(false),
+
+          // Blood splatter effects
           if (widget.showBloodEffects)
             Positioned.fill(
-              child: AnimatedBuilder(
-                animation: _bloodSplashAnimation,
-                builder: (context, child) {
-                  return Opacity(
-                    opacity: _bloodSplashAnimation.value * 0.3,
-                    child: Container(
-                      color: Colors.red.withOpacity(0.1),
-                      child: Center(
-                        child: Text(
-                          '🩸💀🩸',
-                          style: TextStyle(
-                            fontSize: 40,
-                            color: Colors.red.withOpacity(0.3),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-          // Player character (left side) - Gangster with weapon
-          Positioned(
-            left: 15,
-            bottom: 30,
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                final weaponIcon = _getWeaponIcon(widget.currentWeapon);
-                final weaponOffset = _weaponSwingAnimation.value * 20;
-
-                return Transform.translate(
-                  offset: Offset(_playerAnimation.value, 0),
-                  child: Stack(
-                    children: [
-                      // Blood effects on player if losing
-                      if (isPlayerLosing && widget.showBloodEffects)
-                        Positioned(
-                          top: -10,
-                          left: -10,
-                          child: Transform.rotate(
-                            angle: _controller.value * 0.5,
-                            child: Text(
-                              '💉🩸',
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.red.withOpacity(0.7),
-                                shadows: [
-                                  Shadow(
-                                    blurRadius: 5,
-                                    color: Colors.red,
-                                    offset: Offset(1, 1),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-
-                      // Player character with weapon
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Weapon in hand (positioned above character)
-                          Transform.translate(
-                            offset: Offset(weaponOffset, -10),
-                            child: Transform.rotate(
-                              angle: _weaponSwingAnimation.value * 0.3,
-                              child: Text(
-                                weaponIcon,
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  color: Colors.white,
-                                  shadows: [
-                                    Shadow(
-                                      blurRadius: 5,
-                                      color: Colors.black,
-                                      offset: Offset(2, 2),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 8),
-
-                          // Character with gangster style
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: (_playerColorAnimation.value ?? Colors.blue.shade800).withOpacity(0.9),
-                              borderRadius: BorderRadius.circular(25),
-                              border: Border.all(
-                                color: Colors.blue.shade400,
-                                width: 3,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.blue.shade900.withOpacity(0.6),
-                                  blurRadius: 12,
-                                  spreadRadius: 3,
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                // Gangster character
-                                Stack(
-                                  children: [
-                                    Text(
-                                      '👨🏽‍🦲', // Bald gangster emoji
-                                      style: TextStyle(fontSize: 45),
-                                    ),
-                                    Positioned(
-                                      right: 5,
-                                      bottom: 5,
-                                      child: Text(
-                                        '👕', // Bandana
-                                        style: TextStyle(fontSize: 20),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 6),
-                                // Gang name with street style
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.6),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: Colors.white, width: 1),
-                                  ),
-                                  child: Text(
-                                    widget.gangName,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-
-                          // Player name with style
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.blue.shade400, width: 1),
-                            ),
-                            child: Text(
-                              widget.playerName,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.cyan.shade100,
-                                shadows: [
-                                  Shadow(
-                                    blurRadius: 3,
-                                    color: Colors.black,
-                                    offset: Offset(1, 1),
-                                  ),
-                                ],
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-
-                          // Health bar with weapon info
-                          Stack(
-                            children: [
-                              Container(
-                                width: 110,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade900,
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 1,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: 110 * playerHealthPercentage,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  color: _getHealthColor(widget.playerHealth, widget.playerMaxHealth),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                              ),
-                              Positioned.fill(
-                                child: Center(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '${widget.playerHealth.toInt()}/${widget.playerMaxHealth.toInt()}',
-                                        style: const TextStyle(
-                                          fontSize: 9,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        weaponIcon,
-                                        style: const TextStyle(
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-
-          // Enemy character (right side) - Gangster with weapon
-          Positioned(
-            right: 15,
-            bottom: 30,
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                final enemyWeaponIcon = _getEnemyWeaponIcon(widget.enemyType);
-                final weaponOffset = -_weaponSwingAnimation.value * 20;
-
-                return Transform.translate(
-                  offset: Offset(_enemyAnimation.value, 0),
-                  child: Stack(
-                    children: [
-                      // Blood effects on enemy if losing
-                      if (!isPlayerLosing && widget.showBloodEffects)
-                        Positioned(
-                          top: -10,
-                          right: -10,
-                          child: Transform.rotate(
-                            angle: -_controller.value * 0.5,
-                            child: Text(
-                              '💉🩸',
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.red.withOpacity(0.7),
-                                shadows: [
-                                  Shadow(
-                                    blurRadius: 5,
-                                    color: Colors.red,
-                                    offset: Offset(1, 1),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-
-                      // Enemy character with weapon
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Weapon in hand (positioned above character)
-                          Transform.translate(
-                            offset: Offset(weaponOffset, -10),
-                            child: Transform.rotate(
-                              angle: -_weaponSwingAnimation.value * 0.3,
-                              child: Text(
-                                enemyWeaponIcon,
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  color: Colors.white,
-                                  shadows: [
-                                    Shadow(
-                                      blurRadius: 5,
-                                      color: Colors.black,
-                                      offset: Offset(2, 2),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 8),
-
-                          // Enemy character with gangster style
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: (_enemyColorAnimation.value ?? Colors.red.shade800).withOpacity(0.9),
-                              borderRadius: BorderRadius.circular(25),
-                              border: Border.all(
-                                color: Colors.red.shade400,
-                                width: 3,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.red.shade900.withOpacity(0.6),
-                                  blurRadius: 12,
-                                  spreadRadius: 3,
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                // Enemy gangster character
-                                Text(
-                                  _getEnemyEmoji(widget.enemyType),
-                                  style: TextStyle(fontSize: 45),
-                                ),
-                                const SizedBox(height: 6),
-                                // Enemy gang tag
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.6),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: Colors.white, width: 1),
-                                  ),
-                                  child: Text(
-                                    'Enemy Gang',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-
-                          // Enemy name/type
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.red.shade400, width: 1),
-                            ),
-                            child: Text(
-                              widget.enemyType,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.red.shade200,
-                                shadows: [
-                                  Shadow(
-                                    blurRadius: 3,
-                                    color: Colors.black,
-                                    offset: Offset(1, 1),
-                                  ),
-                                ],
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-
-                          // Enemy health bar
-                          Container(
-                            width: 110,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade900,
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 1,
-                              ),
-                            ),
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: 110 * enemyHealthPercentage,
-                                  height: 12,
-                                  decoration: BoxDecoration(
-                                    color: _getHealthColor(widget.enemyHealth, widget.enemyMaxHealth),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                ),
-                                Center(
-                                  child: Text(
-                                    '${widget.enemyHealth.toInt()}/${widget.enemyMaxHealth.toInt()}',
-                                    style: const TextStyle(
-                                      fontSize: 9,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-
-          // Fight indicator with animated effects
-          Center(
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: 1.0 + 0.15 * _controller.value,
-                  child: Opacity(
-                    opacity: 0.8 + 0.2 * _controller.value,
-                    child: Text(
-                      '🔪💥 GANG WAR 💥🔪',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 12.0,
-                            color: Colors.red.shade800,
-                            offset: Offset(3.0, 3.0),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              },
-            ),
-          ),
-
-          // Additional fight effects
-          if (widget.showBloodEffects)
-            Positioned(
-              bottom: 10,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Text(
-                  '🩸💀 BLOODBATH 💀🩸',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.red.withOpacity(0.8),
-                    shadows: [
-                      Shadow(
-                        blurRadius: 5,
-                        color: Colors.black,
-                        offset: Offset(1, 1),
-                      ),
-                    ],
-                  ),
+              child: Opacity(
+                opacity: 0.3,
+                child: CustomPaint(
+                  painter: BloodSplatterPainter(_bloodSplashAnimation.value),
                 ),
               ),
             ),
@@ -689,23 +282,59 @@ class FightAnimationState extends State<FightAnimation>
     );
   }
 
-  String _getEnemyEmoji(String enemyType) {
-    return switch (enemyType.toLowerCase()) {
-      'police officers' || 'police' => '👮‍♂️',
-      'squidie hit squad' || 'squidie' => '👹',
-      'loan shark enforcer' => '🕵️‍♂️',
-      'rival gang members' => '👨🏽‍🦳',
-      _ => '👨🏽‍🦲',
-    };
+  List<Widget> _buildGangMembers(bool isPlayerSide) {
+    final members = isPlayerSide ? widget.playerMembers : widget.enemyCount;
+    final health = isPlayerSide ? widget.playerHealth : widget.enemyHealth;
+    final maxHealth = isPlayerSide ? widget.playerMaxHealth : widget.enemyMaxHealth;
+    final healthPerMember = maxHealth / members;
+    final startX = isPlayerSide ? 20.0 : MediaQuery.of(context).size.width - 100;
+    final spacing = 40.0;
+
+    List<Widget> memberWidgets = [];
+
+    for (int i = 0; i < members; i++) {
+      final memberHealth = (health - (i * healthPerMember)).clamp(0, healthPerMember);
+      final isAlive = memberHealth > 0;
+      final xPos = startX + (i * spacing);
+
+      memberWidgets.add(
+        Positioned(
+          left: xPos,
+          bottom: isAlive ? 20 : 5, // Dead members fall to bottom
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(
+                  isPlayerSide ? _playerAnimation.value * 0.5 : _enemyAnimation.value * 0.5,
+                  isAlive ? 0 : 10, // Dead members sink into mud
+                ),
+                child: _buildGangMemberSprite(isPlayerSide, isAlive, i),
+              );
+            },
+          ),
+        ),
+      );
+    }
+
+    return memberWidgets;
   }
 
-  String _getEnemyWeaponIcon(String enemyType) {
-    return switch (enemyType.toLowerCase()) {
-      'police officers' || 'police' => '🔫',
-      'squidie hit squad' || 'squidie' => '🗡️',
-      'loan shark enforcer' => '⚾',
-      'rival gang members' => '🪓',
-      _ => '🔫',
-    };
+  Widget _buildGangMemberSprite(bool isPlayerSide, bool isAlive, int index) {
+    if (!isAlive) {
+      // Dead member - bloody heap
+      return const Text(
+        '🩸💀',
+        style: TextStyle(fontSize: 20),
+      );
+    }
+
+    // Alive member - simple emoji character
+    final emoji = isPlayerSide ? '👨🏽‍🦲' : '👨🏽‍🦱';
+
+    return Text(
+      emoji,
+      style: const TextStyle(fontSize: 24),
+    );
   }
 }

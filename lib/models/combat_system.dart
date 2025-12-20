@@ -35,7 +35,16 @@ class CombatSystem {
           max(5, playerDamage + random.nextInt(playerDamage ~/ 2));
       remainingEnemyHealth -= playerAttackDamage;
       result.playerDamageDealt += playerAttackDamage;
-      fightLog.add('You attack with $weapon for $playerAttackDamage damage!');
+
+      // Gritty attack descriptions
+      final attackDescriptions = [
+        'You blast $weapon into their flesh, spraying blood across the mud for $playerAttackDamage damage!',
+        'Your $weapon tears through meat and bone, $playerAttackDamage chunks of gore flying everywhere!',
+        'You slam $weapon into their skull, brains and blood mixing in the muck for $playerAttackDamage damage!',
+        'The $weapon rips open their guts, intestines spilling into the filthy water for $playerAttackDamage damage!',
+        'You smash $weapon through their ribs, blood bubbling from punctured lungs for $playerAttackDamage damage!',
+      ];
+      fightLog.add(attackDescriptions[random.nextInt(attackDescriptions.length)]);
 
       // Gang attack (if player has gang members)
       if (gameState.members > 1) {
@@ -43,7 +52,15 @@ class CombatSystem {
             (gameState.members * 3) + random.nextInt(gameState.members * 2);
         remainingEnemyHealth -= gangDamage;
         result.gangDamageDealt += gangDamage;
-        fightLog.add('Your gang attacks for $gangDamage damage!');
+
+        final gangAttackDescriptions = [
+          'Your crew unleashes hell! $gangDamage damage worth of bullets, blades, and broken bones!',
+          'The gang swarms like rabid dogs, tearing flesh for $gangDamage damage!',
+          'Your boys paint the mud red with enemy blood for $gangDamage damage!',
+          'The crew turns the alley into a slaughterhouse, $gangDamage damage of carnage!',
+          'Your gang fights like cornered rats, $gangDamage damage of savage brutality!',
+        ];
+        fightLog.add(gangAttackDescriptions[random.nextInt(gangAttackDescriptions.length)]);
       }
 
       // Enemy counterattack
@@ -53,7 +70,15 @@ class CombatSystem {
         final actualDamage = max(1, enemyDamage - gameState.weapons.vest);
         gameState.takeDamage(actualDamage);
         result.totalEnemyDamage += actualDamage;
-        fightLog.add('$enemyType counterattack for $actualDamage damage!');
+
+        final counterAttackDescriptions = [
+          '$enemyType fight back like wounded animals! $actualDamage damage of bloody retaliation!',
+          'The $enemyType counter with desperate fury! $actualDamage damage tears through your flesh!',
+          '$enemyType unleash their death throes! $actualDamage damage of savage, bloody strikes!',
+          'The surviving $enemyType lash out in agony! $actualDamage damage rips into you!',
+          '$enemyType counterattack with dying rage! $actualDamage damage of gore and pain!',
+        ];
+        fightLog.add(counterAttackDescriptions[random.nextInt(counterAttackDescriptions.length)]);
       }
 
       // Check for critical hits
@@ -63,8 +88,15 @@ class CombatSystem {
         final criticalDamage = (enemyDamage * 1.5).toInt();
         gameState.takeDamage(criticalDamage);
         result.totalEnemyDamage += criticalDamage;
-        fightLog.add(
-            'CRITICAL HIT! $enemyType lands a devastating blow for $criticalDamage damage!');
+
+        final criticalDescriptions = [
+          'CRITICAL HIT! $enemyType lands a devastating blow, your blood paints the walls for $criticalDamage damage!',
+          'CRITICAL HIT! $enemyType tears into you with animal rage! $criticalDamage damage of shredded flesh!',
+          'CRITICAL HIT! $enemyType rips your guts open! $criticalDamage damage spills your life into the mud!',
+          'CRITICAL HIT! $enemyType smashes through your defenses! $criticalDamage damage of broken bones and blood!',
+          'CRITICAL HIT! $enemyType unleashes hell! $criticalDamage damage turns you into a bloody ruin!',
+        ];
+        fightLog.add(criticalDescriptions[random.nextInt(criticalDescriptions.length)]);
       }
     }
 

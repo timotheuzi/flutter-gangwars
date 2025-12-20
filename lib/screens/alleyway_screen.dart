@@ -5,13 +5,101 @@ import '../widgets/game_button.dart';
 import '../models/random_event.dart';
 import 'dart:math';
 
-class AlleywayScreen extends StatelessWidget {
+class AlleywayScreen extends StatefulWidget {
   const AlleywayScreen({super.key});
+
+  @override
+  State<AlleywayScreen> createState() => _AlleywayScreenState();
+}
+
+class _AlleywayScreenState extends State<AlleywayScreen> {
+  // Simple dungeon navigation system
+  int currentX = 0;
+  int currentY = 0;
+  Set<String> visitedRooms = {};
+  Map<String, String> roomDescriptions = {};
+  Map<String, List<String>> roomEvents = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _generateDungeon();
+  }
+
+  void _generateDungeon() {
+    // Generate a simple 5x5 dungeon layout with random rooms
+    final random = Random();
+    for (int x = -2; x <= 2; x++) {
+      for (int y = -2; y <= 2; y++) {
+        final roomKey = '$x,$y';
+        visitedRooms.add(roomKey);
+
+        // Generate room description
+        final roomTypes = [
+          'a narrow alley littered with broken bottles and syringes',
+          'a dark corner where rats scurry through piles of garbage',
+          'a shadowy junction where multiple alleys converge',
+          'an abandoned warehouse entrance, doors hanging off hinges',
+          'a bloody scene where a recent fight took place',
+          'a drug dealer\'s stash spot, hidden behind rusted dumpsters',
+          'a dead end blocked by crumbling brick walls',
+          'a makeshift shelter where homeless people huddle',
+          'a hidden courtyard overgrown with weeds and debris',
+          'a underground access point with a manhole cover',
+        ];
+        roomDescriptions[roomKey] = roomTypes[random.nextInt(roomTypes.length)];
+
+        // Generate room events
+        final events = [
+          'You hear footsteps echoing in the distance...',
+          'A rat bites at your ankle, drawing blood!',
+          'You find a discarded wallet with some cash inside.',
+          'The stench of decay is overwhelming here.',
+          'Fresh blood stains the ground - someone died here recently.',
+          'You spot shadowy figures watching from afar.',
+          'The wind carries the sound of distant gunfire.',
+          'Broken syringes crunch underfoot.',
+          'A homeless person begs for spare change.',
+          'You find a hidden cache of drugs.',
+        ];
+        roomEvents[roomKey] = [events[random.nextInt(events.length)]];
+      }
+    }
+  }
+
+  void _moveDirection(String direction) {
+    setState(() {
+      switch (direction) {
+        case 'north': currentY += 1; break;
+        case 'south': currentY -= 1; break;
+        case 'east': currentX += 1; break;
+        case 'west': currentX -= 1; break;
+      }
+      // Keep within bounds
+      currentX = currentX.clamp(-2, 2);
+      currentY = currentY.clamp(-2, 2);
+    });
+  }
+
+  bool _canMove(String direction) {
+    int testX = currentX;
+    int testY = currentY;
+    switch (direction) {
+      case 'north': testY += 1; break;
+      case 'south': testY -= 1; break;
+      case 'east': testX += 1; break;
+      case 'west': testX -= 1; break;
+    }
+    return testX >= -2 && testX <= 2 && testY >= -2 && testY <= 2;
+  }
 
   @override
   Widget build(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context);
     final gameState = gameProvider.gameState;
+    final currentRoomKey = '$currentX,$currentY';
+    final roomDesc = roomDescriptions[currentRoomKey] ?? 'an unknown alleyway';
+    final roomEvent = roomEvents[currentRoomKey]?.first ?? '';
 
     return Scaffold(
       appBar: AppBar(
@@ -39,33 +127,50 @@ class AlleywayScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              Card(
-                elevation: 5,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      const Text(
-                        '🏙️ DARK ALLEYWAY',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Money: \$${gameState.money}',
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        'The dark alleyway is filled with danger and opportunity. NPCs lurk in the shadows...',
-                        style: TextStyle(fontSize: 16),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.red.shade800,
+                    width: 2,
                   ),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      '🏙️ DARK ALLEYWAY',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red.shade300,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Money: \$${gameState.money}',
+                      style: TextStyle(fontSize: 18, color: Colors.yellow.shade200, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'You are in $roomDesc.',
+                      style: TextStyle(fontSize: 16, color: Colors.grey.shade200, fontWeight: FontWeight.w500),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      roomEvent,
+                      style: TextStyle(fontSize: 14, color: Colors.red.shade300, fontStyle: FontStyle.italic),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Location: ($currentX, $currentY)',
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 20),
@@ -73,8 +178,74 @@ class AlleywayScreen extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
+                      // Navigation Controls
                       const Text(
-                        'Alleyway Actions:',
+                        'Navigate:',
+                        style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // North
+                          ElevatedButton.icon(
+                            onPressed: _canMove('north') ? () => _moveDirection('north') : null,
+                            icon: const Icon(Icons.arrow_upward),
+                            label: const Text('North'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _canMove('north') ? Colors.green.shade700 : Colors.grey.shade700,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // West
+                          ElevatedButton.icon(
+                            onPressed: _canMove('west') ? () => _moveDirection('west') : null,
+                            icon: const Icon(Icons.arrow_back),
+                            label: const Text('West'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _canMove('west') ? Colors.green.shade700 : Colors.grey.shade700,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          // East
+                          ElevatedButton.icon(
+                            onPressed: _canMove('east') ? () => _moveDirection('east') : null,
+                            icon: const Icon(Icons.arrow_forward),
+                            label: const Text('East'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _canMove('east') ? Colors.green.shade700 : Colors.grey.shade700,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // South
+                          ElevatedButton.icon(
+                            onPressed: _canMove('south') ? () => _moveDirection('south') : null,
+                            icon: const Icon(Icons.arrow_downward),
+                            label: const Text('South'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _canMove('south') ? Colors.green.shade700 : Colors.grey.shade700,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Room Actions
+                      const Text(
+                        'Room Actions:',
                         style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
@@ -105,7 +276,7 @@ class AlleywayScreen extends StatelessWidget {
                           ElevatedButton.icon(
                             onPressed: () => _searchAlleyway(context, gameProvider),
                             icon: const Icon(Icons.search),
-                            label: const Text('Search Alleyway'),
+                            label: const Text('Search Area'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.amber.shade700,
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -114,21 +285,22 @@ class AlleywayScreen extends StatelessWidget {
                           ElevatedButton.icon(
                             onPressed: () => _findShortcuts(context, gameProvider),
                             icon: const Icon(Icons.explore),
-                            label: const Text('Find Shortcuts'),
+                            label: const Text('Look Around'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green.shade700,
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             ),
                           ),
-                          ElevatedButton.icon(
-                            onPressed: () => _enterBossRoom(context, gameProvider),
-                            icon: Icon(Icons.warning),
-                            label: const Text('Boss Room'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.purple.shade700,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          if (currentX == 0 && currentY == 0) // Boss room at center
+                            ElevatedButton.icon(
+                              onPressed: () => _enterBossRoom(context, gameProvider),
+                              icon: Icon(Icons.warning),
+                              label: const Text('Boss Room'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.purple.shade700,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              ),
                             ),
-                          ),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -229,17 +401,17 @@ class AlleywayScreen extends StatelessWidget {
 
   String _getNpcDescription(String npcType) {
     return switch (npcType) {
-      'Street Thug' => 'A tough-looking thug blocks your path. He looks like he wants trouble. "You lookin\' at me, punk?"',
-      'Shady Dealer' => 'A shady character in a trench coat approaches you. "Psst... I got the good stuff. Wanna make a deal?"',
-      'Bouncer' => 'A massive bouncer stands guard. He might be useful if you can convince him to join you. "This area is off limits."',
-      'Homeless Person' => 'A homeless person mutters to themselves. They might have useful information. "Spare some change, boss?"',
-      'Corrupt Businessman' => 'A well-dressed businessman with a shady aura offers you a deal. "I have connections... for the right price."',
-      'Street Punk' => 'A young punk with attitude challenges you. He could be a valuable recruit. "You think you\'re tough? Prove it!"',
-      'Gang Recruit' => 'A young wannabe gangster looks up to you. "I wanna be like you, boss. Let me join your crew!"',
-      'Drug Addict' => 'A twitchy drug addict approaches you. "Man, I need a fix... I can get you anything you want."',
-      'Informant' => 'A nervous-looking informant whispers to you. "I know things... dangerous things."',
-      'Rival Gang Member' => 'A member of a rival gang spots you. "This is our turf! Get outta here!"',
-      _ => 'Someone approaches you in the dark alleyway.',
+      'Street Thug' => 'A scarred thug with fresh blood on his knuckles blocks your path. His eyes are wild with rage and cheap booze. "You lookin\' at me, punk? I\'ll carve your fuckin\' eyes out!" The stench of sweat and violence surrounds him.',
+      'Shady Dealer' => 'A gaunt figure in a blood-stained trench coat emerges from the shadows. Track marks line his arms like railroad tracks to hell. "Psst... I got the pure shit. But cross me and you\'ll be beggin\' for death."',
+      'Bouncer' => 'A mountain of a man with broken teeth and prison tattoos guards the entrance. His fists are the size of sledgehammers, scarred from countless beatings. "This area is off limits, or I\'ll snap your spine like a twig."',
+      'Homeless Person' => 'A wretched vagrant covered in filth and open sores mutters incoherently. His eyes dart wildly, seeing ghosts in the darkness. "Spare some change, boss? Or I\'ll slit your throat while you sleep..."',
+      'Corrupt Businessman' => 'A suited predator with gold rings stained red approaches with a crocodile smile. His manicured hands hide the blood of countless betrayals. "I have connections... for the right price. Or I\'ll have your family fed to the dogs."',
+      'Street Punk' => 'A feral youth with a switchblade and dead eyes challenges you. His face is a roadmap of scars from street fights gone wrong. "You think you\'re tough? I\'ll gut you like a fish and leave you bleeding in the gutter!"',
+      'Gang Recruit' => 'A desperate kid with fresh bruises and borrowed clothes looks up at you with hungry eyes. His hands tremble from withdrawal and fear. "I wanna be like you, boss. Let me join your crew... or I\'ll die trying."',
+      'Drug Addict' => 'A skeletal junkie with rotting teeth and haunted eyes staggers toward you. Pus oozes from infected wounds as he twitches violently. "Man, I need a fix... I can get you anything you want. Just don\'t let me die alone."',
+      'Informant' => 'A twitchy rat with yellow teeth and a face like melted wax whispers urgently. He reeks of fear and cheap cologne. "I know things... dangerous things. But if I talk, they\'ll cut out my tongue and feed it to me."',
+      'Rival Gang Member' => 'A hardened killer from a rival crew spots you, his hand instinctively going for the gun in his waistband. Fresh blood stains his clothes from his last victim. "This is our turf! I\'ll paint these walls with your brains!"',
+      _ => 'A shadowy figure approaches through the fog of blood and despair in the dark alleyway.',
     };
   }
 

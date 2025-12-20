@@ -44,7 +44,7 @@ class MudFightScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // Fight Animation - Two animated gang bangers fighting to the death
+              // Fight Animation - Mud style gang warfare with individual member sprites
               FightAnimation(
                 playerName: gameProvider.gameState.playerName,
                 gangName: gameProvider.gameState.gangName,
@@ -53,6 +53,8 @@ class MudFightScreen extends StatelessWidget {
                 enemyHealth: combatData.enemyHealth.toInt(),
                 playerMaxHealth: gameProvider.gameState.maxHealth.toDouble(),
                 enemyMaxHealth: combatData.enemyHealth * combatData.enemyCount,
+                playerMembers: gameProvider.gameState.members,
+                enemyCount: combatData.enemyCount,
                 currentWeapon: 'pistol', // Default weapon, will need to track actual weapon
                 showBloodEffects: (gameProvider.gameState.health < gameProvider.gameState.maxHealth * 0.5) ||
                                  (combatData.enemyHealth < combatData.enemyHealth * combatData.enemyCount * 0.5),
