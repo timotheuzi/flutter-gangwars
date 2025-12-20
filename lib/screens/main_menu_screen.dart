@@ -26,18 +26,18 @@ class MainMenuScreen extends StatelessWidget {
                   color: Colors.black.withOpacity(0.4),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                margin: const EdgeInsets.symmetric(horizontal: 30),
+                margin: const EdgeInsets.symmetric(horizontal: 20), // Reduced margin slightly
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
                       'GANGWAR',
                       style: TextStyle(
-                        fontSize: 64,
+                        fontSize: 48, // Reduced from 64 to prevent overflow
                         fontWeight: FontWeight.bold,
                         color: Colors.redAccent,
                         fontFamily: 'Courier',
-                        letterSpacing: 4,
+                        letterSpacing: 2, // Reduced from 4 to fit better
                         shadows: [
                           Shadow(
                             blurRadius: 15.0,
@@ -51,14 +51,16 @@ class MainMenuScreen extends StatelessWidget {
                           ),
                         ],
                       ),
+                      softWrap: false, // Ensure it stays on one line
+                      overflow: TextOverflow.visible,
                     ),
                     const Text(
                       'FLUTTER EDITION',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 16, // Reduced from 20 to fit better
                         color: Colors.white,
                         fontWeight: FontWeight.w300,
-                        letterSpacing: 8.0,
+                        letterSpacing: 4.0, // Reduced from 8.0
                       ),
                     ),
                     const SizedBox(height: 50),

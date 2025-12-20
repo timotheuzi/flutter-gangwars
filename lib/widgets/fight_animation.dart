@@ -110,11 +110,9 @@ class FightAnimationState extends State<FightAnimation>
   void didUpdateWidget(FightAnimation oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.playerHealth < oldWidget.playerHealth) {
-      // Player side took damage
       _addSplatter(Offset(40 + _random.nextDouble() * 60, 100 + _random.nextDouble() * 50));
     }
     if (widget.enemyHealth < oldWidget.enemyHealth) {
-      // Enemy side took damage
       _addSplatter(Offset(MediaQuery.of(context).size.width - 140 + _random.nextDouble() * 60, 100 + _random.nextDouble() * 50));
     }
   }
@@ -133,16 +131,11 @@ class FightAnimationState extends State<FightAnimation>
         borderRadius: BorderRadius.circular(8),
         child: Stack(
           children: [
-            // Mud ground
             Container(color: Colors.brown.shade900),
-            
-            // Blood splatters
             CustomPaint(
               painter: BloodSplatterPainter(_splatters),
               size: Size.infinite,
             ),
-
-            // Battlefield
             Positioned.fill(
               child: Row(
                 children: [
@@ -159,12 +152,17 @@ class FightAnimationState extends State<FightAnimation>
   }
 
   Widget _buildSide(bool isPlayer) {
-    final count = isPlayer ? widget.playerMembers : widget.enemyCount;
-    final maxHealth = isPlayer ? widget.playerMaxHealth : widget.enemyMaxHealth;
+    final totalCount = isPlayer ? widget.playerMembers : widget.enemyCount;
     final currentHealth = isPlayer ? widget.playerHealth : widget.enemyHealth;
+    final maxHealth = isPlayer ? widget.playerMaxHealth : widget.enemyMaxHealth;
     
-    final healthPerMember = maxHealth / count;
-    final aliveCount = (currentHealth / healthPerMember).ceil();
+    // We treat each member as having an equal share of the total health.
+    // If a side has 100 max health and 4 members, each member has 25 health.
+    // If current health is 60, then 2 members are fully alive, 1 is wounded (still alive sprite), and 1 is dead.
+    final healthPerMember = maxHealth / totalCount;
+    
+    // Any member whose index corresponds to health > 0 is alive.
+    // Index 0 is the "last" to die, index (totalCount-1) is the "first" to die.
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -172,15 +170,21 @@ class FightAnimationState extends State<FightAnimation>
         spacing: 8,
         runSpacing: 8,
         alignment: isPlayer ? WrapAlignment.start : WrapAlignment.end,
-        children: List.generate(count, (index) {
-          final isAlive = index < aliveCount;
-          return _buildMemberWithAnimation(isPlayer, isAlive);
+        children: List.generate(totalCount, (index) {
+          // Check if this specific member is alive
+          // We count from the end of the list for who dies first
+          final memberThreshold = (totalCount - 1 - index) * healthPerMember;
+          final isAlive = currentHealth > memberThreshold;
+          
+          final isVictorious = (isPlayer && widget.enemyHealth <= 0) || (!isPlayer && widget.playerHealth <= 0);
+          
+          return _buildMemberWithAnimation(isPlayer, isAlive, isAlive && isVictorious);
         }),
       ),
     );
   }
 
-  Widget _buildMemberWithAnimation(bool isPlayer, bool isAlive) {
+  Widget _buildMemberWithAnimation(bool isPlayer, bool isAlive, bool isCheering) {
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -188,7 +192,7 @@ class FightAnimationState extends State<FightAnimation>
         if (isAlive) {
           yOffset = sin(_controller.value * 2 * pi) * 3;
         } else {
-          yOffset = 10; // Stay down
+          yOffset = 10;
         }
 
         return Transform.translate(
@@ -196,6 +200,7 @@ class FightAnimationState extends State<FightAnimation>
           child: PixelArtMember(
             isPlayer: isPlayer,
             isAlive: isAlive,
+            isCheering: isCheering,
             size: 30,
           ),
         );

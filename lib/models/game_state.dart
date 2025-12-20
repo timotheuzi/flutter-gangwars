@@ -135,8 +135,13 @@ class GameState with ChangeNotifier {
     }
 
     // Prostitutes generate income
-    final prostituteIncome = prostitutes.count * 100;
-    money += prostituteIncome;
+    final random = Random();
+    int totalIncome = 0;
+    for (int i = 0; i < prostitutes.count; i++) {
+      // Base income $1000 + quality variation up to $500
+      totalIncome += 1000 + random.nextInt(501);
+    }
+    money += totalIncome;
 
     // Increase squidies critical hit chance
     squidiesCriticalHitChance = min(0.25, squidiesCriticalHitChance + 0.005);
@@ -174,14 +179,14 @@ class GameState with ChangeNotifier {
       // Check for trends from previous day
       double modifier = 1.0;
       if (drugTrends.containsKey(drug)) {
-        if (drugTrends[drug]!.contains('bust')) {
-          modifier = 1.5 + random.nextDouble(); // Scarcity drives prices UP
-        } else if (drugTrends[drug]!.contains('flooded')) {
-          modifier = 0.3 + random.nextDouble() * 0.4; // Surplus drives prices DOWN
+        if (drugTrends[drug]!.contains('skyrocket')) {
+          modifier = 2.0 + random.nextDouble(); // Massive spike
+        } else if (drugTrends[drug]!.contains('tank')) {
+          modifier = 0.2 + random.nextDouble() * 0.3; // Massive drop
         }
       }
 
-      final volatility = 0.1 + (day * 0.01);
+      final volatility = 0.15 + (day * 0.01);
       final variation = (random.nextDouble() * (volatility * 2)) - volatility;
       drugPrices[drug] = max(10, (basePrice * modifier * (1 + variation)).toInt());
     }
@@ -192,15 +197,17 @@ class GameState with ChangeNotifier {
     final random = Random();
     final drugs = drugPrices.keys.toList();
     
-    // Pick 1-2 drugs for trends tomorrow
-    final numTrends = random.nextInt(2) + 1;
+    // Always generate 2-3 significant trends to keep the bar talk active
+    final numTrends = random.nextInt(2) + 2; 
+    final shuffledDrugs = List.from(drugs)..shuffle();
+    
     for (int i = 0; i < numTrends; i++) {
-      final drug = drugs[random.nextInt(drugs.length)];
+      final drug = shuffledDrugs[i];
       final isBust = random.nextBool();
       if (isBust) {
         drugTrends[drug] = 'The Feds just made a massive bust on a $drug shipment. Prices are gonna skyrocket tomorrow.';
       } else {
-        drugTrends[drug] = 'Word is the market is being flooded with cheap $drug. Prices are gonna tank soon.';
+        drugTrends[drug] = 'Word is the market is being flooded with cheap $drug from the border. Prices are gonna tank soon.';
       }
     }
   }
