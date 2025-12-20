@@ -13,10 +13,11 @@ class BarScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bar - Droid Gangwar'),
+        title: const Text('The Local Bar'),
+        backgroundColor: Colors.amber.shade900,
         actions: [
           IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.location_city),
             onPressed: () => gameProvider.navigateToScreen('city'),
           ),
         ],
@@ -29,7 +30,7 @@ class BarScreen extends StatelessWidget {
             colors: [
               Colors.amber.shade900,
               Colors.amber.shade700,
-              Colors.deepPurple.shade600,
+              Colors.black,
             ],
           ),
         ),
@@ -39,27 +40,23 @@ class BarScreen extends StatelessWidget {
             children: [
               Card(
                 elevation: 5,
+                color: Colors.black45,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
                       const Text(
-                        '🍺 BAR',
+                        '🍺 THE RUSTY BUCKET',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.amber,
+                          color: Colors.amberAccent,
                         ),
                       ),
                       const SizedBox(height: 10),
-                      Text(
-                        'Money: \$${gameState.money}',
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                      const SizedBox(height: 10),
                       const Text(
-                        'Gather information, recruit members, and hear the latest street gossip.',
-                        style: TextStyle(fontSize: 16),
+                        'The air is thick with smoke and secrets. For a few bucks, you might learn something that keeps you alive or makes you rich.',
+                        style: TextStyle(fontSize: 14, color: Colors.white70, fontStyle: FontStyle.italic),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -67,48 +64,87 @@ class BarScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'The bar is bustling with activity...',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('You hear rumors about rival gangs in the area...'),
-                            ),
-                          );
-                        },
-                        child: const Text('Listen to Rumors'),
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('You gather some useful intel about police patrols'),
-                            ),
-                          );
-                        },
-                        child: const Text('Gather Intel'),
-                      ),
-                    ],
-                  ),
+              
+              const Text(
+                'Street Gossip & Market Intel:',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 10),
+              
+              Expanded(
+                child: gameState.drugTrends.isEmpty 
+                  ? const Center(
+                      child: Text(
+                        'The regulars are tight-lipped today. Buy some drinks to loosen their tongues.',
+                        style: TextStyle(color: Colors.white60),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: gameState.drugTrends.length,
+                      itemBuilder: (context, index) {
+                        final drug = gameState.drugTrends.keys.elementAt(index);
+                        final rumor = gameState.drugTrends[drug]!;
+                        return Card(
+                          color: Colors.grey.shade900,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.record_voice_over, color: Colors.amberAccent),
+                                const SizedBox(width: 15),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Rumor about $drug:',
+                                        style: const TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        rumor,
+                                        style: const TextStyle(color: Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+              ),
+              
+              const SizedBox(height: 10),
               GameButton(
-                text: 'Return to City',
+                text: 'Buy a Round (\$100)',
+                onPressed: () {
+                  if (gameProvider.gameState.spendMoney(100)) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('You buy a round for the house. The gossip gets louder...')),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('You can\'t even afford a beer, kid. Get out.')),
+                    );
+                  }
+                },
+                icon: Icons.local_drink,
+                backgroundColor: Colors.orange.shade800,
+              ),
+              const SizedBox(height: 10),
+              GameButton(
+                text: 'Back to Streets',
                 onPressed: () => gameProvider.navigateToScreen('city'),
                 icon: Icons.arrow_back,
-                backgroundColor: Colors.brown,
+                backgroundColor: Colors.brown.shade800,
               ),
             ],
           ),

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import '../widgets/game_button.dart';
+import '../widgets/main_menu_background.dart';
 
 class MainMenuScreen extends StatelessWidget {
   const MainMenuScreen({super.key});
@@ -11,84 +12,92 @@ class MainMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.deepPurple.shade900,
-              Colors.purple.shade800,
-              Colors.blue.shade700,
-            ],
-          ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'GANGWAR',
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                        blurRadius: 10.0,
-                        color: Colors.black,
-                        offset: Offset(2.0, 2.0),
+      body: Stack(
+        children: [
+          // Animated Background
+          const MainMenuBackground(),
+
+          // Menu Content
+          Center(
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                margin: const EdgeInsets.symmetric(horizontal: 30),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'GANGWAR',
+                      style: TextStyle(
+                        fontSize: 64,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.redAccent,
+                        fontFamily: 'Courier',
+                        letterSpacing: 4,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 15.0,
+                            color: Colors.black,
+                            offset: Offset(4.0, 4.0),
+                          ),
+                          Shadow(
+                            blurRadius: 2.0,
+                            color: Colors.white,
+                            offset: Offset(-1.0, -1.0),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    const Text(
+                      'FLUTTER EDITION',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 8.0,
+                      ),
+                    ),
+                    const SizedBox(height: 50),
+                    _buildMenuButton(context, 'NEW GAME', () => _startNewGame(context), Icons.add),
+                    const SizedBox(height: 15),
+                    _buildMenuButton(context, 'CONTINUE', () => _continueGame(context), Icons.play_arrow),
+                    const SizedBox(height: 15),
+                    _buildMenuButton(context, 'CREDITS', () => _showCredits(context), Icons.info),
+                    const SizedBox(height: 15),
+                    _buildMenuButton(context, 'QUIT', () => _quitGame(context), Icons.exit_to_app),
+                    const SizedBox(height: 40),
+                    const Text(
+                      'STREETS NEVER SLEEP',
+                      style: TextStyle(
+                        color: Colors.white54,
+                        fontSize: 12,
+                        letterSpacing: 2,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                const Text(
-                  'FLUTTER EDITION',
-                  style: TextStyle(
-                    fontSize: 24,
-                    color: Colors.white70,
-                    letterSpacing: 2.0,
-                  ),
-                ),
-                const SizedBox(height: 50),
-                GameButton(
-                  text: 'NEW GAME',
-                  onPressed: () => _startNewGame(context),
-                  icon: Icons.add,
-                ),
-                const SizedBox(height: 20),
-                GameButton(
-                  text: 'CONTINUE',
-                  onPressed: () => _continueGame(context),
-                  icon: Icons.play_arrow,
-                ),
-                const SizedBox(height: 20),
-                GameButton(
-                  text: 'CREDITS',
-                  onPressed: () => _showCredits(context),
-                  icon: Icons.info,
-                ),
-                const SizedBox(height: 20),
-                GameButton(
-                  text: 'QUIT',
-                  onPressed: () => _quitGame(context),
-                  icon: Icons.exit_to_app,
-                ),
-                const SizedBox(height: 30),
-                const Text(
-                  'A cross-platform adaptation of the classic Gang War game',
-                  style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: 14,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuButton(BuildContext context, String text, VoidCallback onPressed, IconData icon) {
+    return SizedBox(
+      width: 250,
+      child: GameButton(
+        text: text,
+        onPressed: onPressed,
+        icon: icon,
+        backgroundColor: Colors.black.withOpacity(0.7),
       ),
     );
   }
@@ -100,23 +109,28 @@ class MainMenuScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('New Game'),
+        backgroundColor: Colors.grey.shade900,
+        title: const Text('NEW OPERATION', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: playerNameController,
+              style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
-                labelText: 'Your Name',
-                hintText: 'Enter your name',
+                labelText: 'STREET NAME',
+                labelStyle: TextStyle(color: Colors.white70),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.redAccent)),
               ),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: gangNameController,
+              style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
-                labelText: 'Gang Name',
-                hintText: 'Enter your gang name',
+                labelText: 'GANG NAME',
+                labelStyle: TextStyle(color: Colors.white70),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.redAccent)),
               ),
             ),
           ],
@@ -124,9 +138,10 @@ class MainMenuScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text('ABORT', style: TextStyle(color: Colors.white60)),
           ),
-          TextButton(
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () {
               if (playerNameController.text.isNotEmpty &&
                   gangNameController.text.isNotEmpty) {
@@ -139,7 +154,7 @@ class MainMenuScreen extends StatelessWidget {
                 Navigator.pop(context);
               }
             },
-            child: const Text('Start'),
+            child: const Text('IGNITE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -152,64 +167,27 @@ class MainMenuScreen extends StatelessWidget {
       gameProvider.navigateToScreen('city');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No saved game found!')),
+        const SnackBar(content: Text('No saved data on these streets.')),
       );
     }
   }
 
   void _showCredits(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Game Credits'),
-        content: const SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Droid Gangwar - Flutter Edition'),
-              SizedBox(height: 10),
-              Text('Original Game: Gang War MUD by timotheuzi@hotmail.com'),
-              Text(
-                  'Flutter Adaptation: Built with Flutter for cross-platform support'),
-              SizedBox(height: 15),
-              Text('Features:'),
-              Text(
-                  '• Cross-platform: Android, iOS, Linux, Windows, macOS, Web'),
-              Text('• Modern UI with Flutter widgets'),
-              Text('• Full game logic migration from Kotlin to Dart'),
-              Text('• State management with Provider'),
-              Text('• Persistent game saves'),
-              SizedBox(height: 15),
-              Text('Special Thanks:'),
-              Text('• Original Gang War community'),
-              Text('• Flutter development team'),
-              Text('• All beta testers'),
-              SizedBox(height: 15),
-              Text('Version 1.0'),
-              Text('Built with ❤️ for gang warfare enthusiasts'),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
+    final gameProvider = Provider.of<GameProvider>(context, listen: false);
+    gameProvider.navigateToScreen('credits');
   }
 
   void _quitGame(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Quit Game'),
-        content: const Text('Are you sure you want to quit?'),
+        backgroundColor: Colors.grey.shade900,
+        title: const Text('LEAVING?', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: const Text('The streets will remember your face.', style: TextStyle(color: Colors.white70)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text('STAY', style: TextStyle(color: Colors.white60)),
           ),
           TextButton(
             onPressed: () {
@@ -220,7 +198,7 @@ class MainMenuScreen extends StatelessWidget {
                 exit(0);
               }
             },
-            child: const Text('Quit'),
+            child: const Text('EXIT', style: TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),

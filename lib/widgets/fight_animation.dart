@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
+import 'pixel_art_member.dart';
 
 class FightAnimation extends StatefulWidget {
   final String playerName;
@@ -32,188 +34,59 @@ class FightAnimation extends StatefulWidget {
   FightAnimationState createState() => FightAnimationState();
 }
 
-class BloodSplatterPainter extends CustomPainter {
-  final double animationValue;
+class BloodSplatter {
+  Offset position;
+  double size;
+  double opacity;
+  double rotation;
 
-  BloodSplatterPainter(this.animationValue);
+  BloodSplatter(this.position, this.size, this.opacity, this.rotation);
+}
+
+class BloodSplatterPainter extends CustomPainter {
+  final List<BloodSplatter> splatters;
+
+  BloodSplatterPainter(this.splatters);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.red.withOpacity(0.3 + animationValue * 0.4)
-      ..style = PaintingStyle.fill;
+    final paint = Paint()..style = PaintingStyle.fill;
 
-    // Draw some random blood splatters
-    final random = Offset(size.width * 0.2, size.height * 0.3);
-    canvas.drawCircle(random, 15 + animationValue * 10, paint);
-
-    final random2 = Offset(size.width * 0.7, size.height * 0.6);
-    canvas.drawCircle(random2, 8 + animationValue * 6, paint);
-
-    final random3 = Offset(size.width * 0.4, size.height * 0.8);
-    canvas.drawCircle(random3, 12 + animationValue * 8, paint);
+    for (var splatter in splatters) {
+      paint.color = Colors.red.shade900.withOpacity(splatter.opacity);
+      canvas.save();
+      canvas.translate(splatter.position.dx, splatter.position.dy);
+      canvas.rotate(splatter.rotation);
+      
+      final path = Path();
+      path.moveTo(0, -splatter.size);
+      path.quadraticBezierTo(splatter.size * 0.5, -splatter.size * 0.8, splatter.size, 0);
+      path.quadraticBezierTo(splatter.size * 0.8, splatter.size * 0.5, 0, splatter.size);
+      path.quadraticBezierTo(-splatter.size * 0.8, splatter.size * 0.5, -splatter.size, 0);
+      path.quadraticBezierTo(-splatter.size * 0.5, -splatter.size * 0.8, 0, -splatter.size);
+      
+      canvas.drawPath(path, paint);
+      canvas.restore();
+    }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant BloodSplatterPainter oldDelegate) => true;
 }
 
 class FightAnimationState extends State<FightAnimation>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _playerAnimation;
-  late Animation<double> _enemyAnimation;
-  late Animation<Color?> _playerColorAnimation;
-  late Animation<Color?> _enemyColorAnimation;
-  late Animation<double> _bloodSplashAnimation;
-  late Animation<double> _weaponSwingAnimation;
-  late Animation<double> _bloodDripAnimation;
-  late Animation<double> _woundPulseAnimation;
-  late Animation<double> _bloodParticleAnimation;
-  late Animation<double> _goreEffectAnimation;
+  final List<BloodSplatter> _splatters = [];
+  final Random _random = Random();
 
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat(reverse: true);
-
-    // Player animation - moves left and right
-    _playerAnimation = Tween<double>(begin: -40.0, end: 40.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeInOut),
-      ),
-    );
-
-    // Enemy animation - moves right and left (opposite of player)
-    _enemyAnimation = Tween<double>(begin: 40.0, end: -40.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.5, 1.0, curve: Curves.easeInOut),
-      ),
-    );
-
-    // Player color animation - pulses based on health
-    _playerColorAnimation = ColorTween(
-      begin: Colors.blue.shade800,
-      end: _getHealthColor(widget.playerHealth, widget.playerMaxHealth),
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 1.0, curve: Curves.easeInOut),
-      ),
-    );
-
-    // Enemy color animation - pulses based on health
-    _enemyColorAnimation = ColorTween(
-      begin: Colors.red.shade800,
-      end: _getHealthColor(widget.enemyHealth, widget.enemyMaxHealth),
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 1.0, curve: Curves.easeInOut),
-      ),
-    );
-
-    // Enhanced blood splash animation
-    _bloodSplashAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.6, 1.0, curve: Curves.elasticOut),
-      ),
-    );
-
-    // Blood drip animation
-    _bloodDripAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 1.0, curve: Curves.bounceIn),
-      ),
-    );
-
-    // Wound pulse animation
-    _woundPulseAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 1.0, curve: Curves.easeInOut),
-      ),
-    );
-
-    // Blood particle animation
-    _bloodParticleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.7, 1.0, curve: Curves.easeOut),
-      ),
-    );
-
-    // Gore effect animation
-    _goreEffectAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.8, 1.0, curve: Curves.elasticOut),
-      ),
-    );
-
-    // Weapon swing animation
-    _weaponSwingAnimation = Tween<double>(begin: -0.5, end: 0.5).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.elasticOut),
-      ),
-    );
-  }
-
-  Color _getHealthColor(int health, double maxHealth) {
-    final healthPercentage = health / maxHealth;
-    if (healthPercentage > 0.6) {
-      return Colors.green;
-    } else if (healthPercentage > 0.3) {
-      return Colors.orange;
-    } else {
-      return Colors.red;
-    }
-  }
-
-  String _getWeaponIcon(String? weapon) {
-    if (weapon == null) return '👊💥'; // Bloody fists
-
-    return switch (weapon.toLowerCase()) {
-      'pistol' => '🔫💥',
-      'uzi' => '🔫🔫💥',
-      'ar15' => '🪖⚡',
-      'grenade' => '💣💥',
-      'knife' => '🔪🩸',
-      'sword' => '🗡️⚔️',
-      'barbed_wire_bat' => '⚾💢🩸',
-      'brass_knuckles' => '🥊💥',
-      'axe' => '🪓⚡',
-      'fists' => '👊💥',
-      'ghost_gun' => '👻🔫',
-      'vampire_bat' => '🦇⚾💥',
-      'missile_launcher' => '🚀💥',
-      'machine_gun' => '🔫🔫🔫💥',
-      'rocket_launcher' => '🚀🚀💥',
-      'submachine_gun' => '🔫🔫⚡',
-      'flamethrower' => '🔥💥',
-      'golden_gun' => '💰🔫✨',
-      _ => '👊💥',
-    };
-  }
-
-  @override
-  void didUpdateWidget(FightAnimation oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.playerHealth != widget.playerHealth ||
-        oldWidget.enemyHealth != widget.enemyHealth ||
-        oldWidget.currentWeapon != widget.currentWeapon ||
-        oldWidget.showBloodEffects != widget.showBloodEffects) {
-      setState(() {});
-    }
+      duration: const Duration(milliseconds: 1000),
+    )..repeat();
   }
 
   @override
@@ -222,119 +95,111 @@ class FightAnimationState extends State<FightAnimation>
     super.dispose();
   }
 
+  void _addSplatter(Offset position) {
+    setState(() {
+      _splatters.add(BloodSplatter(
+        position,
+        10 + _random.nextDouble() * 15,
+        0.6 + _random.nextDouble() * 0.4,
+        _random.nextDouble() * 2 * pi,
+      ));
+    });
+  }
+
+  @override
+  void didUpdateWidget(FightAnimation oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.playerHealth < oldWidget.playerHealth) {
+      // Player side took damage
+      _addSplatter(Offset(40 + _random.nextDouble() * 60, 100 + _random.nextDouble() * 50));
+    }
+    if (widget.enemyHealth < oldWidget.enemyHealth) {
+      // Enemy side took damage
+      _addSplatter(Offset(MediaQuery.of(context).size.width - 140 + _random.nextDouble() * 60, 100 + _random.nextDouble() * 50));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 200,
+      height: 220,
+      width: double.infinity,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.black.withOpacity(0.95),
-            Colors.red.shade900.withOpacity(0.8),
-            Colors.black.withOpacity(0.9),
+        color: Colors.brown.shade900,
+        border: Border.all(color: Colors.brown.shade700, width: 4),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Stack(
+          children: [
+            // Mud ground
+            Container(color: Colors.brown.shade900),
+            
+            // Blood splatters
+            CustomPaint(
+              painter: BloodSplatterPainter(_splatters),
+              size: Size.infinite,
+            ),
+
+            // Battlefield
+            Positioned.fill(
+              child: Row(
+                children: [
+                  Expanded(child: _buildSide(true)),
+                  const SizedBox(width: 40),
+                  Expanded(child: _buildSide(false)),
+                ],
+              ),
+            ),
           ],
         ),
-        border: Border.all(
-          color: Colors.red.shade600,
-          width: 2,
-        ),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Stack(
-        children: [
-          // Muddy battlefield background
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.brown.shade900.withOpacity(0.6),
-                    Colors.black.withOpacity(0.8),
-                    Colors.red.shade900.withOpacity(0.4),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // Player gang members (left side)
-          ..._buildGangMembers(true),
-
-          // Enemy gang members (right side)
-          ..._buildGangMembers(false),
-
-          // Blood splatter effects
-          if (widget.showBloodEffects)
-            Positioned.fill(
-              child: Opacity(
-                opacity: 0.3,
-                child: CustomPaint(
-                  painter: BloodSplatterPainter(_bloodSplashAnimation.value),
-                ),
-              ),
-            ),
-        ],
       ),
     );
   }
 
-  List<Widget> _buildGangMembers(bool isPlayerSide) {
-    final members = isPlayerSide ? widget.playerMembers : widget.enemyCount;
-    final health = isPlayerSide ? widget.playerHealth : widget.enemyHealth;
-    final maxHealth = isPlayerSide ? widget.playerMaxHealth : widget.enemyMaxHealth;
-    final healthPerMember = maxHealth / members;
-    final startX = isPlayerSide ? 20.0 : MediaQuery.of(context).size.width - 100;
-    final spacing = 40.0;
+  Widget _buildSide(bool isPlayer) {
+    final count = isPlayer ? widget.playerMembers : widget.enemyCount;
+    final maxHealth = isPlayer ? widget.playerMaxHealth : widget.enemyMaxHealth;
+    final currentHealth = isPlayer ? widget.playerHealth : widget.enemyHealth;
+    
+    final healthPerMember = maxHealth / count;
+    final aliveCount = (currentHealth / healthPerMember).ceil();
 
-    List<Widget> memberWidgets = [];
-
-    for (int i = 0; i < members; i++) {
-      final memberHealth = (health - (i * healthPerMember)).clamp(0, healthPerMember);
-      final isAlive = memberHealth > 0;
-      final xPos = startX + (i * spacing);
-
-      memberWidgets.add(
-        Positioned(
-          left: xPos,
-          bottom: isAlive ? 20 : 5, // Dead members fall to bottom
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              return Transform.translate(
-                offset: Offset(
-                  isPlayerSide ? _playerAnimation.value * 0.5 : _enemyAnimation.value * 0.5,
-                  isAlive ? 0 : 10, // Dead members sink into mud
-                ),
-                child: _buildGangMemberSprite(isPlayerSide, isAlive, i),
-              );
-            },
-          ),
-        ),
-      );
-    }
-
-    return memberWidgets;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        alignment: isPlayer ? WrapAlignment.start : WrapAlignment.end,
+        children: List.generate(count, (index) {
+          final isAlive = index < aliveCount;
+          return _buildMemberWithAnimation(isPlayer, isAlive);
+        }),
+      ),
+    );
   }
 
-  Widget _buildGangMemberSprite(bool isPlayerSide, bool isAlive, int index) {
-    if (!isAlive) {
-      // Dead member - bloody heap
-      return const Text(
-        '🩸💀',
-        style: TextStyle(fontSize: 20),
-      );
-    }
+  Widget _buildMemberWithAnimation(bool isPlayer, bool isAlive) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        double yOffset = 0;
+        if (isAlive) {
+          yOffset = sin(_controller.value * 2 * pi) * 3;
+        } else {
+          yOffset = 10; // Stay down
+        }
 
-    // Alive member - simple emoji character
-    final emoji = isPlayerSide ? '👨🏽‍🦲' : '👨🏽‍🦱';
-
-    return Text(
-      emoji,
-      style: const TextStyle(fontSize: 24),
+        return Transform.translate(
+          offset: Offset(0, yOffset),
+          child: PixelArtMember(
+            isPlayer: isPlayer,
+            isAlive: isAlive,
+            size: 30,
+          ),
+        );
+      },
     );
   }
 }

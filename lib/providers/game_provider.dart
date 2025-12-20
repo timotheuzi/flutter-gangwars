@@ -95,14 +95,14 @@ class GameProvider with ChangeNotifier {
       int enemyHealth, int enemyCount, String enemyType, String combatId) {
     _combatResult = CombatResult()
       ..enemiesKilled = 0
-      ..fightLog.add('Combat starting: $enemyType ($enemyCount enemies)');
+      ..fightLog.add('Combat starting in the mud: $enemyType ($enemyCount enemies)');
 
     _currentCombatData = CombatData(
       enemyHealth: enemyHealth.toDouble(),
       enemyCount: enemyCount,
       enemyType: enemyType,
       combatId: combatId,
-      initialMessage: 'You engage in combat with $enemyType!',
+      initialMessage: 'You engage in a muddy brawl with $enemyType!',
     );
 
     _currentScreen = 'mud_fight';
@@ -262,6 +262,20 @@ class GameProvider with ChangeNotifier {
     return false;
   }
 
+  bool recruitProstitute() {
+    if (_gameState.money >= _gameState.prostitutes.price) {
+      _gameState.money -= _gameState.prostitutes.price;
+      _gameState.prostitutes.count++;
+      _gameMessage = 'You recruited a new prostitute! Daily income increased.';
+      saveGameState();
+      notifyListeners();
+      return true;
+    }
+    _gameMessage = 'Not enough money to recruit!';
+    notifyListeners();
+    return false;
+  }
+
   int _getDrugQuantity(String drugType) {
     return switch (drugType) {
       'weed' => _gameState.drugs.weed,
@@ -315,9 +329,9 @@ class GameProvider with ChangeNotifier {
     _combatResult = result;
 
     if (result.victory) {
-      _gameMessage = 'Victory! You defeated the $enemyType!';
+      _gameMessage = 'Victory! You defeated the $enemyType in the mud!';
     } else if (result.defeat) {
-      _gameMessage = 'Defeat! Game Over!';
+      _gameMessage = 'Defeat! You died in the gutter.';
       _currentScreen = 'game_over';
     }
 

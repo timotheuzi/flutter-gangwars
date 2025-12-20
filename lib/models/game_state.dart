@@ -14,7 +14,7 @@ class GameState with ChangeNotifier {
   int health = 30;
   int maxHealth = 100;
   int steps = 0;
-  int maxSteps = 15;
+  int maxSteps = 8; // Reduced from 15 to make days pass faster
   int lives = 3;
   int damage = 0;
   int currentScore = 0;
@@ -29,9 +29,13 @@ class GameState with ChangeNotifier {
     'pixie_dust': 3000
   };
 
+  // Future drug trends
+  Map<String, String> drugTrends = {};
+
   Flags flags = Flags();
   Weapons weapons = Weapons();
   Drugs drugs = Drugs();
+  Prostitutes prostitutes = Prostitutes();
 
   // Squidies gang enhancements
   int squidiesGainedToday = 0;
@@ -64,7 +68,7 @@ class GameState with ChangeNotifier {
     this.health = 30,
     this.maxHealth = 100,
     this.steps = 0,
-    this.maxSteps = 15,
+    this.maxSteps = 8,
     this.lives = 3,
     this.damage = 0,
     this.currentScore = 0,
@@ -130,6 +134,10 @@ class GameState with ChangeNotifier {
       if (members > 100) members = 100;
     }
 
+    // Prostitutes generate income
+    final prostituteIncome = prostitutes.count * 100;
+    money += prostituteIncome;
+
     // Increase squidies critical hit chance
     squidiesCriticalHitChance = min(0.25, squidiesCriticalHitChance + 0.005);
 
@@ -146,10 +154,12 @@ class GameState with ChangeNotifier {
     }
 
     updateDrugPrices();
+    generateDrugTrends();
     notifyListeners();
   }
 
   void updateDrugPrices() {
+    final random = Random();
     for (var drug in drugPrices.keys) {
       final basePrice = switch (drug) {
         'weed' => 500,
@@ -161,11 +171,38 @@ class GameState with ChangeNotifier {
         _ => 500,
       };
 
+      // Check for trends from previous day
+      double modifier = 1.0;
+      if (drugTrends.containsKey(drug)) {
+        if (drugTrends[drug]!.contains('bust')) {
+          modifier = 1.5 + random.nextDouble(); // Scarcity drives prices UP
+        } else if (drugTrends[drug]!.contains('flooded')) {
+          modifier = 0.3 + random.nextDouble() * 0.4; // Surplus drives prices DOWN
+        }
+      }
+
       final volatility = 0.1 + (day * 0.01);
-      final variation = (Random().nextDouble() * (volatility * 2)) - volatility;
-      drugPrices[drug] = max(10, (basePrice * (1 + variation)).toInt());
+      final variation = (random.nextDouble() * (volatility * 2)) - volatility;
+      drugPrices[drug] = max(10, (basePrice * modifier * (1 + variation)).toInt());
     }
-    notifyListeners();
+  }
+
+  void generateDrugTrends() {
+    drugTrends.clear();
+    final random = Random();
+    final drugs = drugPrices.keys.toList();
+    
+    // Pick 1-2 drugs for trends tomorrow
+    final numTrends = random.nextInt(2) + 1;
+    for (int i = 0; i < numTrends; i++) {
+      final drug = drugs[random.nextInt(drugs.length)];
+      final isBust = random.nextBool();
+      if (isBust) {
+        drugTrends[drug] = 'The Feds just made a massive bust on a $drug shipment. Prices are gonna skyrocket tomorrow.';
+      } else {
+        drugTrends[drug] = 'Word is the market is being flooded with cheap $drug. Prices are gonna tank soon.';
+      }
+    }
   }
 
   // Convert to JSON for saving
@@ -188,9 +225,11 @@ class GameState with ChangeNotifier {
         'currentScore': currentScore,
         'currentLocation': currentLocation,
         'drugPrices': drugPrices,
+        'drugTrends': drugTrends,
         'flags': flags.toJson(),
         'weapons': weapons.toJson(),
         'drugs': drugs.toJson(),
+        'prostitutes': prostitutes.toJson(),
         'squidiesGainedToday': squidiesGainedToday,
         'squidiesCriticalHitChance': squidiesCriticalHitChance,
         'gangMembers': gangMembers.map((m) => m.toJson()).toList(),
@@ -218,7 +257,7 @@ class GameState with ChangeNotifier {
       health: json['health'] ?? 30,
       maxHealth: json['maxHealth'] ?? 100,
       steps: json['steps'] ?? 0,
-      maxSteps: json['maxSteps'] ?? 15,
+      maxSteps: json['maxSteps'] ?? 8,
       lives: json['lives'] ?? 3,
       damage: json['damage'] ?? 0,
       currentScore: json['currentScore'] ?? 0,
@@ -226,9 +265,11 @@ class GameState with ChangeNotifier {
     );
 
     state.drugPrices = Map<String, int>.from(json['drugPrices'] ?? {});
+    state.drugTrends = Map<String, String>.from(json['drugTrends'] ?? {});
     state.flags = Flags.fromJson(json['flags'] ?? {});
     state.weapons = Weapons.fromJson(json['weapons'] ?? {});
     state.drugs = Drugs.fromJson(json['drugs'] ?? {});
+    state.prostitutes = Prostitutes.fromJson(json['prostitutes'] ?? {});
     state.squidiesGainedToday = json['squidiesGainedToday'] ?? 0;
     state.squidiesCriticalHitChance =
         (json['squidiesCriticalHitChance'] ?? 0.1).toDouble();
@@ -454,5 +495,23 @@ class Drugs {
       ..ice = json['ice'] ?? 0
       ..percs = json['percs'] ?? 0
       ..pixieDust = json['pixie_dust'] ?? 0;
+  }
+}
+
+class Prostitutes {
+  int count = 0;
+  int price = 5000;
+
+  Prostitutes();
+
+  Map<String, dynamic> toJson() => {
+        'count': count,
+        'price': price,
+      };
+
+  factory Prostitutes.fromJson(Map<String, dynamic> json) {
+    return Prostitutes()
+      ..count = json['count'] ?? 0
+      ..price = json['price'] ?? 5000;
   }
 }
