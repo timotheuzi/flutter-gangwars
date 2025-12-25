@@ -5,6 +5,7 @@ import '../providers/game_provider.dart';
 import '../widgets/game_button.dart';
 import '../widgets/location_card.dart';
 import '../models/random_event.dart';
+import '../widgets/event_animation.dart';
 
 class CityScreen extends StatelessWidget {
   const CityScreen({super.key});
@@ -18,6 +19,11 @@ class CityScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('City - Droid Gangwar'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.restart_alt),
+            tooltip: 'Restart Game',
+            onPressed: () => _showRestartConfirm(context),
+          ),
           IconButton(
             icon: const Icon(Icons.info),
             onPressed: () => _showStats(context),
@@ -327,63 +333,91 @@ class CityScreen extends StatelessWidget {
     );
   }
 
+  void _showRestartConfirm(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Restart Game?'),
+        content: const Text('This will wipe all stats and progress. Are you sure you want to start a new legacy?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              final gameProvider = Provider.of<GameProvider>(context, listen: false);
+              gameProvider.restartGame(keepPersistentData: false);
+            },
+            child: const Text('RESTART', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _handleWander(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
-    // Use the event from wander() instead of just the string result
     final event = gameProvider.wanderWithEvent();
     
     if (event == null) {
-      // Day changed or something else handled by string
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(gameProvider.gameMessage), // Use gameMessage which is set by wander logic
+          content: Text(gameProvider.gameMessage),
           duration: const Duration(seconds: 3),
         ),
       );
       return;
     }
 
-    if (event.type == EventType.npcEncounter && event.options.isNotEmpty) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          title: Text(event.title),
-          content: Text(event.description),
-          actions: event.options.map((option) {
-            return TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _handleNpcOption(context, option, event);
-              },
-              child: Text(option),
-            );
-          }).toList(),
-        ),
-      );
-    } else {
-      // Just show the message for other events
-       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(event.description),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-    }
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          String? selectedOption;
+          return AlertDialog(
+            backgroundColor: Colors.grey.shade900,
+            title: Text(event.title, style: const TextStyle(color: Colors.white)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                EventAnimation(event: event, selectedOption: selectedOption),
+                const SizedBox(height: 15),
+                Text(event.description, style: const TextStyle(color: Colors.white70)),
+              ],
+            ),
+            actions: event.options.isNotEmpty 
+              ? event.options.map((option) {
+                  return TextButton(
+                    onPressed: () {
+                      setState(() => selectedOption = option);
+                      // Brief delay to show animation if needed
+                      Future.delayed(const Duration(milliseconds: 500), () {
+                        Navigator.pop(context);
+                        _handleNpcOption(context, option, event);
+                      });
+                    },
+                    child: Text(option),
+                  );
+                }).toList()
+              : [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+          );
+        }
+      ),
+    );
   }
   
   void _handleNpcOption(BuildContext context, String option, RandomEvent event) {
      final gameProvider = Provider.of<GameProvider>(context, listen: false);
-     
-     // We need a method in GameProvider to apply the option effect
      final resultMessage = gameProvider.handleNpcInteraction(event, option);
      
-     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(resultMessage),
-        duration: const Duration(seconds: 3),
-      ),
-    );
+     if (gameProvider.currentScreen != 'mud_fight') {
+       ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(resultMessage),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+     }
   }
 
   void _startFinalBattle(BuildContext context) {

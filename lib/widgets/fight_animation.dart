@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'pixel_art_member.dart';
+import 'pixel_art_icon.dart';
 
 class FightAnimation extends StatefulWidget {
   final String playerName;
@@ -156,13 +157,7 @@ class FightAnimationState extends State<FightAnimation>
     final currentHealth = isPlayer ? widget.playerHealth : widget.enemyHealth;
     final maxHealth = isPlayer ? widget.playerMaxHealth : widget.enemyMaxHealth;
     
-    // We treat each member as having an equal share of the total health.
-    // If a side has 100 max health and 4 members, each member has 25 health.
-    // If current health is 60, then 2 members are fully alive, 1 is wounded (still alive sprite), and 1 is dead.
     final healthPerMember = maxHealth / totalCount;
-    
-    // Any member whose index corresponds to health > 0 is alive.
-    // Index 0 is the "last" to die, index (totalCount-1) is the "first" to die.
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -172,39 +167,65 @@ class FightAnimationState extends State<FightAnimation>
         alignment: isPlayer ? WrapAlignment.start : WrapAlignment.end,
         children: List.generate(totalCount, (index) {
           // Check if this specific member is alive
-          // We count from the end of the list for who dies first
+          // Index 0 is "leader", so they die last. Index totalCount-1 is the first to die.
           final memberThreshold = (totalCount - 1 - index) * healthPerMember;
           final isAlive = currentHealth > memberThreshold;
           
           final isVictorious = (isPlayer && widget.enemyHealth <= 0) || (!isPlayer && widget.playerHealth <= 0);
           
-          return _buildMemberWithAnimation(isPlayer, isAlive, isAlive && isVictorious);
+          return _buildMemberWithAnimation(isPlayer, isAlive, isAlive && isVictorious, index);
         }),
       ),
     );
   }
 
-  Widget _buildMemberWithAnimation(bool isPlayer, bool isAlive, bool isCheering) {
+  Widget _buildMemberWithAnimation(bool isPlayer, bool isAlive, bool isCheering, int index) {
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
         double yOffset = 0;
         if (isAlive) {
-          yOffset = sin(_controller.value * 2 * pi) * 3;
+          yOffset = sin(_controller.value * 2 * pi + (index * 0.5)) * 3;
         } else {
           yOffset = 10;
         }
 
-        return Transform.translate(
-          offset: Offset(0, yOffset),
-          child: PixelArtMember(
-            isPlayer: isPlayer,
-            isAlive: isAlive,
-            isCheering: isCheering,
-            size: 30,
-          ),
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isAlive && !isCheering && widget.currentWeapon != null)
+               _buildWeaponFloating(isPlayer),
+            Transform.translate(
+              offset: Offset(0, yOffset),
+              child: PixelArtMember(
+                isPlayer: isPlayer,
+                isAlive: isAlive,
+                isCheering: isCheering,
+                size: 30,
+              ),
+            ),
+          ],
         );
       },
     );
+  }
+
+  Widget _buildWeaponFloating(bool isPlayer) {
+    // Show a small icon of the weapon being used
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: PixelArtIcon(name: _getSanitizedWeaponName(widget.currentWeapon!), size: 16),
+    );
+  }
+
+  String _getSanitizedWeaponName(String name) {
+    if (name.contains('pistol')) return 'pistol';
+    if (name.contains('uzi')) return 'uzi';
+    if (name.contains('ar15')) return 'ar15';
+    if (name.contains('sword')) return 'sword';
+    if (name.contains('bat')) return 'bat';
+    if (name.contains('grenade')) return 'grenade';
+    if (name.contains('knife')) return 'knife';
+    return 'pistol';
   }
 }

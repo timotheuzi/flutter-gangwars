@@ -52,7 +52,7 @@ build/
 /web/stack.trace
 
 # Specific directory requested to be ignored
-/gangwar_ref/
+# /gangwar_ref/
 
 # Other artifacts
 *.zip

@@ -43,7 +43,8 @@ help:
 	@echo "  format           - Format code"
 	@echo ""
 	@echo -e "${GREEN}Dependency Targets:${NC}"
-	@echo "  install-deps     - Install all dependencies"
+	@echo "  install-deps     - Install all Flutter dependencies"
+	@echo "  install-linux-deps - Install Linux system requirements (GTK, etc.)"
 	@echo "  upgrade-deps     - Upgrade all dependencies"
 	@echo "  clean-deps       - Clean dependency cache"
 	@echo ""
@@ -63,11 +64,18 @@ doctor:
 	@echo -e "${BLUE}Checking Flutter installation...${NC}"
 	$(FLUTTER) doctor
 
-# Install dependencies
+# Install Flutter dependencies
 install-deps:
 	@echo -e "${BLUE}Installing dependencies...${NC}"
 	$(FLUTTER) pub get
 	@echo -e "${GREEN}Dependencies installed successfully!${NC}"
+
+# Install Linux system dependencies (Ubuntu/Debian)
+install-linux-deps:
+	@echo -e "${BLUE}Installing Linux system dependencies...${NC}"
+	sudo apt-get update
+	sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev
+	@echo -e "${GREEN}System dependencies installed successfully!${NC}"
 
 # Upgrade dependencies
 upgrade-deps:
@@ -207,7 +215,7 @@ install-tools:
 	$(FLUTTER) pub global activate flutterfire_cli
 	@echo -e "${GREEN}Tools installed!${NC}"
 
-.PHONY: all help doctor install-deps upgrade-deps clean-deps pubspec version \
+.PHONY: all help doctor install-deps install-linux-deps upgrade-deps clean-deps pubspec version \
         analyze format test run run-linux run-android run-ios \
         build-linux build-windows build-android build-android-bundle build-ios build-web build-all \
         clean clean-all kill release install-tools
