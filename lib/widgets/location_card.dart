@@ -4,7 +4,7 @@ import 'pixel_art_location.dart';
 class LocationCard extends StatelessWidget {
   final String title;
   final String description;
-  final IconData icon; // Keep for fallback or other uses
+  final IconData icon;
   final Color color;
   final VoidCallback onPressed;
 
@@ -20,57 +20,71 @@ class LocationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
+      elevation: 8,
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(15),
       ),
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                color.withOpacity(0.9),
-                color.withOpacity(0.7),
-              ],
+        child: Stack(
+          children: [
+            // LARGE Background Icon/Illustration
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.6,
+                child: PixelArtLocation(location: title, size: 150),
+              ),
             ),
-            border: Border.all(color: Colors.white24, width: 1),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                PixelArtLocation(location: title, size: 50),
-                const SizedBox(height: 8),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [Shadow(color: Colors.black45, blurRadius: 2, offset: Offset(1, 1))],
+            
+            // Gradient Overlay for text readability
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.8),
+                    ],
                   ),
-                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  description,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Colors.white70,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+              ),
             ),
-          ),
+
+            // Text Content (At the bottom)
+            Positioned(
+              bottom: 10,
+              left: 8,
+              right: 10,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900, // Fixed: Changed from FontWeight.black to FontWeight.w900
+                      color: Colors.white,
+                      fontFamily: 'Courier',
+                      shadows: [Shadow(color: Colors.black, blurRadius: 4, offset: Offset(2, 2))],
+                    ),
+                  ),
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.white70,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
