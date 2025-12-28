@@ -148,8 +148,8 @@ class _MainMenuBackgroundState extends State<MainMenuBackground> with SingleTick
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Container(width: 30, height: 20, color: Colors.blue.withOpacity(0.3)), // Window
-              Container(width: 30, height: 20, color: Colors.blue.withOpacity(0.3)), // Window
+              Container(width: 30, height: 20, color: Colors.blue.withValues(alpha: 0.3)), // Window
+              Container(width: 30, height: 20, color: Colors.blue.withValues(alpha: 0.3)), // Window
             ],
           ),
         ),
@@ -169,10 +169,6 @@ class _MainMenuBackgroundState extends State<MainMenuBackground> with SingleTick
 class GraffitiPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 5;
-
     void drawTag(String text, Offset pos, Color color) {
       final textPainter = TextPainter(
         text: TextSpan(

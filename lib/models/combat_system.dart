@@ -94,7 +94,7 @@ class CombatSystem {
       
       final moneyReward = (enemyCount * 500) + random.nextInt(enemyCount * 200);
       gameState.money += moneyReward;
-      fightLog.add('Looted \$${moneyReward} from the mangled corpses.');
+      fightLog.add('Looted \$$moneyReward from the mangled corpses.');
     } else {
       result.finalMessage = 'STALEMATE: The battle ends in a bloody stalemate. Both sides retreat through the mud.';
     }

@@ -375,6 +375,8 @@ class Weapons {
 
   Weapons(); // Default constructor
 
+  int get totalBullets => bullets + explodingBullets + hollowPointBullets;
+
   bool canFightWithPistol() =>
       pistols > 0 &&
       (bullets > 0 || explodingBullets > 0 || hollowPointBullets > 0);

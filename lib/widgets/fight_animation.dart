@@ -54,7 +54,7 @@ class BloodSplatterPainter extends CustomPainter {
     final paint = Paint()..style = PaintingStyle.fill;
 
     for (var splatter in splatters) {
-      paint.color = Colors.red.shade900.withOpacity(splatter.opacity);
+      paint.color = Colors.red.shade900.withValues(alpha: splatter.opacity);
       canvas.save();
       canvas.translate(splatter.position.dx, splatter.position.dy);
       canvas.rotate(splatter.rotation);

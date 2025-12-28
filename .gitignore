@@ -8,6 +8,7 @@
 .buildlog/
 .history
 .svn/
+gangwar_ref
 
 # IntelliJ related
 *.iml

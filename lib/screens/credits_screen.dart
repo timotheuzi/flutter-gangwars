@@ -71,10 +71,10 @@ class CreditsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Colors.redAccent,
                         ),
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 35),
                       const Text(
                         'Original Game: Gang War MUD by timotheuzi@hotmail.com\n\n'
                         'Crypto Donations:\n'

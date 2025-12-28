@@ -45,7 +45,7 @@ class BloodDropPainter extends CustomPainter {
     
     // Add a small shine/highlight
     final shinePaint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
+      ..color = Colors.white.withValues(alpha: 0.3)
       ..style = PaintingStyle.fill;
       
     canvas.drawOval(

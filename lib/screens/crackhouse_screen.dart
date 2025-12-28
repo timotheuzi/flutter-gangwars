@@ -67,7 +67,7 @@ class CrackhouseScreen extends StatelessWidget {
               
               // Recruit Section
               Card(
-                color: Colors.pink.shade900.withOpacity(0.4),
+                color: Colors.pink.shade900.withValues(alpha: 0.4),
                 child: ListTile(
                   leading: const PixelArtIcon(name: 'prostitute', size: 48),
                   title: const Text('Recruit Prostitutes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),

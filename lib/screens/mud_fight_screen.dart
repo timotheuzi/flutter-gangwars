@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import '../widgets/game_button.dart';
 import '../widgets/fight_animation.dart';
-import '../models/game_state.dart';
 
 class MudFightScreen extends StatelessWidget {
   const MudFightScreen({super.key});
@@ -22,6 +21,9 @@ class MudFightScreen extends StatelessWidget {
         ),
       );
     }
+
+    final isDefeated = gameProvider.gameState.health <= 0 || combatResult?.defeat == true;
+    final isVictorious = combatResult?.victory == true;
 
     return Scaffold(
       appBar: AppBar(
@@ -52,7 +54,7 @@ class MudFightScreen extends StatelessWidget {
                   gangName: gameProvider.gameState.gangName,
                   enemyType: combatData.enemyType,
                   playerHealth: gameProvider.gameState.health,
-                  enemyHealth: combatData.enemyHealth.toInt(),
+                  enemyHealth: combatResult?.remainingEnemyHealth ?? (combatData.enemyHealth * combatData.enemyCount).toInt(),
                   playerMaxHealth: gameProvider.gameState.maxHealth.toDouble(),
                   enemyMaxHealth: combatData.enemyHealth * combatData.enemyCount,
                   playerMembers: gameProvider.gameState.members,
@@ -62,7 +64,7 @@ class MudFightScreen extends StatelessWidget {
                       : 'fists',
                   showBloodEffects: (gameProvider.gameState.health < gameProvider.gameState.maxHealth * 0.7) ||
                                    (combatResult?.totalEnemyDamage != null && combatResult!.totalEnemyDamage > 0) ||
-                                   (combatResult?.victory == true),
+                                   isVictorious,
                 ),
 
                 const SizedBox(height: 20),
@@ -70,7 +72,7 @@ class MudFightScreen extends StatelessWidget {
                 // Combat Info Card
                 Card(
                   elevation: 5,
-                  color: Colors.brown.shade800.withOpacity(0.8),
+                  color: Colors.brown.shade800.withValues(alpha: 0.8),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -85,7 +87,7 @@ class MudFightScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          '${combatData.enemyCount} enemies - Health: ${combatData.enemyHealth.toInt()}',
+                          '${combatData.enemyCount} enemies - Total Health: ${combatResult?.remainingEnemyHealth ?? (combatData.enemyHealth * combatData.enemyCount).toInt()}',
                           style: const TextStyle(fontSize: 18, color: Colors.white),
                         ),
                         const SizedBox(height: 10),
@@ -152,8 +154,7 @@ class MudFightScreen extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Combat Actions
-                if (gameProvider.gameState.health > 0 &&
-                    (combatResult?.victory != true))
+                if (!isDefeated && !isVictorious)
                   Column(
                     children: [
                       // Ammo Selection
@@ -290,10 +291,10 @@ class MudFightScreen extends StatelessWidget {
                       ),
                     ],
                   )
-                else if (combatResult?.victory == true)
+                else if (isVictorious)
                   _buildCombatResultCard(context, 'VICTORY', Colors.green,
                       Icons.emoji_events, combatResult!.finalMessage)
-                else if (combatResult?.defeat == true || gameProvider.gameState.health <= 0)
+                else if (isDefeated)
                   _buildCombatResultCard(context, 'DEFEAT', Colors.red,
                       Icons.dangerous, combatResult?.defeat == true ? combatResult!.finalMessage : "You sustained fatal injuries before the fight could conclude."),
               ],
@@ -392,7 +393,7 @@ class MudFightScreen extends StatelessWidget {
     );
   }
 
-  bool _hasAnyDrugs(GameState gameState) {
+  bool _hasAnyDrugs(dynamic gameState) {
     return gameState.drugs.crack > 0 ||
            gameState.drugs.coke > 0 ||
            gameState.drugs.weed > 0 ||
@@ -401,7 +402,7 @@ class MudFightScreen extends StatelessWidget {
            gameState.drugs.pixieDust > 0;
   }
 
-  int _getDrugCount(GameState gameState, String drugType) {
+  int _getDrugCount(dynamic gameState, String drugType) {
     return switch (drugType) {
       'crack' => gameState.drugs.crack,
       'coke' => gameState.drugs.coke,
@@ -418,7 +419,7 @@ class MudFightScreen extends StatelessWidget {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     return Card(
       elevation: 5,
-      color: color.withOpacity(0.1),
+      color: color.withValues(alpha: 0.1),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(

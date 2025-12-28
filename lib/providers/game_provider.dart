@@ -95,6 +95,9 @@ class GameProvider with ChangeNotifier {
       int enemyHealth, int enemyCount, String enemyType, String combatId) {
     _combatResult = CombatResult()
       ..enemiesKilled = 0
+      ..initialEnemyHealth = enemyHealth * enemyCount
+      ..remainingEnemyHealth = enemyHealth * enemyCount
+      ..initialPlayerHealth = _gameState.health
       ..fightLog.add('Combat starting in the mud: $enemyType ($enemyCount enemies)');
 
     _currentCombatData = CombatData(
@@ -323,16 +326,18 @@ class GameProvider with ChangeNotifier {
   }
 
   bool performCombat(String weapon, String enemyType, int enemyCount) {
-    final enemyHealth = _calculateEnemyHealth(enemyType, enemyCount);
+    // Use the stored enemy health from combat data to maintain scaling/power factor
+    final perEnemyHealth = _currentCombatData?.enemyHealth ?? _calculateEnemyHealth(enemyType, enemyCount);
+    
     final result = CombatSystem.calculateCombat(
-        _gameState, weapon, enemyType, enemyCount, enemyHealth);
+        _gameState, weapon, enemyType, enemyCount, perEnemyHealth);
     _combatResult = result;
 
     if (result.victory) {
       _gameMessage = 'Victory! You defeated the $enemyType in the mud!';
     } else if (result.defeat) {
       _gameMessage = 'Defeat! You died in the gutter.';
-      _currentScreen = 'game_over';
+      // We do NOT change _currentScreen here so the user can see the defeat card summary
     }
 
     saveGameState();
@@ -342,9 +347,10 @@ class GameProvider with ChangeNotifier {
 
   double _calculateEnemyHealth(String enemyType, int enemyCount) {
     return switch (enemyType) {
-      'Police Officers' => enemyCount * 10.0,
-      'Squidie Hit Squad' => enemyCount * 25.0,
-      _ => enemyCount * 15.0,
+      'Police Officers' => 10.0,
+      'Squidie Hit Squad' => 25.0,
+      'Squidie Army' => 50.0,
+      _ => 15.0,
     };
   }
 

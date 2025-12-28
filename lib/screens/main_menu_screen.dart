@@ -23,7 +23,7 @@ class MainMenuScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.4),
+                  color: Colors.black.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 margin: const EdgeInsets.symmetric(horizontal: 20), // Reduced margin slightly
@@ -99,7 +99,7 @@ class MainMenuScreen extends StatelessWidget {
         text: text,
         onPressed: onPressed,
         icon: icon,
-        backgroundColor: Colors.black.withOpacity(0.7),
+        backgroundColor: Colors.black.withValues(alpha: 0.7),
       ),
     );
   }

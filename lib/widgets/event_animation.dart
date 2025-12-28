@@ -20,7 +20,6 @@ class EventAnimation extends StatefulWidget {
 
 class _EventAnimationState extends State<EventAnimation> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  final Random _random = Random();
 
   @override
   void initState() {

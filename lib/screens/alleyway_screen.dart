@@ -130,7 +130,7 @@ class _AlleywayScreenState extends State<AlleywayScreen> {
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.8),
+                  color: Colors.black.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: Colors.red.shade800,
@@ -294,7 +294,7 @@ class _AlleywayScreenState extends State<AlleywayScreen> {
                           if (currentX == 0 && currentY == 0) // Boss room at center
                             ElevatedButton.icon(
                               onPressed: () => _enterBossRoom(context, gameProvider),
-                              icon: Icon(Icons.warning),
+                              icon: const Icon(Icons.warning),
                               label: const Text('Boss Room'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.purple.shade700,
@@ -306,7 +306,7 @@ class _AlleywayScreenState extends State<AlleywayScreen> {
                       const SizedBox(height: 20),
                       if (gameProvider.gameMessage.isNotEmpty)
                         Card(
-                          color: Colors.black.withOpacity(0.7),
+                          color: Colors.black.withValues(alpha: 0.7),
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: Text(
@@ -501,8 +501,16 @@ class _AlleywayScreenState extends State<AlleywayScreen> {
       // Add random drugs
       final drugs = ['weed', 'crack', 'coke', 'ice', 'percs', 'pixie_dust'];
       final drugType = drugs[Random().nextInt(drugs.length)];
-      gameState.drugs.weed += effects['drugs']!;
-      resultMessage += 'You obtained some drugs!\n';
+      
+      switch (drugType) {
+        case 'weed': gameState.drugs.weed += effects['drugs']!;
+        case 'crack': gameState.drugs.crack += effects['drugs']!;
+        case 'coke': gameState.drugs.coke += effects['drugs']!;
+        case 'ice': gameState.drugs.ice += effects['drugs']!;
+        case 'percs': gameState.drugs.percs += effects['drugs']!;
+        case 'pixie_dust': gameState.drugs.pixieDust += effects['drugs']!;
+      }
+      resultMessage += 'You obtained some $drugType!\n';
     }
 
     // Handle combat options

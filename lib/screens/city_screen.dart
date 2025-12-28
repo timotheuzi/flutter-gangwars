@@ -208,7 +208,7 @@ class CityScreen extends StatelessWidget {
                       description: 'Game information',
                       icon: Icons.credit_card,
                       color: Colors.teal,
-                      onPressed: () => _showCredits(context),
+                      onPressed: () => gameProvider.navigateToScreen('credits'),
                     ),
                   ],
                 ),
@@ -307,7 +307,10 @@ class CityScreen extends StatelessWidget {
               const Text('Weapons:',
                   style: TextStyle(fontWeight: FontWeight.bold)),
               Text('Pistols: ${gameState.weapons.pistols}'),
-              Text('Bullets: ${gameState.weapons.bullets}'),
+              Text('Total Bullets: ${gameState.weapons.totalBullets}'),
+              Text('Standard Bullets: ${gameState.weapons.bullets}'),
+              Text('Hollow Point: ${gameState.weapons.hollowPointBullets}'),
+              Text('Exploding: ${gameState.weapons.explodingBullets}'),
               Text('Uzis: ${gameState.weapons.uzis}'),
               Text('Grenades: ${gameState.weapons.grenades}'),
               Text('Vest: ${gameState.weapons.vest}'),
@@ -392,8 +395,10 @@ class CityScreen extends StatelessWidget {
                       setState(() => selectedOption = option);
                       // Brief delay to show animation if needed
                       Future.delayed(const Duration(milliseconds: 500), () {
-                        Navigator.pop(context);
-                        _handleNpcOption(context, option, event);
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          _handleNpcOption(context, option, event);
+                        }
                       });
                     },
                     child: Text(option),
@@ -435,7 +440,7 @@ class CityScreen extends StatelessWidget {
         gameState.weapons.goldenGun;
     final hasEnoughGuns = totalFirearms >= gameState.members ~/ 2;
     final hasEnoughBullets =
-        gameState.weapons.bullets >= gameState.members * 20;
+        gameState.weapons.totalBullets >= gameState.members * 20;
 
     if (!hasEnoughMembers || !hasEnoughGuns || !hasEnoughBullets) {
       String message =
@@ -445,7 +450,7 @@ class CityScreen extends StatelessWidget {
         message += '\n- Enough firearms for at least half your gang.';
       }
       if (!hasEnoughBullets) {
-        message += '\n- At least 20 bullets per gang member.';
+        message += '\n- At least 20 bullets (any type) per gang member.';
       }
 
       showDialog(
@@ -491,7 +496,8 @@ class CityScreen extends StatelessWidget {
     }
 
     final powerFactor = max(1.0, gameState.members / 5.0);
-    final enemyHealth = enemyCount * (baseEnemyHealth * powerFactor);
+    final perEnemyHealth = (baseEnemyHealth * powerFactor).toInt();
+    final totalEnemyHealth = perEnemyHealth * enemyCount;
 
     showDialog(
       context: context,
@@ -506,7 +512,7 @@ class CityScreen extends StatelessWidget {
               Text(
                   'They have gathered all their $enemyCount soldiers to crush you.'),
               Text(
-                  'Their total health is estimated to be around ${enemyHealth.toInt()}.'),
+                  'Their total health is estimated to be around $totalEnemyHealth.'),
               const SizedBox(height: 10),
               Text(squidieUpgradeMessage),
               const SizedBox(height: 10),
@@ -525,7 +531,7 @@ class CityScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               gameProvider.startMudFight(
-                enemyHealth.toInt(),
+                perEnemyHealth,
                 enemyCount,
                 'Squidie Army',
                 'final_battle_${DateTime.now().millisecondsSinceEpoch}',
@@ -533,49 +539,6 @@ class CityScreen extends StatelessWidget {
               Navigator.pop(context);
             },
             child: const Text('TO VICTORY!'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showCredits(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Game Credits'),
-        content: const SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Droid Gangwar - Flutter Edition'),
-              SizedBox(height: 10),
-              Text('Original Game: Gang War MUD by timotheuzi@hotmail.com'),
-              Text(
-                  'Flutter Adaptation: Built with Flutter for cross-platform support'),
-              SizedBox(height: 15),
-              Text('Features:'),
-              Text(
-                  '• Cross-platform: Android, iOS, Linux, Windows, macOS, Web'),
-              Text('• Modern UI with Flutter widgets'),
-              Text('• Full game logic migration from Kotlin to Dart'),
-              Text('• State management with Provider'),
-              Text('• Persistent game saves'),
-              SizedBox(height: 15),
-              Text('Special Thanks:'),
-              Text('• Original Gang War community'),
-              Text('• Flutter development team'),
-              Text('• All beta testers'),
-              SizedBox(height: 15),
-              Text('Version 1.0'),
-              Text('Built with ❤️ for gang warfare enthusiasts'),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Back to City'),
           ),
         ],
       ),
