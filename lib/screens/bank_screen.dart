@@ -14,12 +14,10 @@ class BankScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bank - Droid Gangwar'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => gameProvider.navigateToScreen('city'),
-          ),
-        ],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => gameProvider.navigateToScreen('city'),
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -34,86 +32,94 @@ class BankScreen extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             children: [
+              const SizedBox(height: 10),
               Card(
                 elevation: 5,
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(12.0),
                   child: Column(
                     children: [
                       const Text(
                         '🏦 BANK',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Colors.blue,
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Money: \$${gameState.money}',
-                        style: const TextStyle(fontSize: 18),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildStatItem('Money', '\$${gameState.money}', Colors.green),
+                          _buildStatItem('Account', '\$${gameState.account}', Colors.blue),
+                          _buildStatItem('Loan', '\$${gameState.loan}', Colors.red),
+                        ],
                       ),
-                      Text(
-                        'Bank Account: \$${gameState.account}',
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        'Manage your finances, take loans, and grow your empire.',
-                        style: TextStyle(fontSize: 16),
-                        textAlign: TextAlign.center,
-                      ),
+                      if (gameState.loan > 0) ...[
+                        const SizedBox(height: 5),
+                        Text(
+                          'Loan Status: ${gameState.flags.hasAttractedLoanShark ? "HUNTED BY LOAN SHARKS" : "Due soon"}',
+                          style: TextStyle(
+                            color: gameState.flags.hasAttractedLoanShark ? Colors.red : Colors.orange,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Expanded(
-                child: Column(
+                child: ListView(
                   children: [
                     _buildBankActionCard(
                       context,
                       'Deposit Money',
-                      'Deposit cash into your bank account for safe keeping',
+                      'Move cash to your account.',
                       Colors.green,
                       () => _showDepositDialog(context),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     _buildBankActionCard(
                       context,
                       'Withdraw Money',
-                      'Withdraw cash from your bank account',
+                      'Take cash from your account.',
                       Colors.blue,
                       () => _showWithdrawDialog(context),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     _buildBankActionCard(
                       context,
                       'Take Loan',
-                      'Borrow money to expand your operations (with interest)',
+                      'Borrow cash. Pay back in 1 day!',
                       Colors.orange,
                       () => _showLoanDialog(context),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     _buildBankActionCard(
                       context,
                       'Repay Loan',
-                      'Repay your outstanding loan to avoid trouble',
+                      'Clear your debt before they find you.',
                       Colors.red,
                       gameState.loan > 0 ? () => _showRepayDialog(context) : null,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 10),
-              GameButton(
-                text: 'Return to City',
-                onPressed: () => gameProvider.navigateToScreen('city'),
-                icon: Icons.arrow_back,
-                backgroundColor: Colors.brown,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: GameButton(
+                  text: 'Return to City',
+                  onPressed: () => gameProvider.navigateToScreen('city'),
+                  icon: Icons.arrow_back,
+                  backgroundColor: Colors.brown,
+                ),
               ),
             ],
           ),
@@ -122,30 +128,50 @@ class BankScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildStatItem(String label, String value, Color color) {
+    return Column(
+      children: [
+        Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+        Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color)),
+      ],
+    );
+  }
+
   Widget _buildBankActionCard(BuildContext context, String title, String description, Color color, VoidCallback? onPressed) {
-    return Card(
-      elevation: 3,
-      child: InkWell(
-        onTap: onPressed,
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: color,
+    return Opacity(
+      opacity: onPressed == null ? 0.5 : 1.0,
+      child: Card(
+        elevation: 3,
+        child: InkWell(
+          onTap: onPressed,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+            child: Row(
+              children: [
+                Icon(Icons.account_balance_wallet, color: color),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
+                      ),
+                      Text(
+                        description,
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                description,
-                style: const TextStyle(fontSize: 14),
-              ),
-            ],
+                const Icon(Icons.chevron_right, color: Colors.grey),
+              ],
+            ),
           ),
         ),
       ),
@@ -259,7 +285,7 @@ class BankScreen extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Warning: Loans have high interest!'),
+            const Text('Warning: Loans must be repaid in 1 day or you will be hunted!'),
             const SizedBox(height: 10),
             TextField(
               controller: amountController,
@@ -282,11 +308,12 @@ class BankScreen extends StatelessWidget {
               if (amount > 0) {
                 gameProvider.gameState.money += amount;
                 gameProvider.gameState.loan += amount;
-                gameProvider.gameState.flags.hasAttractedLoanShark = true;
+                gameProvider.gameState.loanDayTaken = gameProvider.gameState.day;
+                gameProvider.gameState.flags.hasAttractedLoanShark = false;
                 gameProvider.saveGameState();
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Took loan of \$${amount.toString()} - be careful!')),
+                  SnackBar(content: Text('Took loan of \$${amount.toString()} - repay it FAST!')),
                 );
               }
             },
@@ -332,6 +359,7 @@ class BankScreen extends StatelessWidget {
                 gameProvider.gameState.money -= amount;
                 gameProvider.gameState.loan -= amount;
                 if (gameProvider.gameState.loan <= 0) {
+                  gameProvider.gameState.loan = 0;
                   gameProvider.gameState.flags.hasAttractedLoanShark = false;
                 }
                 gameProvider.saveGameState();

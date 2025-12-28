@@ -7,6 +7,7 @@ class GameState with ChangeNotifier {
   int money = 1000;
   int account = 0; // Bank account
   int loan = 0;
+  int loanDayTaken = 0;
   int members = 1; // Gang members
   int reputation = 0; // Gang reputation
   int squidies = 20; // Enemy gang members
@@ -61,6 +62,7 @@ class GameState with ChangeNotifier {
     this.money = 1000,
     this.account = 0,
     this.loan = 0,
+    this.loanDayTaken = 0,
     this.members = 1,
     this.reputation = 0,
     this.squidies = 20,
@@ -219,6 +221,7 @@ class GameState with ChangeNotifier {
         'money': money,
         'account': account,
         'loan': loan,
+        'loanDayTaken': loanDayTaken,
         'members': members,
         'reputation': reputation,
         'squidies': squidies,
@@ -257,6 +260,7 @@ class GameState with ChangeNotifier {
       money: json['money'] ?? 1000,
       account: json['account'] ?? 0,
       loan: json['loan'] ?? 0,
+      loanDayTaken: json['loanDayTaken'] ?? 0,
       members: json['members'] ?? 1,
       reputation: json['reputation'] ?? 0,
       squidies: json['squidies'] ?? 20,

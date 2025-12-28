@@ -350,6 +350,7 @@ class GameProvider with ChangeNotifier {
       'Police Officers' => 10.0,
       'Squidie Hit Squad' => 25.0,
       'Squidie Army' => 50.0,
+      'Loan Shark Enforcer' => 200.0,
       _ => 15.0,
     };
   }
@@ -474,13 +475,19 @@ class GameProvider with ChangeNotifier {
     if (_gameState.steps >= _gameState.maxSteps) {
       _gameState.advanceDay();
       _gameMessage = 'A new day begins! Day ${_gameState.day}';
+      
+      // Check for loan sharks at the start of a new day - now 2 days grace
+      if (_gameState.loan > 0 && (_gameState.day - _gameState.loanDayTaken) >= 2) {
+        _gameState.flags.hasAttractedLoanShark = true;
+      }
+      
       return null;
     }
 
     // Check for loan shark encounter
     if (_gameState.loan > 0 &&
         _gameState.flags.hasAttractedLoanShark &&
-        Random().nextDouble() < 0.1) {
+        Random().nextDouble() < 0.2) { // Increased chance
       final msg = _handleLoanSharkEncounter();
       _gameMessage = msg;
       return null; // Combat started or debt paid
@@ -531,11 +538,10 @@ class GameProvider with ChangeNotifier {
     final repaymentAmount = (_gameState.loan * 1.5).toInt();
 
     if (_gameState.money >= repaymentAmount) {
-      _gameState.money -= repaymentAmount;
-      _gameState.loan = 0;
-      _gameState.flags.hasAttractedLoanShark = false;
-      saveGameState();
-      return 'You paid the loan shark enforcer. Debt cleared!';
+      // Automatic repayment if money is available? Or force combat? 
+      // Requirement says "hunted down", so let's trigger combat.
+      startMudFight(200, 1, 'Loan Shark Enforcer', 'loan_shark_boss_fight');
+      return 'A Loan Shark Enforcer corners you! "You owe us \$${repaymentAmount}, punk!"';
     } else {
       // Start combat with loan shark enforcer
       startMudFight(200, 1, 'Loan Shark Enforcer', 'loan_shark_boss_fight');
@@ -555,14 +561,6 @@ class GameProvider with ChangeNotifier {
       switch (key) {
         case 'damage':
           if (option == 'Fight' || option == 'Challenge') {
-             // For fighting, we might want to start combat instead of just applying damage
-             // But for now, let's follow the data structure which seems to apply direct damage/rewards
-             // OR trigger combat if it's a "Fight" option specifically?
-             // Let's check RandomEventData. It returns "Fight" with "damage": 10.
-             // Maybe "damage" means player takes damage? Or deals damage?
-             // Assuming player takes damage in a quick scuffle or this is "Fight" result.
-             
-             // However, to make it "proper combat", we should call startMudFight.
              if (option == 'Fight' || option == 'Challenge') {
                 final enemyName = event.title.replaceFirst('NPC Encounter: ', '');
                 startMudFight(100, 1, enemyName, event.id);

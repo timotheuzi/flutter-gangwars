@@ -4,8 +4,25 @@ import '../providers/game_provider.dart';
 import '../widgets/game_button.dart';
 import '../widgets/fight_animation.dart';
 
-class MudFightScreen extends StatelessWidget {
+class MudFightScreen extends StatefulWidget {
   const MudFightScreen({super.key});
+
+  @override
+  State<MudFightScreen> createState() => _MudFightScreenState();
+}
+
+class _MudFightScreenState extends State<MudFightScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  void _scrollToTop() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +60,7 @@ class MudFightScreen extends StatelessWidget {
           ),
         ),
         child: SingleChildScrollView(
+          controller: _scrollController,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -326,6 +344,7 @@ class MudFightScreen extends StatelessWidget {
           gameProvider.currentCombatData!.enemyType,
           gameProvider.currentCombatData!.enemyCount,
         );
+        _scrollToTop();
       },
       icon: Icon(icon),
       label: Text(weaponName),

@@ -34,33 +34,63 @@ class CombatSystem {
       rounds++;
       fightLog.add('\n--- ROUND $rounds ---');
 
-      // 1. PLAYER (Leader) ATTACK
-      final playerDmg = _getWeaponDamage(weapon, gameState);
-      final actualPlayerDmg = max(5, playerDmg + random.nextInt(max(1, playerDmg ~/ 2)));
-      remainingEnemyHealth -= actualPlayerDmg;
-      result.playerDamageDealt += actualPlayerDmg;
-      result.remainingEnemyHealth = max(0, remainingEnemyHealth);
+      // Track available weapons (one weapon per member)
+      final availableWeapons = _getAvailableWeaponsMap(gameState);
       
-      fightLog.add(_getPlayerAttackDetail(weapon, gameState, actualPlayerDmg));
+      // 1. PLAYER (Leader) ATTACK
+      // Player uses the selected weapon, and it's removed from available for others
+      if (availableWeapons.containsKey(weapon) && availableWeapons[weapon]! > 0) {
+        availableWeapons[weapon] = availableWeapons[weapon]! - 1;
+      } else if (weapon != 'fists') {
+        // If weapon not available, default to fists
+        weapon = 'fists';
+      }
+
+      final playerDmg = _getWeaponDamage(weapon, gameState);
+      final isAuto = _isAutomatic(weapon, gameState);
+      
+      if (isAuto) {
+        int totalPlayerDmg = 0;
+        final shots = weapon == 'pistol' ? 3 : 5; // Fan hammer = 3, others = 5
+        for (int s = 1; s <= shots; s++) {
+          if (remainingEnemyHealth <= 0) break;
+          final shotDmg = max(2, (playerDmg / shots).toInt() + random.nextInt(max(1, (playerDmg / (shots * 2)).toInt())));
+          remainingEnemyHealth -= shotDmg;
+          totalPlayerDmg += shotDmg;
+          result.playerDamageDealt += shotDmg;
+          fightLog.add('SHOT $s: ${_getShotDescription(weapon, shotDmg)}');
+        }
+        result.remainingEnemyHealth = max(0, remainingEnemyHealth);
+      } else {
+        final actualPlayerDmg = max(5, playerDmg + random.nextInt(max(1, playerDmg ~/ 2)));
+        remainingEnemyHealth -= actualPlayerDmg;
+        result.playerDamageDealt += actualPlayerDmg;
+        result.remainingEnemyHealth = max(0, remainingEnemyHealth);
+        fightLog.add(_getPlayerAttackDetail(weapon, gameState, actualPlayerDmg));
+      }
 
       // 2. GANG MEMBERS ATTACK
       if (gameState.members > 1 && remainingEnemyHealth > 0) {
         int gangTurnDmg = 0;
-        final weaponsUsed = <String>[];
         
         for (int i = 0; i < gameState.members - 1; i++) {
-          final memberWeapon = _getStrongestAvailableWeapon(gameState);
+          if (remainingEnemyHealth <= 0) break;
+          
+          final memberWeapon = _getStrongestFromMap(availableWeapons);
+          if (memberWeapon != 'fists') {
+            availableWeapons[memberWeapon] = availableWeapons[memberWeapon]! - 1;
+          }
+          
           final memberDmg = _getWeaponDamage(memberWeapon, gameState);
           final actualDmg = max(2, memberDmg + random.nextInt(max(1, memberDmg ~/ 3)));
           gangTurnDmg += actualDmg;
-          if (!weaponsUsed.contains(memberWeapon)) weaponsUsed.add(memberWeapon);
+          remainingEnemyHealth -= actualDmg;
+          result.gangDamageDealt += actualDmg;
+          
+          fightLog.add('[GANG MEMBER] Attacks with ${memberWeapon.toUpperCase()} for $actualDmg damage!');
         }
         
-        remainingEnemyHealth -= gangTurnDmg;
-        result.gangDamageDealt += gangTurnDmg;
         result.remainingEnemyHealth = max(0, remainingEnemyHealth);
-        
-        fightLog.add('[GANG] Your crew unloads with ${weaponsUsed.join(", ").toUpperCase()} for $gangTurnDmg damage! Their weapons sing a dirge for the fallen!');
       }
 
       // 3. ENEMY COUNTERATTACK
@@ -103,11 +133,66 @@ class CombatSystem {
     return result;
   }
 
+  static Map<String, int> _getAvailableWeaponsMap(GameState gameState) {
+    final w = gameState.weapons;
+    return {
+      'ar15': w.ar15,
+      'uzi': w.uzis,
+      'pistol': w.pistols,
+      'sword': w.sword,
+      'barbed_wire_bat': w.barbedWireBat,
+      'knife': w.knife,
+      'machine_gun': w.machineGun,
+      'submachine_gun': w.submachineGun,
+      'golden_gun': w.goldenGun,
+    };
+  }
+
+  static String _getStrongestFromMap(Map<String, int> weapons) {
+    if ((weapons['golden_gun'] ?? 0) > 0) return 'golden_gun';
+    if ((weapons['ar15'] ?? 0) > 0) return 'ar15';
+    if ((weapons['machine_gun'] ?? 0) > 0) return 'machine_gun';
+    if ((weapons['submachine_gun'] ?? 0) > 0) return 'submachine_gun';
+    if ((weapons['uzi'] ?? 0) > 0) return 'uzi';
+    if ((weapons['pistol'] ?? 0) > 0) return 'pistol';
+    if ((weapons['sword'] ?? 0) > 0) return 'sword';
+    if ((weapons['barbed_wire_bat'] ?? 0) > 0) return 'barbed_wire_bat';
+    if ((weapons['knife'] ?? 0) > 0) return 'knife';
+    return 'fists';
+  }
+
+  static bool _isFirearm(String weapon) {
+    return weapon == 'pistol' || 
+           weapon == 'uzi' || 
+           weapon == 'ar15' || 
+           weapon == 'ghost_gun' || 
+           weapon == 'machine_gun' || 
+           weapon == 'submachine_gun' ||
+           weapon == 'golden_gun';
+  }
+
+  static bool _isAutomatic(String weapon, GameState gameState) {
+    if (weapon == 'pistol' && gameState.pistolUpgraded) return true;
+    return weapon == 'uzi' || weapon == 'machine_gun' || weapon == 'submachine_gun' || weapon == 'ar15';
+  }
+
+  static String _getShotDescription(String weapon, int damage) {
+    final random = Random();
+    final msgs = [
+      "A round finds its mark! ($damage damage)",
+      "The barrel flashes as a bullet rips into the target! ($damage damage)",
+      "Direct hit! Lead tears through flesh! ($damage damage)",
+      "The shot connects with brutal efficiency! ($damage damage)",
+    ];
+    return msgs[random.nextInt(msgs.length)];
+  }
+
   static String _getPlayerAttackDetail(String weapon, GameState gameState, int damage) {
     final random = Random();
     final weapons = gameState.weapons;
+    final isFirearm = _isFirearm(weapon);
     
-    if (weapons.useExplodingBullets && weapons.explodingBullets > 0) {
+    if (isFirearm && weapons.useExplodingBullets && weapons.explodingBullets > 0) {
       final explodingMsgs = [
         "You fire an exploding bullet that detonates on impact, shredding the enemy's body in a horrific explosion! ($damage damage)",
         "The exploding round screams toward your target and erupts in a devastating blast of shrapnel and fire! ($damage damage)",
@@ -116,7 +201,7 @@ class CombatSystem {
       return '💥 ${explodingMsgs[random.nextInt(explodingMsgs.length)]}';
     }
     
-    if (weapons.useHollowPointBullets && weapons.hollowPointBullets > 0) {
+    if (isFirearm && weapons.useHollowPointBullets && weapons.hollowPointBullets > 0) {
       final hpMsgs = [
         "You fire a hollow point bullet that expands on impact, creating devastating wound channels! ($damage damage)",
         "The hollow point round mushrooms dramatically as it strikes, maximizing tissue damage and stopping power! ($damage damage)",
@@ -125,15 +210,16 @@ class CombatSystem {
       return '💥 ${hpMsgs[random.nextInt(hpMsgs.length)]}';
     }
 
-    if (weapon == 'pistol' && gameState.pistolUpgraded) {
-      return 'You fan the hammer! Three shots rip into them, your pistol chattering like an angry demon for $damage total damage!';
-    }
-
     final descriptions = {
       'pistol': [
         "You squeeze off a precise shot from your pistol, the barrel flashing as the bullet screams toward your target! ($damage damage)",
         "Your pistol bucks in your hand as you fire, sending a slug hurtling through the air with deadly intent! ($damage damage)",
         "You line up the sights and pull the trigger, your pistol roaring as it launches death toward your enemy! ($damage damage)"
+      ],
+      'uzi': [
+        "You spray lead with your Uzi, the compact weapon rattling as it stitches holes through your enemies! ($damage damage)",
+        "A hail of bullets erupts from your Uzi, turning the battlefield into a leaden nightmare! ($damage damage)",
+        "Your submachine gun barks rapidly, sending a stream of hot lead into the fray! ($damage damage)"
       ],
       'ar15': [
         "You unleash a burst from your AR-15, the rifle chattering like an angry mechanical demon! ($damage damage)",
@@ -210,14 +296,20 @@ class CombatSystem {
       'barbed_wire_bat' => 22,
       'knife' => 12,
       'grenade' => 60,
+      'ghost_gun' => 20,
+      'machine_gun' => 55,
+      'submachine_gun' => 40,
+      'golden_gun' => 1000,
       _ => 8,
     };
 
     double ammoMult = 1.0;
-    if (gameState.weapons.useExplodingBullets && gameState.weapons.explodingBullets > 0) {
-      ammoMult = 1.8;
-    } else if (gameState.weapons.useHollowPointBullets && gameState.weapons.hollowPointBullets > 0) {
-      ammoMult = 1.4;
+    if (_isFirearm(weapon)) {
+      if (gameState.weapons.useExplodingBullets && gameState.weapons.explodingBullets > 0) {
+        ammoMult = 1.8;
+      } else if (gameState.weapons.useHollowPointBullets && gameState.weapons.hollowPointBullets > 0) {
+        ammoMult = 1.4;
+      }
     }
 
     base = (base * ammoMult).toInt();
@@ -227,12 +319,19 @@ class CombatSystem {
   }
 
   static int _calculateEnemyDamage(String enemyType, int enemyCount, GameState gameState) {
-    final base = switch (enemyType) {
+    int base = switch (enemyType) {
       'Police Officers' => 15,
       'Squidie Hit Squad' => 20,
       'Loan Shark Enforcer' => 30,
       _ => 10,
     };
+    
+    // Scale damage for Loan Shark based on loan size
+    if (enemyType == 'Loan Shark Enforcer') {
+       final loanPower = (gameState.loan / 1000).clamp(1.0, 10.0);
+       base = (base * loanPower).toInt();
+    }
+    
     return base * enemyCount;
   }
 
