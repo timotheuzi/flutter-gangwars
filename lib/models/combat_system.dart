@@ -39,10 +39,20 @@ class CombatSystem {
       
       // 1. PLAYER (Leader) ATTACK
       // Player uses the selected weapon, and it's removed from available for others
-      if (availableWeapons.containsKey(weapon) && availableWeapons[weapon]! > 0) {
+      if (weapon == 'grenade') {
+        if (gameState.weapons.grenades > 0) {
+          gameState.weapons.grenades--;
+          // Grenade is removed from available map too to prevent gang members using it if it was the last one
+          if (availableWeapons.containsKey('grenade')) {
+            availableWeapons['grenade'] = availableWeapons['grenade']! - 1;
+          }
+        } else {
+          weapon = 'fists';
+        }
+      } else if (availableWeapons.containsKey(weapon) && availableWeapons[weapon]! > 0) {
         availableWeapons[weapon] = availableWeapons[weapon]! - 1;
       } else if (weapon != 'fists') {
-        // If weapon not available, default to fists
+        // If weapon not available (out of stock or consumed), default to fists
         weapon = 'fists';
       }
 
@@ -71,19 +81,20 @@ class CombatSystem {
 
       // 2. GANG MEMBERS ATTACK
       if (gameState.members > 1 && remainingEnemyHealth > 0) {
-        int gangTurnDmg = 0;
-        
         for (int i = 0; i < gameState.members - 1; i++) {
           if (remainingEnemyHealth <= 0) break;
           
           final memberWeapon = _getStrongestFromMap(availableWeapons);
           if (memberWeapon != 'fists') {
             availableWeapons[memberWeapon] = availableWeapons[memberWeapon]! - 1;
+            // Handle actual inventory consumption for consumables
+            if (memberWeapon == 'grenade') {
+              gameState.weapons.grenades--;
+            }
           }
           
           final memberDmg = _getWeaponDamage(memberWeapon, gameState);
           final actualDmg = max(2, memberDmg + random.nextInt(max(1, memberDmg ~/ 3)));
-          gangTurnDmg += actualDmg;
           remainingEnemyHealth -= actualDmg;
           result.gangDamageDealt += actualDmg;
           
@@ -145,19 +156,32 @@ class CombatSystem {
       'machine_gun': w.machineGun,
       'submachine_gun': w.submachineGun,
       'golden_gun': w.goldenGun,
+      'ghost_gun': w.ghostGuns,
+      'grenade': w.grenades,
+      'vampire_bat': w.vampireBat,
+      'brass_knuckles': w.brassKnuckles,
+      'axe': w.axe,
+      'poison_blowgun': w.poisonBlowgun,
     };
   }
 
   static String _getStrongestFromMap(Map<String, int> weapons) {
     if ((weapons['golden_gun'] ?? 0) > 0) return 'golden_gun';
-    if ((weapons['ar15'] ?? 0) > 0) return 'ar15';
     if ((weapons['machine_gun'] ?? 0) > 0) return 'machine_gun';
+    if ((weapons['ar15'] ?? 0) > 0) return 'ar15';
     if ((weapons['submachine_gun'] ?? 0) > 0) return 'submachine_gun';
     if ((weapons['uzi'] ?? 0) > 0) return 'uzi';
     if ((weapons['pistol'] ?? 0) > 0) return 'pistol';
     if ((weapons['sword'] ?? 0) > 0) return 'sword';
+    if ((weapons['axe'] ?? 0) > 0) return 'axe';
+    if ((weapons['vampire_bat'] ?? 0) > 0) return 'vampire_bat';
     if ((weapons['barbed_wire_bat'] ?? 0) > 0) return 'barbed_wire_bat';
+    if ((weapons['poison_blowgun'] ?? 0) > 0) return 'poison_blowgun';
     if ((weapons['knife'] ?? 0) > 0) return 'knife';
+    if ((weapons['brass_knuckles'] ?? 0) > 0) return 'brass_knuckles';
+    if ((weapons['ghost_gun'] ?? 0) > 0) return 'ghost_gun';
+    // Grenades are powerful but consumable, gang members only use them if specifically available
+    if ((weapons['grenade'] ?? 0) > 0) return 'grenade';
     return 'fists';
   }
 
@@ -236,11 +260,28 @@ class CombatSystem {
       ],
       'grenade': [
         "You hurl a grenade that bounces toward your enemies, the fuse hissing as it counts down to oblivion! ($damage damage)",
-        "The grenade leaves your hand in a perfect arc, exploding in a shower of deadly shrapnel moments later! ($damage damage)"
+        "The grenade leaves your hand in a perfect arc, exploding in a shower of deadly shrapnel moments later! ($damage damage)",
+        "KABOOM! The grenade detonates in a massive fireball, shredding everything in its radius! ($damage damage)"
       ],
       'knife': [
         "You lunge forward with your knife, the blade flashing as it seeks out vital arteries! ($damage damage)",
         "You drive the blade home with lethal force, twisting and tearing through flesh and muscle! ($damage damage)"
+      ],
+      'axe': [
+        "You bring your axe down with a sickening thud, the heavy blade burying itself in the enemy! ($damage damage)",
+        "Your axe cleaves through armor and bone alike, leaving a trail of devastation! ($damage damage)"
+      ],
+      'vampire_bat': [
+        "The vampire bat drinks deeply from your foe, each hit pulsing with dark energy! ($damage damage)",
+        "You swing the vampire bat, and it seems to seek out the enemy's lifeblood with every strike! ($damage damage)"
+      ],
+      'poison_blowgun': [
+        "A silent dart flies from your blowgun, carrying a lethal toxin that wracks the enemy with pain! ($damage damage)",
+        "The poison dart finds its mark, its toxic payload beginning its deadly work immediately! ($damage damage)"
+      ],
+      'golden_gun': [
+        "THE GOLDEN GUN ROARS! A single golden bullet erupts with the power of a thousand suns! ($damage damage)",
+        "You pull the trigger of the Golden Gun, and your enemy simply ceases to exist in a flash of gold! ($damage damage)"
       ],
     };
 
@@ -295,11 +336,15 @@ class CombatSystem {
       'sword' => 28,
       'barbed_wire_bat' => 22,
       'knife' => 12,
-      'grenade' => 60,
+      'grenade' => 180, // Huge damage
       'ghost_gun' => 20,
       'machine_gun' => 55,
       'submachine_gun' => 40,
       'golden_gun' => 1000,
+      'axe' => 35,
+      'vampire_bat' => 45,
+      'brass_knuckles' => 15,
+      'poison_blowgun' => 40,
       _ => 8,
     };
 
