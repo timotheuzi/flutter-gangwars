@@ -87,7 +87,7 @@ class GameState with ChangeNotifier {
     notifyListeners();
   }
 
-  bool isGameOver() => lives <= 0 || health <= 0;
+  bool isGameOver() => lives <= 0 || (health <= 0 && lives <= 0);
 
   bool canAfford(int amount) => money >= amount;
 
@@ -102,14 +102,15 @@ class GameState with ChangeNotifier {
 
   void heal(int amount) {
     health = min(maxHealth, health + amount);
-    damage = max(0, damage - amount);
+    damage = max(0, maxHealth - health);
     notifyListeners();
   }
 
   void takeDamage(int amount) {
-    health -= amount;
+    health = max(0, health - amount);
+    damage = maxHealth - health;
     if (health <= 0) {
-      // Handle death logic
+      lives = max(0, lives - 1);
     }
     notifyListeners();
   }
@@ -164,13 +165,6 @@ class GameState with ChangeNotifier {
     updateDrugPrices();
     generateDrugTrends();
     
-    // Custom message for prostitute income
-    String incomeMessage = '';
-    if (prostitutes.count > 0) {
-      incomeMessage = '\nYour prostitutes earned you \$$totalIncome tonight.';
-    }
-    
-    // We don't have direct access to gameMessage here, but it's handled in GameProvider
     notifyListeners();
   }
 
