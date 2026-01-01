@@ -23,33 +23,20 @@ class RandomEventData {
 
   static EventType _getRandomEventType(Random random, GameState gameState) {
     final eventChances = [
-      // Combat events
       if (gameState.reputation > 50) EventType.gangFight,
       if (gameState.loan > 0) EventType.policeChase,
       if (gameState.members > 5) EventType.squidieHitSquad,
-
-      // NPC events
       EventType.npcEncounter,
       EventType.npcEncounter,
       EventType.npcEncounter,
-
-      // Positive events
       EventType.drugDeal,
       EventType.moneyFound,
       EventType.healthRestore,
       EventType.weaponFound,
-
-      // Negative events
       EventType.trap,
-
-      // Neutral events
       EventType.nothing,
       EventType.nothing,
     ];
-
-    if (eventChances.isEmpty) {
-      return EventType.nothing;
-    }
 
     return eventChances[random.nextInt(eventChances.length)];
   }
@@ -57,85 +44,57 @@ class RandomEventData {
   static RandomEvent _createGangFightEvent() {
     return RandomEvent(
       id: 'gang_fight_${DateTime.now().millisecondsSinceEpoch}',
-      title: 'Gang Fight!',
-      description:
-          'A rival gang challenges you! They want to take over your territory.',
+      title: '🩸 TERRITORY DISPUTE',
+      description: 'A pack of starving rival thugs corners you. "You\'re breathing our air, dead man." Their eyes are hollow, filled only with the desire to see your blood in the mud. Fight or die?',
       type: EventType.gangFight,
+      options: ['YES (FIGHT)', 'NO (FLEE)'],
     );
   }
 
   static RandomEvent _createPoliceChaseEvent() {
     return RandomEvent(
       id: 'police_chase_${DateTime.now().millisecondsSinceEpoch}',
-      title: 'Police Chase!',
-      description:
-          'The police have spotted your illegal activities! They\'re coming after you.',
+      title: '⚖️ STATE RECKONING',
+      description: 'Blue and red strobes cut through the smog. The state\'s armored hounds have caught your scent. Surrender means a shallow grave in the prison pits. Escape or be erased?',
       type: EventType.policeChase,
+      options: ['YES (RUN)', 'NO (SURRENDER)'],
     );
   }
 
   static RandomEvent _createSquidieHitSquadEvent() {
     return RandomEvent(
       id: 'squidie_hit_${DateTime.now().millisecondsSinceEpoch}',
-      title: 'Squidie Hit Squad!',
-      description:
-          'The Squidie gang has sent assassins to eliminate you! They won\'t stop until you\'re dead.',
+      title: '🦑 ABYSSAL ASSASSINS',
+      description: 'The shadows themselves seem to grow tentacles. Squidie hitmen, their skin slick with bioluminescent filth, emerge from the blackness. They don\'t want your money—they want your soul. Stand your ground?',
       type: EventType.squidieHitSquad,
+      options: ['YES (FIGHT)', 'NO (HIDE)'],
     );
   }
 
   static RandomEvent _createNpcEncounterEvent(Random random) {
-    final npcTypes = [
-      'Street Thug',
-      'Shady Dealer',
-      'Bouncer',
-      'Homeless Person',
-      'Corrupt Businessman',
-      'Street Punk',
-      'Alleyway Boss',
-      'Drug Lord',
-      'Mysterious Stranger',
-      'Rival Gang Leader'
-    ];
+    final npcTypes = ['Street Thug', 'Shady Dealer', 'Bouncer', 'Homeless Person', 'Corrupt Businessman', 'Street Punk', 'Alleyway Boss', 'Drug Lord', 'Mysterious Stranger', 'Rival Gang Leader'];
     final npcType = npcTypes[random.nextInt(npcTypes.length)];
 
-    final options = <String>[];
-    final optionEffects = <String, Map<String, int>>{};
+    final options = ['Talk', 'Fight', 'Flee'];
+    final optionEffects = <String, Map<String, int>>{
+      'Fight': {'damage': 10},
+      'Talk': {'health': 5, 'money': 100},
+      'Flee': {'damage': 5, 'money': -50},
+    };
 
-    // Add basic options
-    options.add('Fight');
-    optionEffects['Fight'] = {'damage': 10};
-
-    options.add('Talk');
-    optionEffects['Talk'] = {'health': 5, 'money': 100};
-
-    options.add('Flee');
-    optionEffects['Flee'] = {'damage': 5, 'money': -50};
-
-    // Add special options based on NPC type
-    if (npcType == 'Shady Dealer' || npcType == 'Corrupt Businessman' || npcType == 'Drug Lord') {
-      options.add('Trade Drugs');
-      optionEffects['Trade Drugs'] = {'money': -200, 'drugs': 2};
+    if (npcType == 'Shady Dealer' || npcType == 'Drug Lord') {
+      options.add('Trade');
+      optionEffects['Trade'] = {'money': -200, 'drugs': 2};
     }
 
-    if (npcType == 'Bouncer' || npcType == 'Street Punk' || npcType == 'Rival Gang Leader') {
+    if (npcType == 'Street Punk' || npcType == 'Rival Gang Leader') {
       options.add('Recruit');
       optionEffects['Recruit'] = {'money': -5000, 'members': 1};
     }
 
-    if (npcType == 'Mysterious Stranger' || npcType == 'Homeless Person') {
-      options.add('Get Info');
-      optionEffects['Get Info'] = {'money': -100, 'reputation': 5};
-    }
-
-    if (npcType == 'Alleyway Boss' || npcType == 'Rival Gang Leader') {
-      options.add('Challenge');
-      optionEffects['Challenge'] = {'damage': 20, 'reputation': 10};
-    }
-
     return RandomEvent(
       id: 'npc_${DateTime.now().millisecondsSinceEpoch}',
-      title: 'NPC Encounter: $npcType',
+      title: '👤 DARK ENCOUNTER: $npcType',
       description: _getNpcDescription(npcType),
       type: EventType.npcEncounter,
       options: options,
@@ -145,138 +104,117 @@ class RandomEventData {
 
   static String _getNpcDescription(String npcType) {
     return switch (npcType) {
-      'Street Thug' =>
-        'A tough-looking thug blocks your path. He looks like he wants trouble. "You lookin\' at me, punk?"',
-      'Shady Dealer' =>
-        'A shady character in a trench coat approaches you. "Psst... I got the good stuff. Wanna make a deal?"',
-      'Bouncer' =>
-        'A massive bouncer stands guard. He might be useful if you can convince him to join you. "This area is off limits."',
-      'Homeless Person' =>
-        'A homeless person mutters to themselves. They might have useful information. "Spare some change, boss?"',
-      'Corrupt Businessman' =>
-        'A well-dressed businessman with a shady aura offers you a deal. "I have connections... for the right price."',
-      'Street Punk' =>
-        'A young punk with attitude challenges you. He could be a valuable recruit. "You think you\'re tough? Prove it!"',
-      'Alleyway Boss' =>
-        'A powerful figure emerges from the shadows. This is the boss of this territory. "You dare enter my domain?"',
-      'Drug Lord' =>
-        'A wealthy drug lord surrounded by bodyguards offers you a business proposition. "I control the trade here..."',
-      'Mysterious Stranger' =>
-        'A cloaked figure whispers secrets of the dark alleyway. "I know things... dangerous things."',
-      'Rival Gang Leader' =>
-        'The leader of a rival gang challenges you. "This turf belongs to us! Prepare to fight!"',
-      _ => 'Someone approaches you in the dark alleyway.',
+      'Street Thug' => 'A brute with a jaw of rusted iron blocks your path. "You look like you have too many teeth, friend. I can fix that."',
+      'Shady Dealer' => 'A figure wrapped in rags that smell of formaldehyde gestures to a bag. "The chemicals will make you a god, or a corpse. Either way, the pain stops."',
+      'Bouncer' => 'A mountain of scar tissue and synth-muscle stands guard. "You aren\'t on the list of the living. Turn back or be liquidated."',
+      'Homeless Person' => 'A wretched soul clutching a shattered bottle weeps. "The Squidies took my eyes, boss. Give me a coin so I can buy enough rot-gut to forget the screaming."',
+      'Corrupt Businessman' => 'A man in a blood-stained suit smiles, his teeth too white for this hellscape. "I trade in information, and your obituary is looking very profitable."',
+      'Street Punk' => 'A youth with a mohawk of jagged glass sneers. "The old world is dead, old man. We\'re the maggots eating the corpse. Want to join the feast?"',
+      'Alleyway Boss' => 'A warlord sitting on a throne of spent casings watches you. "Every step you take in this alley is a debt you owe me. Pay in blood or gold."',
+      'Drug Lord' => 'A kingpin surrounded by silent, masked executioners nods. "The city is a vein, and I am the needle. Do you want to be the poison or the cure?"',
+      'Mysterious Stranger' => 'A cloaked figure whose shadow moves independently whispers. "I have seen the end. It is dark, it is cold, and you are right in the middle of it."',
+      'Rival Gang Leader' => 'A rival boss sharpening a jagged blade laughs. "Your gang is a joke, and I\'m the punchline. Let\'s see how much you leak."',
+      _ => 'A silhouette detaches itself from the gloom, its intentions as dark as the city itself.',
     };
   }
 
   static RandomEvent _createDrugDealEvent(Random random) {
     final drugs = ['crack', 'coke', 'weed', 'ice', 'percs', 'pixie_dust'];
     final drug = drugs[random.nextInt(drugs.length)];
-    final quantity = random.nextInt(5) + 1;
-    final price = quantity * 100;
+    final qty = random.nextInt(5) + 1;
+    final price = qty * 100;
 
     return RandomEvent(
       id: 'drug_deal_${DateTime.now().millisecondsSinceEpoch}',
-      title: 'Drug Deal Opportunity',
-      description:
-          'A dealer offers you $quantity kilos of $drug for \$${price.toString()}. Do you want to buy?',
+      title: '💊 CHEMICAL PACT',
+      description: 'A twitching runner offers you $qty kilos of $drug for \$$price. The product glows with an unnatural, sickly light. Seal the deal?',
       type: EventType.drugDeal,
+      options: ['YES', 'NO'],
+      optionEffects: {
+        'YES': {'money': -price, 'drugs': qty},
+        'NO': {},
+      },
     );
   }
 
   static RandomEvent _createMoneyFoundEvent(Random random) {
     final amount = (random.nextInt(10) + 1) * 100;
-
     return RandomEvent(
       id: 'money_found_${DateTime.now().millisecondsSinceEpoch}',
-      title: 'Money Found!',
-      description:
-          'You found a stash of cash! \$${amount.toString()} added to your pocket.',
+      title: '💰 CORPSE LOOT',
+      description: 'You find a body face-down in a pool of iridescent sludge. A bag of blood-soaked cash (\$$amount) is clutched in its cold, stiff fingers. Take it?',
       type: EventType.moneyFound,
+      options: ['YES', 'NO'],
+      optionEffects: {
+        'YES': {'money': amount},
+        'NO': {},
+      },
     );
   }
 
   static RandomEvent _createHealthRestoreEvent() {
     return RandomEvent(
       id: 'health_restore_${DateTime.now().millisecondsSinceEpoch}',
-      title: 'Health Restored',
-      description:
-          'You found a first aid kit! Your health is partially restored.',
+      title: '💉 STOLEN LIFE',
+      description: 'An abandoned medical drone sits sparking in a corner. Its needles are dirty, but its tanks are full of experimental stims. Inject yourself?',
       type: EventType.healthRestore,
+      options: ['YES', 'NO'],
+      optionEffects: {
+        'YES': {'health': 30},
+        'NO': {},
+      },
     );
   }
 
   static RandomEvent _createWeaponFoundEvent() {
-    final weapons = [
-      'pistol',
-      'knife',
-      'brass_knuckles',
-      'bullets',
-      'uzi',
-      'grenade',
-      'vest_light'
-    ];
+    final weapons = ['pistol', 'knife', 'brass_knuckles', 'bullets', 'uzi'];
     final weapon = weapons[Random().nextInt(weapons.length)];
-
     return RandomEvent(
       id: 'weapon_found_${DateTime.now().millisecondsSinceEpoch}',
-      title: 'Weapon Found!',
-      description: 'You found a $weapon! This could be useful in combat.',
+      title: '⚔️ DESPERATE ARMORY',
+      description: 'Hidden beneath a pile of charred remains, you find a $weapon. It is stained with old blood, but the mechanism still hungry for more. Claim it?',
       type: EventType.weaponFound,
+      options: ['YES', 'NO'],
+      optionEffects: {
+        'YES': {}, // Handled specially in logic
+        'NO': {},
+      },
     );
   }
 
   static RandomEvent _createTrapEvent() {
     return RandomEvent(
       id: 'trap_${DateTime.now().millisecondsSinceEpoch}',
-      title: 'Trap Encountered!',
-      description:
-          'You stepped into a trap! Your health is reduced and you lost some money.',
+      title: '🪤 THE SLAUGHTERHOUSE',
+      description: 'The door clicks shut behind you. Tripwires hum in the dark. It\'s an ambush, and the floor is slick with the grease of previous victims. Fight through the gore?',
       type: EventType.trap,
+      options: ['YES (FIGHT)', 'NO (RUN)'],
+      optionEffects: {
+        'YES': {'damage': 10},
+        'NO': {'damage': 20, 'money': -100},
+      },
     );
   }
 
   static RandomEvent _createNothingEvent() {
     return RandomEvent(
       id: 'nothing_${DateTime.now().millisecondsSinceEpoch}',
-      title: 'Nothing Happened',
-      description: 'You wander the streets but nothing interesting happens.',
+      title: '🌑 THE SILENT GRAVE',
+      description: 'The streets are silent, save for the dripping of something thick and metallic from the overhead pipes. Not a soul dares to move. You are alone with your sins.',
       type: EventType.nothing,
     );
   }
 
   static bool hasMeetRequirements(RandomEvent event, GameState gameState) {
-    // Check if event has specific requirements
     return switch (event.type) {
       EventType.gangFight => gameState.reputation > 30,
-      EventType.policeChase =>
-        gameState.loan > 0 || gameState.flags.hasId == false,
+      EventType.policeChase => gameState.loan > 0 || !gameState.flags.hasId,
       EventType.squidieHitSquad => gameState.members > 3,
       _ => true,
     };
   }
 
   static void applyEventEffects(RandomEvent event, GameState gameState) {
-    switch (event.type) {
-      case EventType.moneyFound:
-        final amount =
-            int.tryParse(event.description.split('\$').last.split(' ').first) ??
-                100;
-        gameState.money += amount;
-      case EventType.healthRestore:
-        gameState.heal(20);
-      case EventType.trap:
-        gameState.takeDamage(15);
-        gameState.money -= 50;
-      case EventType.drugDeal:
-        // This would be handled by the trade system
-        break;
-      case EventType.weaponFound:
-        // This would be handled by the weapon system
-        break;
-      default:
-        // No direct effects for combat events
-        break;
-    }
+    // Basic automatic effects moved to option selection logic in GameProvider
   }
 }

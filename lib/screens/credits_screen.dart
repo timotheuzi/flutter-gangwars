@@ -71,18 +71,24 @@ class CreditsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Colors.redAccent,
                         ),
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 35),
                       const Text(
-                        'Original Game: Gang War MUD by timotheuzi@hotmail.com',
-                        style: TextStyle(fontSize: 16),
+                        'Original Game: Gang War MUD by timotheuzi@hotmail.com\n\n'
+                        'Crypto Donations:\n'
+                        'LTC ltc1qcx3xsrpxqm7q7gpkxhxhtaeqgdqpmq0jdrw7vh\n'
+                        'SOL 4sAaizpXmFS4yedakv7mLN1Z2myGh2CWnes3YJBhF1Hb\n'
+                        'XLM GCVYEJ7GC7LZZ2EBZL5DXWCLTZPTXX7YEUXLS36YGE6BA37R5BHRI2XG\n'
+                        'BTC bc1qfv69rux98r7u3sr786j2qpsenmkskvkf58ynkk\n'
+                        'ETH 0xD1A6b95958dE597c2D9478A3b4212adF0789BF81',
+                        style: TextStyle(fontSize: 16, color: Colors.white70),
                       ),
                       const SizedBox(height: 10),
                       const Text(
                         'Flutter Adaptation: Cross-platform Flutter implementation',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 16, color: Colors.white70),
                       ),
                       const SizedBox(height: 20),
                       const Text(
@@ -90,34 +96,43 @@ class CreditsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Text('• Cross-platform: Android, iOS, Linux, Windows, macOS, Web'),
-                      const Text('• Modern UI with Flutter widgets'),
-                      const Text('• Full game logic migration from Kotlin to Dart'),
-                      const Text('• State management with Provider'),
-                      const Text('• Persistent game saves'),
+                      const Text(
+                          '• Cross-platform: Android, iOS, Linux, Windows, macOS, Web',
+                          style: TextStyle(color: Colors.white70)),
+                      const Text('• Modern UI with Flutter widgets',
+                          style: TextStyle(color: Colors.white70)),
+                      const Text('• State management with Provider',
+                          style: TextStyle(color: Colors.white70)),
+                      const Text('• Persistent game saves',
+                          style: TextStyle(color: Colors.white70)),
                       const SizedBox(height: 20),
                       const Text(
                         'Special Thanks:',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Text('• Original Gang War community'),
-                      const Text('• Flutter development team'),
-                      const Text('• All beta testers and contributors'),
+                      const Text('• Original Gang War community',
+                          style: TextStyle(color: Colors.white70)),
+                      const Text('• Flutter development team',
+                          style: TextStyle(color: Colors.white70)),
+                      const Text('• All beta testers and contributors',
+                          style: TextStyle(color: Colors.white70)),
                       const SizedBox(height: 20),
                       const Text(
                         'Version: 1.0',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                       const Text(
                         'Built with ❤️ for gang warfare enthusiasts',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 16, color: Colors.white70),
                       ),
                       const SizedBox(height: 20),
                       const Text(
@@ -125,13 +140,18 @@ class CreditsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 10),
-                      const Text('• Flutter 3.38.4'),
-                      const Text('• Dart 3.10.3'),
-                      const Text('• Provider for state management'),
-                      const Text('• Shared Preferences for persistence'),
+                      const Text('• Flutter 3.38.4',
+                          style: TextStyle(color: Colors.white70)),
+                      const Text('• Dart 3.10.3',
+                          style: TextStyle(color: Colors.white70)),
+                      const Text('• Provider for state management',
+                          style: TextStyle(color: Colors.white70)),
+                      const Text('• Shared Preferences for persistence',
+                          style: TextStyle(color: Colors.white70)),
                     ],
                   ),
                 ),

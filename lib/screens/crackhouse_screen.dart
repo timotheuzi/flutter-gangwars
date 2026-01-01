@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import '../widgets/game_button.dart';
+import '../widgets/pixel_art_icon.dart';
 
 class CrackhouseScreen extends StatelessWidget {
   const CrackhouseScreen({super.key});
@@ -13,10 +14,11 @@ class CrackhouseScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Crackhouse - Droid Gangwar'),
+        title: const Text('The Ossuary - Droid Gangwar'),
+        backgroundColor: Colors.purple.shade900,
         actions: [
           IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.location_city),
             onPressed: () => gameProvider.navigateToScreen('city'),
           ),
         ],
@@ -29,7 +31,7 @@ class CrackhouseScreen extends StatelessWidget {
             colors: [
               Colors.purple.shade900,
               Colors.purple.shade700,
-              Colors.deepPurple.shade600,
+              Colors.black,
             ],
           ),
         ),
@@ -39,27 +41,28 @@ class CrackhouseScreen extends StatelessWidget {
             children: [
               Card(
                 elevation: 5,
+                color: Colors.black45,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
                       const Text(
-                        '🏠 CRACKHOUSE',
+                        '🏚️ THE CRACKHOUSE',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
+                          color: Colors.purpleAccent,
                         ),
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Money: \$${gameState.money}',
-                        style: const TextStyle(fontSize: 18),
+                        'Blood Money: \$${gameState.money}',
+                        style: const TextStyle(fontSize: 18, color: Colors.greenAccent),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 5),
                       const Text(
-                        'Buy and sell drugs to make money and expand your gang\'s influence.',
-                        style: TextStyle(fontSize: 16),
+                        'The air is thick with the scent of chemical rot and shattered dreams. Walls bleed with graffiti of the damned.',
+                        style: TextStyle(color: Colors.white70, fontStyle: FontStyle.italic),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -67,8 +70,25 @@ class CrackhouseScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
+              
+              // Recruit Section
+              Card(
+                color: Colors.pink.shade900.withValues(alpha: 0.4),
+                child: ListTile(
+                  leading: const PixelArtIcon(name: 'prostitute', size: 48),
+                  title: const Text('Recruit Prostitutes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  subtitle: Text('Cost: \$${gameState.prostitutes.price}', style: const TextStyle(color: Colors.white70)),
+                  trailing: ElevatedButton(
+                    onPressed: () => gameProvider.recruitProstitute(),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.pinkAccent),
+                    child: const Text('RECRUIT'),
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 10),
               const Text(
-                'Available Drugs:',
+                'Market of the Damned:',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -90,10 +110,10 @@ class CrackhouseScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               GameButton(
-                text: 'Return to City',
+                text: 'Escape to City',
                 onPressed: () => gameProvider.navigateToScreen('city'),
                 icon: Icons.arrow_back,
-                backgroundColor: Colors.brown,
+                backgroundColor: Colors.brown.shade800,
               ),
             ],
           ),
@@ -106,7 +126,6 @@ class CrackhouseScreen extends StatelessWidget {
     final gameProvider = Provider.of<GameProvider>(context);
     final gameState = gameProvider.gameState;
 
-    // Get current quantity
     final quantity = switch (drugName.toLowerCase()) {
       'weed' => gameState.drugs.weed,
       'crack' => gameState.drugs.crack,
@@ -119,47 +138,49 @@ class CrackhouseScreen extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
+      color: Colors.grey.shade900,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Column(
+        child: Row(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '$drugName: \$$price/kg',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+            PixelArtIcon(name: drugName, size: 50),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        drugName,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                      Text(
+                        'Stash: $quantity kg',
+                        style: const TextStyle(fontSize: 14, color: Colors.amberAccent),
+                      ),
+                    ],
                   ),
-                ),
-                Text(
-                  'Owned: $quantity kg',
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () => _showBuyDialog(context, drugName, price),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                  Text('\$$price/kg', style: const TextStyle(color: Colors.greenAccent)),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _showBuyDialog(context, drugName, price),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.green.shade800, padding: const EdgeInsets.symmetric(horizontal: 20)),
+                        child: const Text('ACQUIRE'),
+                      ),
+                      ElevatedButton(
+                        onPressed: quantity > 0 ? () => _showSellDialog(context, drugName, price) : null,
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade800, padding: const EdgeInsets.symmetric(horizontal: 20)),
+                        child: const Text('LIQUIDATE'),
+                      ),
+                    ],
                   ),
-                  child: const Text('Buy'),
-                ),
-                ElevatedButton(
-                  onPressed: quantity > 0
-                      ? () => _showSellDialog(context, drugName, price)
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                  ),
-                  child: const Text('Sell'),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -174,34 +195,40 @@ class CrackhouseScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Buy $drugName'),
+        backgroundColor: Colors.grey.shade900,
+        title: Row(
+          children: [
+            PixelArtIcon(name: drugName, size: 30),
+            const SizedBox(width: 10),
+            Text('Acquire $drugName', style: const TextStyle(color: Colors.white)),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Price: \$${price.toString()}/kg'),
+            Text('Tribute: \$${price.toString()}/kg', style: const TextStyle(color: Colors.white70)),
             const SizedBox(height: 10),
             TextField(
               controller: quantityController,
+              style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
                 labelText: 'Quantity (kg)',
-                hintText: 'Enter amount to buy',
+                labelStyle: TextStyle(color: Colors.white70),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)),
               ),
               keyboardType: TextInputType.number,
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
           TextButton(
             onPressed: () {
               final quantity = int.tryParse(quantityController.text) ?? 1;
               gameProvider.tradeDrug(drugName.toLowerCase(), 'buy', quantity);
               Navigator.pop(context);
             },
-            child: const Text('Buy'),
+            child: const Text('BUY'),
           ),
         ],
       ),
@@ -220,33 +247,39 @@ class CrackhouseScreen extends StatelessWidget {
       _ => 0,
     };
 
-    final quantityController = TextEditingController(text: quantity > 0 ? '1' : '0');
+    final quantityController = TextEditingController(text: quantity.toString());
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Sell $drugName'),
+        backgroundColor: Colors.grey.shade900,
+        title: Row(
+          children: [
+            PixelArtIcon(name: drugName, size: 30),
+            const SizedBox(width: 10),
+            Text('Liquidate $drugName', style: const TextStyle(color: Colors.white)),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Price: \$${price.toString()}/kg'),
-            Text('You have: $quantity kg'),
+            Text('Value: \$${price.toString()}/kg', style: const TextStyle(color: Colors.white70)),
+            Text('In Possession: $quantity kg', style: const TextStyle(color: Colors.white70)),
             const SizedBox(height: 10),
             TextField(
               controller: quantityController,
+              style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(
                 labelText: 'Quantity (kg)',
-                hintText: 'Enter amount to sell',
+                labelStyle: TextStyle(color: Colors.white70),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white70)),
               ),
               keyboardType: TextInputType.number,
             ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
           TextButton(
             onPressed: () {
               final sellQuantity = int.tryParse(quantityController.text) ?? 1;
@@ -255,7 +288,7 @@ class CrackhouseScreen extends StatelessWidget {
                 Navigator.pop(context);
               }
             },
-            child: const Text('Sell'),
+            child: const Text('SELL'),
           ),
         ],
       ),

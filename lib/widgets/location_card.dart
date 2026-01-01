@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'pixel_art_location.dart';
 
 class LocationCard extends StatelessWidget {
   final String title;
@@ -19,53 +20,71 @@ class LocationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
+      elevation: 8,
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(15),
       ),
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                color.withOpacity(0.8),
-                color.withOpacity(0.6),
-              ],
+        child: Stack(
+          children: [
+            // LARGE Background Icon/Illustration
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.6,
+                child: PixelArtLocation(location: title, size: 150),
+              ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 40, color: Colors.white),
-                const SizedBox(height: 10),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+            
+            // Gradient Overlay for text readability
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.8),
+                    ],
                   ),
-                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 5),
-                Text(
-                  description,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+              ),
             ),
-          ),
+
+            // Text Content (At the bottom)
+            Positioned(
+              bottom: 10,
+              left: 8,
+              right: 10,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900, // Fixed: Changed from FontWeight.black to FontWeight.w900
+                      color: Colors.white,
+                      fontFamily: 'Courier',
+                      shadows: [Shadow(color: Colors.black, blurRadius: 4, offset: Offset(2, 2))],
+                    ),
+                  ),
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.white70,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

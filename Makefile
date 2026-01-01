@@ -38,12 +38,14 @@ help:
 	@echo "  run-linux        - Run Linux version"
 	@echo "  run-android      - Run Android version"
 	@echo "  run-ios          - Run iOS version"
+	@echo "  run-web          - Run web version"
 	@echo "  test             - Run all tests"
 	@echo "  analyze          - Run static code analysis"
 	@echo "  format           - Format code"
 	@echo ""
 	@echo -e "${GREEN}Dependency Targets:${NC}"
-	@echo "  install-deps     - Install all dependencies"
+	@echo "  install-deps     - Install all Flutter dependencies"
+	@echo "  install-linux-deps - Install Linux system requirements (GTK, GStreamer, etc.)"
 	@echo "  upgrade-deps     - Upgrade all dependencies"
 	@echo "  clean-deps       - Clean dependency cache"
 	@echo ""
@@ -63,11 +65,22 @@ doctor:
 	@echo -e "${BLUE}Checking Flutter installation...${NC}"
 	$(FLUTTER) doctor
 
-# Install dependencies
+# Install Flutter dependencies
 install-deps:
 	@echo -e "${BLUE}Installing dependencies...${NC}"
 	$(FLUTTER) pub get
 	@echo -e "${GREEN}Dependencies installed successfully!${NC}"
+
+# Install Linux system dependencies (Ubuntu/Debian/Kali)
+install-linux-deps:
+	@echo -e "${BLUE}Installing Linux system dependencies...${NC}"
+	sudo apt-get update
+	# Explicitly installing libgbm1 first to resolve Kali version conflicts
+	sudo apt-get install -y libgbm1
+	sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev \
+		libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+		libgstreamer-plugins-bad1.0-dev liblzma-dev libgbm-dev
+	@echo -e "${GREEN}System dependencies installed successfully!${NC}"
 
 # Upgrade dependencies
 upgrade-deps:
@@ -85,6 +98,7 @@ clean-deps:
 # Validate pubspec.yaml
 pubspec:
 	@echo -e "${BLUE}Validating pubspec.yaml...${NC}"
+	$(FLUTTER) pub test --version || true
 	$(FLUTTER) pub deps
 	@echo -e "${GREEN}pubspec.yaml is valid!${NC}"
 
@@ -131,6 +145,11 @@ run-ios:
 	@echo -e "${BLUE}Running iOS version...${NC}"
 	$(FLUTTER) run -d ios
 	@echo -e "${GREEN}iOS app running!${NC}"
+
+run-web:
+	@echo -e "${BLUE}Running web version...${NC}"
+	$(FLUTTER) run -d web-server
+	@echo -e "${GREEN}Web app running! Access at http://localhost:8080${NC}"
 
 # Build targets
 build-linux:
@@ -207,7 +226,7 @@ install-tools:
 	$(FLUTTER) pub global activate flutterfire_cli
 	@echo -e "${GREEN}Tools installed!${NC}"
 
-.PHONY: all help doctor install-deps upgrade-deps clean-deps pubspec version \
-        analyze format test run run-linux run-android run-ios \
+.PHONY: all help doctor install-deps install-linux-deps upgrade-deps clean-deps pubspec version \
+        analyze format test run run-linux run-android run-ios run-web \
         build-linux build-windows build-android build-android-bundle build-ios build-web build-all \
         clean clean-all kill release install-tools

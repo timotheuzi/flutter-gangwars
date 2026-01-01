@@ -5,6 +5,7 @@ import '../providers/game_provider.dart';
 import '../widgets/game_button.dart';
 import '../widgets/location_card.dart';
 import '../models/random_event.dart';
+import '../widgets/event_animation.dart';
 
 class CityScreen extends StatelessWidget {
   const CityScreen({super.key});
@@ -18,6 +19,11 @@ class CityScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('City - Droid Gangwar'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.restart_alt),
+            tooltip: 'Restart Game',
+            onPressed: () => _showRestartConfirm(context),
+          ),
           IconButton(
             icon: const Icon(Icons.info),
             onPressed: () => _showStats(context),
@@ -116,8 +122,12 @@ class CityScreen extends StatelessWidget {
                   runSpacing: 10,
                   alignment: WrapAlignment.center,
                   children: gameState.drugPrices.entries.map((entry) {
+                    final displayName = entry.key
+                        .split('_')
+                        .map((word) => word[0].toUpperCase() + word.substring(1))
+                        .join(' ');
                     return Chip(
-                      label: Text('${entry.key}: \$${entry.value}/kg'),
+                      label: Text('$displayName: \$${entry.value}/kg'),
                       backgroundColor: Colors.deepPurple.shade100,
                       labelStyle: const TextStyle(color: Colors.deepPurple),
                     );
@@ -202,7 +212,7 @@ class CityScreen extends StatelessWidget {
                       description: 'Game information',
                       icon: Icons.credit_card,
                       color: Colors.teal,
-                      onPressed: () => _showCredits(context),
+                      onPressed: () => gameProvider.navigateToScreen('credits'),
                     ),
                   ],
                 ),
@@ -277,6 +287,7 @@ class CityScreen extends StatelessWidget {
   void _showStats(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     final gameState = gameProvider.gameState;
+    final weapons = gameState.weapons;
 
     showDialog(
       context: context,
@@ -300,11 +311,35 @@ class CityScreen extends StatelessWidget {
               const SizedBox(height: 15),
               const Text('Weapons:',
                   style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('Pistols: ${gameState.weapons.pistols}'),
-              Text('Bullets: ${gameState.weapons.bullets}'),
-              Text('Uzis: ${gameState.weapons.uzis}'),
-              Text('Grenades: ${gameState.weapons.grenades}'),
-              Text('Vest: ${gameState.weapons.vest}'),
+              if (weapons.pistols > 0) Text('Pistols: ${weapons.pistols}'),
+              if (weapons.totalBullets > 0) Text('Total Bullets: ${weapons.totalBullets}'),
+              if (weapons.bullets > 0) Text('Standard Bullets: ${weapons.bullets}'),
+              if (weapons.hollowPointBullets > 0) Text('Hollow Point: ${weapons.hollowPointBullets}'),
+              if (weapons.explodingBullets > 0) Text('Exploding: ${weapons.explodingBullets}'),
+              if (weapons.uzis > 0) Text('Uzis: ${weapons.uzis}'),
+              if (weapons.ar15 > 0) Text('AR-15: ${weapons.ar15}'),
+              if (weapons.machineGun > 0) Text('Machine Guns: ${weapons.machineGun}'),
+              if (weapons.submachineGun > 0) Text('Submachine Guns: ${weapons.submachineGun}'),
+              if (weapons.ghostGuns > 0) Text('Ghost Guns: ${weapons.ghostGuns}'),
+              if (weapons.goldenGun > 0) Text('Golden Guns: ${weapons.goldenGun}'),
+              if (weapons.grenades > 0) Text('Grenades: ${weapons.grenades}'),
+              if (weapons.missileLauncher > 0) Text('Missile Launcher: ${weapons.missileLauncher}'),
+              if (weapons.missiles > 0) Text('Missiles: ${weapons.missiles}'),
+              if (weapons.rocketLauncher > 0) Text('Rocket Launcher: ${weapons.rocketLauncher}'),
+              if (weapons.flamethrower > 0) Text('Flamethrowers: ${weapons.flamethrower}'),
+              if (weapons.knife > 0) Text('Knives: ${weapons.knife}'),
+              if (weapons.sword > 0) Text('Swords: ${weapons.sword}'),
+              if (weapons.axe > 0) Text('Axes: ${weapons.axe}'),
+              if (weapons.barbedWireBat > 0) Text('Barbed Wire Bats: ${weapons.barbedWireBat}'),
+              if (weapons.vampireBat > 0) Text('Vampire Bats: ${weapons.vampireBat}'),
+              if (weapons.brassKnuckles > 0) Text('Brass Knuckles: ${weapons.brassKnuckles}'),
+              if (weapons.poisonBlowgun > 0) Text('Poison Blowguns: ${weapons.poisonBlowgun}'),
+              if (weapons.goldenSword > 0) Text('Golden Swords: ${weapons.goldenSword}'),
+              if (weapons.goldenAxe > 0) Text('Golden Axes: ${weapons.goldenAxe}'),
+              if (weapons.goldenKnife > 0) Text('Golden Knives: ${weapons.goldenKnife}'),
+              if (weapons.goldenUzi > 0) Text('Golden Uzis: ${weapons.goldenUzi}'),
+              if (weapons.goldenAr15 > 0) Text('Golden AR-15: ${weapons.goldenAr15}'),
+              if (weapons.vest > 0) Text('Body Armor: ${weapons.vest}'),
               const SizedBox(height: 15),
               const Text('Drugs:',
                   style: TextStyle(fontWeight: FontWeight.bold)),
@@ -327,63 +362,93 @@ class CityScreen extends StatelessWidget {
     );
   }
 
+  void _showRestartConfirm(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Restart Game?'),
+        content: const Text('This will wipe all stats and progress. Are you sure you want to start a new legacy?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              final gameProvider = Provider.of<GameProvider>(context, listen: false);
+              gameProvider.restartGame(keepPersistentData: false);
+            },
+            child: const Text('RESTART', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _handleWander(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
-    // Use the event from wander() instead of just the string result
     final event = gameProvider.wanderWithEvent();
     
     if (event == null) {
-      // Day changed or something else handled by string
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(gameProvider.gameMessage), // Use gameMessage which is set by wander logic
+          content: Text(gameProvider.gameMessage),
           duration: const Duration(seconds: 3),
         ),
       );
       return;
     }
 
-    if (event.type == EventType.npcEncounter && event.options.isNotEmpty) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          title: Text(event.title),
-          content: Text(event.description),
-          actions: event.options.map((option) {
-            return TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _handleNpcOption(context, option, event);
-              },
-              child: Text(option),
-            );
-          }).toList(),
-        ),
-      );
-    } else {
-      // Just show the message for other events
-       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(event.description),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-    }
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          String? selectedOption;
+          return AlertDialog(
+            backgroundColor: Colors.grey.shade900,
+            title: Text(event.title, style: const TextStyle(color: Colors.white)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                EventAnimation(event: event, selectedOption: selectedOption),
+                const SizedBox(height: 15),
+                Text(event.description, style: const TextStyle(color: Colors.white70)),
+              ],
+            ),
+            actions: event.options.isNotEmpty 
+              ? event.options.map((option) {
+                  return TextButton(
+                    onPressed: () {
+                      setState(() => selectedOption = option);
+                      // Brief delay to show animation if needed
+                      Future.delayed(const Duration(milliseconds: 500), () {
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                          _handleNpcOption(context, option, event);
+                        }
+                      });
+                    },
+                    child: Text(option),
+                  );
+                }).toList()
+              : [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+          );
+        }
+      ),
+    );
   }
   
   void _handleNpcOption(BuildContext context, String option, RandomEvent event) {
      final gameProvider = Provider.of<GameProvider>(context, listen: false);
-     
-     // We need a method in GameProvider to apply the option effect
      final resultMessage = gameProvider.handleNpcInteraction(event, option);
      
-     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(resultMessage),
-        duration: const Duration(seconds: 3),
-      ),
-    );
+     if (gameProvider.currentScreen != 'mud_fight') {
+       ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(resultMessage),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+     }
   }
 
   void _startFinalBattle(BuildContext context) {
@@ -401,7 +466,7 @@ class CityScreen extends StatelessWidget {
         gameState.weapons.goldenGun;
     final hasEnoughGuns = totalFirearms >= gameState.members ~/ 2;
     final hasEnoughBullets =
-        gameState.weapons.bullets >= gameState.members * 20;
+        gameState.weapons.totalBullets >= gameState.members * 20;
 
     if (!hasEnoughMembers || !hasEnoughGuns || !hasEnoughBullets) {
       String message =
@@ -411,7 +476,7 @@ class CityScreen extends StatelessWidget {
         message += '\n- Enough firearms for at least half your gang.';
       }
       if (!hasEnoughBullets) {
-        message += '\n- At least 20 bullets per gang member.';
+        message += '\n- At least 20 bullets (any type) per gang member.';
       }
 
       showDialog(
@@ -457,7 +522,8 @@ class CityScreen extends StatelessWidget {
     }
 
     final powerFactor = max(1.0, gameState.members / 5.0);
-    final enemyHealth = enemyCount * (baseEnemyHealth * powerFactor);
+    final perEnemyHealth = (baseEnemyHealth * powerFactor).toInt();
+    final totalEnemyHealth = perEnemyHealth * enemyCount;
 
     showDialog(
       context: context,
@@ -472,7 +538,7 @@ class CityScreen extends StatelessWidget {
               Text(
                   'They have gathered all their $enemyCount soldiers to crush you.'),
               Text(
-                  'Their total health is estimated to be around ${enemyHealth.toInt()}.'),
+                  'Their total health is estimated to be around $totalEnemyHealth.'),
               const SizedBox(height: 10),
               Text(squidieUpgradeMessage),
               const SizedBox(height: 10),
@@ -491,7 +557,7 @@ class CityScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               gameProvider.startMudFight(
-                enemyHealth.toInt(),
+                perEnemyHealth,
                 enemyCount,
                 'Squidie Army',
                 'final_battle_${DateTime.now().millisecondsSinceEpoch}',
@@ -499,49 +565,6 @@ class CityScreen extends StatelessWidget {
               Navigator.pop(context);
             },
             child: const Text('TO VICTORY!'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showCredits(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Game Credits'),
-        content: const SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Droid Gangwar - Flutter Edition'),
-              SizedBox(height: 10),
-              Text('Original Game: Gang War MUD by timotheuzi@hotmail.com'),
-              Text(
-                  'Flutter Adaptation: Built with Flutter for cross-platform support'),
-              SizedBox(height: 15),
-              Text('Features:'),
-              Text(
-                  '• Cross-platform: Android, iOS, Linux, Windows, macOS, Web'),
-              Text('• Modern UI with Flutter widgets'),
-              Text('• Full game logic migration from Kotlin to Dart'),
-              Text('• State management with Provider'),
-              Text('• Persistent game saves'),
-              SizedBox(height: 15),
-              Text('Special Thanks:'),
-              Text('• Original Gang War community'),
-              Text('• Flutter development team'),
-              Text('• All beta testers'),
-              SizedBox(height: 15),
-              Text('Version 1.0'),
-              Text('Built with ❤️ for gang warfare enthusiasts'),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Back to City'),
           ),
         ],
       ),

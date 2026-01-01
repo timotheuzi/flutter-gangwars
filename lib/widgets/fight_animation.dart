@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
+import 'pixel_art_member.dart';
+import 'pixel_art_icon.dart';
 
 class FightAnimation extends StatefulWidget {
   final String playerName;
@@ -32,188 +35,116 @@ class FightAnimation extends StatefulWidget {
   FightAnimationState createState() => FightAnimationState();
 }
 
-class BloodSplatterPainter extends CustomPainter {
-  final double animationValue;
+enum ParticleType { blood, gut }
 
-  BloodSplatterPainter(this.animationValue);
+class Particle {
+  Offset position;
+  Offset velocity;
+  double size;
+  double opacity;
+  double rotation;
+  double rotationSpeed;
+  Color color;
+  ParticleType type;
+  int life;
+  int maxLife;
+
+  Particle({
+    required this.position,
+    required this.velocity,
+    required this.size,
+    required this.opacity,
+    required this.rotation,
+    required this.rotationSpeed,
+    required this.color,
+    required this.type,
+    required this.maxLife,
+  }) : life = maxLife;
+}
+
+class BloodSplatterPainter extends CustomPainter {
+  final List<Particle> particles;
+
+  BloodSplatterPainter(this.particles);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.red.withOpacity(0.3 + animationValue * 0.4)
-      ..style = PaintingStyle.fill;
+    final bloodPaint = Paint()..style = PaintingStyle.fill;
+    final gutPaint = Paint()..style = PaintingStyle.fill;
 
-    // Draw some random blood splatters
-    final random = Offset(size.width * 0.2, size.height * 0.3);
-    canvas.drawCircle(random, 15 + animationValue * 10, paint);
-
-    final random2 = Offset(size.width * 0.7, size.height * 0.6);
-    canvas.drawCircle(random2, 8 + animationValue * 6, paint);
-
-    final random3 = Offset(size.width * 0.4, size.height * 0.8);
-    canvas.drawCircle(random3, 12 + animationValue * 8, paint);
+    for (var particle in particles) {
+      final currentOpacity = particle.opacity * (particle.life / particle.maxLife);
+      
+      if (particle.type == ParticleType.blood) {
+        bloodPaint.color = particle.color.withValues(alpha: currentOpacity);
+        canvas.save();
+        canvas.translate(particle.position.dx, particle.position.dy);
+        canvas.rotate(particle.rotation);
+        
+        final path = Path();
+        path.moveTo(0, -particle.size);
+        path.quadraticBezierTo(particle.size * 0.5, -particle.size * 0.8, particle.size, 0);
+        path.quadraticBezierTo(particle.size * 0.8, particle.size * 0.5, 0, particle.size);
+        path.quadraticBezierTo(-particle.size * 0.8, particle.size * 0.5, -particle.size, 0);
+        path.quadraticBezierTo(-particle.size * 0.5, -particle.size * 0.8, 0, -particle.size);
+        
+        canvas.drawPath(path, bloodPaint);
+        canvas.restore();
+      } else {
+        // Guts/Gore: irregular shapes
+        gutPaint.color = particle.color.withValues(alpha: currentOpacity);
+        canvas.save();
+        canvas.translate(particle.position.dx, particle.position.dy);
+        canvas.rotate(particle.rotation);
+        
+        // Rect for a "chunk"
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromLTWH(-particle.size/2, -particle.size/4, particle.size, particle.size/2),
+            Radius.circular(particle.size / 4)
+          ),
+          gutPaint
+        );
+        canvas.restore();
+      }
+    }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant BloodSplatterPainter oldDelegate) => true;
 }
 
 class FightAnimationState extends State<FightAnimation>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _playerAnimation;
-  late Animation<double> _enemyAnimation;
-  late Animation<Color?> _playerColorAnimation;
-  late Animation<Color?> _enemyColorAnimation;
-  late Animation<double> _bloodSplashAnimation;
-  late Animation<double> _weaponSwingAnimation;
-  late Animation<double> _bloodDripAnimation;
-  late Animation<double> _woundPulseAnimation;
-  late Animation<double> _bloodParticleAnimation;
-  late Animation<double> _goreEffectAnimation;
+  final List<Particle> _particles = [];
+  final Random _random = Random();
 
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat(reverse: true);
-
-    // Player animation - moves left and right
-    _playerAnimation = Tween<double>(begin: -40.0, end: 40.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeInOut),
-      ),
-    );
-
-    // Enemy animation - moves right and left (opposite of player)
-    _enemyAnimation = Tween<double>(begin: 40.0, end: -40.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.5, 1.0, curve: Curves.easeInOut),
-      ),
-    );
-
-    // Player color animation - pulses based on health
-    _playerColorAnimation = ColorTween(
-      begin: Colors.blue.shade800,
-      end: _getHealthColor(widget.playerHealth, widget.playerMaxHealth),
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 1.0, curve: Curves.easeInOut),
-      ),
-    );
-
-    // Enemy color animation - pulses based on health
-    _enemyColorAnimation = ColorTween(
-      begin: Colors.red.shade800,
-      end: _getHealthColor(widget.enemyHealth, widget.enemyMaxHealth),
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 1.0, curve: Curves.easeInOut),
-      ),
-    );
-
-    // Enhanced blood splash animation
-    _bloodSplashAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.6, 1.0, curve: Curves.elasticOut),
-      ),
-    );
-
-    // Blood drip animation
-    _bloodDripAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 1.0, curve: Curves.bounceIn),
-      ),
-    );
-
-    // Wound pulse animation
-    _woundPulseAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 1.0, curve: Curves.easeInOut),
-      ),
-    );
-
-    // Blood particle animation
-    _bloodParticleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.7, 1.0, curve: Curves.easeOut),
-      ),
-    );
-
-    // Gore effect animation
-    _goreEffectAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.8, 1.0, curve: Curves.elasticOut),
-      ),
-    );
-
-    // Weapon swing animation
-    _weaponSwingAnimation = Tween<double>(begin: -0.5, end: 0.5).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.elasticOut),
-      ),
-    );
+      duration: const Duration(milliseconds: 16), // Approx 60fps
+    )..addListener(_updateParticles)..repeat();
   }
 
-  Color _getHealthColor(int health, double maxHealth) {
-    final healthPercentage = health / maxHealth;
-    if (healthPercentage > 0.6) {
-      return Colors.green;
-    } else if (healthPercentage > 0.3) {
-      return Colors.orange;
-    } else {
-      return Colors.red;
-    }
-  }
-
-  String _getWeaponIcon(String? weapon) {
-    if (weapon == null) return '👊💥'; // Bloody fists
-
-    return switch (weapon.toLowerCase()) {
-      'pistol' => '🔫💥',
-      'uzi' => '🔫🔫💥',
-      'ar15' => '🪖⚡',
-      'grenade' => '💣💥',
-      'knife' => '🔪🩸',
-      'sword' => '🗡️⚔️',
-      'barbed_wire_bat' => '⚾💢🩸',
-      'brass_knuckles' => '🥊💥',
-      'axe' => '🪓⚡',
-      'fists' => '👊💥',
-      'ghost_gun' => '👻🔫',
-      'vampire_bat' => '🦇⚾💥',
-      'missile_launcher' => '🚀💥',
-      'machine_gun' => '🔫🔫🔫💥',
-      'rocket_launcher' => '🚀🚀💥',
-      'submachine_gun' => '🔫🔫⚡',
-      'flamethrower' => '🔥💥',
-      'golden_gun' => '💰🔫✨',
-      _ => '👊💥',
-    };
-  }
-
-  @override
-  void didUpdateWidget(FightAnimation oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.playerHealth != widget.playerHealth ||
-        oldWidget.enemyHealth != widget.enemyHealth ||
-        oldWidget.currentWeapon != widget.currentWeapon ||
-        oldWidget.showBloodEffects != widget.showBloodEffects) {
-      setState(() {});
-    }
+  void _updateParticles() {
+    if (!mounted) return;
+    
+    setState(() {
+      for (int i = _particles.length - 1; i >= 0; i--) {
+        final p = _particles[i];
+        p.position += p.velocity;
+        p.velocity += const Offset(0, 0.2); // Gravity
+        p.rotation += p.rotationSpeed;
+        p.life--;
+        
+        if (p.life <= 0) {
+          _particles.removeAt(i);
+        }
+      }
+    });
   }
 
   @override
@@ -222,119 +153,148 @@ class FightAnimationState extends State<FightAnimation>
     super.dispose();
   }
 
+  void _addExplosion(Offset position, bool isGut) {
+    int count = isGut ? 15 : 25;
+    for (int i = 0; i < count; i++) {
+      final angle = _random.nextDouble() * 2 * pi;
+      final speed = 1.0 + _random.nextDouble() * 4.0;
+      
+      _particles.add(Particle(
+        position: position,
+        velocity: Offset(cos(angle) * speed, sin(angle) * speed - 2), // Upward bias
+        size: isGut ? (4 + _random.nextDouble() * 6) : (2 + _random.nextDouble() * 5),
+        opacity: 0.8 + _random.nextDouble() * 0.2,
+        rotation: _random.nextDouble() * 2 * pi,
+        rotationSpeed: (_random.nextDouble() - 0.5) * 0.5,
+        color: isGut ? Colors.pink.shade300 : Colors.red.shade900,
+        type: isGut && _random.nextDouble() > 0.6 ? ParticleType.gut : ParticleType.blood,
+        maxLife: 40 + _random.nextInt(30),
+      ));
+    }
+  }
+
+  @override
+  void didUpdateWidget(FightAnimation oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.playerHealth < oldWidget.playerHealth) {
+      final pos = Offset(40 + _random.nextDouble() * 60, 100 + _random.nextDouble() * 50);
+      _addExplosion(pos, (oldWidget.playerHealth - widget.playerHealth) > 15);
+    }
+    if (widget.enemyHealth < oldWidget.enemyHealth) {
+      final pos = Offset(MediaQuery.of(context).size.width - 140 + _random.nextDouble() * 60, 100 + _random.nextDouble() * 50);
+       _addExplosion(pos, (oldWidget.enemyHealth - widget.enemyHealth) > 20);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 200,
+      height: 220,
+      width: double.infinity,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.black.withOpacity(0.95),
-            Colors.red.shade900.withOpacity(0.8),
-            Colors.black.withOpacity(0.9),
+        color: Colors.brown.shade900,
+        border: Border.all(color: Colors.brown.shade700, width: 4),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Stack(
+          children: [
+            Container(color: Colors.brown.shade900),
+            CustomPaint(
+              painter: BloodSplatterPainter(_particles),
+              size: Size.infinite,
+            ),
+            Positioned.fill(
+              child: Row(
+                children: [
+                  Expanded(child: _buildSide(true)),
+                  const SizedBox(width: 40),
+                  Expanded(child: _buildSide(false)),
+                ],
+              ),
+            ),
           ],
         ),
-        border: Border.all(
-          color: Colors.red.shade600,
-          width: 2,
-        ),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Stack(
-        children: [
-          // Muddy battlefield background
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.brown.shade900.withOpacity(0.6),
-                    Colors.black.withOpacity(0.8),
-                    Colors.red.shade900.withOpacity(0.4),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // Player gang members (left side)
-          ..._buildGangMembers(true),
-
-          // Enemy gang members (right side)
-          ..._buildGangMembers(false),
-
-          // Blood splatter effects
-          if (widget.showBloodEffects)
-            Positioned.fill(
-              child: Opacity(
-                opacity: 0.3,
-                child: CustomPaint(
-                  painter: BloodSplatterPainter(_bloodSplashAnimation.value),
-                ),
-              ),
-            ),
-        ],
       ),
     );
   }
 
-  List<Widget> _buildGangMembers(bool isPlayerSide) {
-    final members = isPlayerSide ? widget.playerMembers : widget.enemyCount;
-    final health = isPlayerSide ? widget.playerHealth : widget.enemyHealth;
-    final maxHealth = isPlayerSide ? widget.playerMaxHealth : widget.enemyMaxHealth;
-    final healthPerMember = maxHealth / members;
-    final startX = isPlayerSide ? 20.0 : MediaQuery.of(context).size.width - 100;
-    final spacing = 40.0;
+  Widget _buildSide(bool isPlayer) {
+    final totalCount = isPlayer ? widget.playerMembers : widget.enemyCount;
+    final currentHealth = isPlayer ? widget.playerHealth : widget.enemyHealth;
+    final maxHealth = isPlayer ? widget.playerMaxHealth : widget.enemyMaxHealth;
+    
+    // Safety check
+    if (totalCount <= 0) return const SizedBox();
+    
+    final healthPerMember = maxHealth / totalCount;
 
-    List<Widget> memberWidgets = [];
-
-    for (int i = 0; i < members; i++) {
-      final memberHealth = (health - (i * healthPerMember)).clamp(0, healthPerMember);
-      final isAlive = memberHealth > 0;
-      final xPos = startX + (i * spacing);
-
-      memberWidgets.add(
-        Positioned(
-          left: xPos,
-          bottom: isAlive ? 20 : 5, // Dead members fall to bottom
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              return Transform.translate(
-                offset: Offset(
-                  isPlayerSide ? _playerAnimation.value * 0.5 : _enemyAnimation.value * 0.5,
-                  isAlive ? 0 : 10, // Dead members sink into mud
-                ),
-                child: _buildGangMemberSprite(isPlayerSide, isAlive, i),
-              );
-            },
-          ),
-        ),
-      );
-    }
-
-    return memberWidgets;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        alignment: isPlayer ? WrapAlignment.start : WrapAlignment.end,
+        children: List.generate(totalCount, (index) {
+          final memberThreshold = index * healthPerMember;
+          final isAlive = currentHealth > memberThreshold;
+          
+          final isVictorious = (isPlayer && widget.enemyHealth <= 0) || (!isPlayer && widget.playerHealth <= 0);
+          
+          return _buildMemberWithAnimation(isPlayer, isAlive, isAlive && isVictorious, index);
+        }),
+      ),
+    );
   }
 
-  Widget _buildGangMemberSprite(bool isPlayerSide, bool isAlive, int index) {
-    if (!isAlive) {
-      // Dead member - bloody heap
-      return const Text(
-        '🩸💀',
-        style: TextStyle(fontSize: 20),
-      );
-    }
+  Widget _buildMemberWithAnimation(bool isPlayer, bool isAlive, bool isCheering, int index) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        double yOffset = 0;
+        if (isAlive) {
+          yOffset = sin(_controller.value * 2 * pi * 0.05 + (index * 0.5)) * 3;
+        } else {
+          yOffset = 10;
+        }
 
-    // Alive member - simple emoji character
-    final emoji = isPlayerSide ? '👨🏽‍🦲' : '👨🏽‍🦱';
-
-    return Text(
-      emoji,
-      style: const TextStyle(fontSize: 24),
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isAlive && !isCheering && widget.currentWeapon != null)
+               _buildWeaponFloating(isPlayer),
+            Transform.translate(
+              offset: Offset(0, yOffset),
+              child: PixelArtMember(
+                isPlayer: isPlayer,
+                isAlive: isAlive,
+                isCheering: isCheering,
+                size: 30,
+              ),
+            ),
+          ],
+        );
+      },
     );
+  }
+
+  Widget _buildWeaponFloating(bool isPlayer) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: PixelArtIcon(name: _getSanitizedWeaponName(widget.currentWeapon!), size: 16),
+    );
+  }
+
+  String _getSanitizedWeaponName(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('pistol')) return 'pistol';
+    if (lower.contains('uzi')) return 'uzi';
+    if (lower.contains('ar15')) return 'ar15';
+    if (lower.contains('sword')) return 'sword';
+    if (lower.contains('bat')) return 'bat';
+    if (lower.contains('grenade')) return 'grenade';
+    if (lower.contains('knife')) return 'knife';
+    return 'pistol';
   }
 }
