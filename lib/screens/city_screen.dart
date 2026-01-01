@@ -122,8 +122,12 @@ class CityScreen extends StatelessWidget {
                   runSpacing: 10,
                   alignment: WrapAlignment.center,
                   children: gameState.drugPrices.entries.map((entry) {
+                    final displayName = entry.key
+                        .split('_')
+                        .map((word) => word[0].toUpperCase() + word.substring(1))
+                        .join(' ');
                     return Chip(
-                      label: Text('${entry.key}: \$${entry.value}/kg'),
+                      label: Text('$displayName: \$${entry.value}/kg'),
                       backgroundColor: Colors.deepPurple.shade100,
                       labelStyle: const TextStyle(color: Colors.deepPurple),
                     );
@@ -283,6 +287,7 @@ class CityScreen extends StatelessWidget {
   void _showStats(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     final gameState = gameProvider.gameState;
+    final weapons = gameState.weapons;
 
     showDialog(
       context: context,
@@ -306,14 +311,35 @@ class CityScreen extends StatelessWidget {
               const SizedBox(height: 15),
               const Text('Weapons:',
                   style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('Pistols: ${gameState.weapons.pistols}'),
-              Text('Total Bullets: ${gameState.weapons.totalBullets}'),
-              Text('Standard Bullets: ${gameState.weapons.bullets}'),
-              Text('Hollow Point: ${gameState.weapons.hollowPointBullets}'),
-              Text('Exploding: ${gameState.weapons.explodingBullets}'),
-              Text('Uzis: ${gameState.weapons.uzis}'),
-              Text('Grenades: ${gameState.weapons.grenades}'),
-              Text('Vest: ${gameState.weapons.vest}'),
+              if (weapons.pistols > 0) Text('Pistols: ${weapons.pistols}'),
+              if (weapons.totalBullets > 0) Text('Total Bullets: ${weapons.totalBullets}'),
+              if (weapons.bullets > 0) Text('Standard Bullets: ${weapons.bullets}'),
+              if (weapons.hollowPointBullets > 0) Text('Hollow Point: ${weapons.hollowPointBullets}'),
+              if (weapons.explodingBullets > 0) Text('Exploding: ${weapons.explodingBullets}'),
+              if (weapons.uzis > 0) Text('Uzis: ${weapons.uzis}'),
+              if (weapons.ar15 > 0) Text('AR-15: ${weapons.ar15}'),
+              if (weapons.machineGun > 0) Text('Machine Guns: ${weapons.machineGun}'),
+              if (weapons.submachineGun > 0) Text('Submachine Guns: ${weapons.submachineGun}'),
+              if (weapons.ghostGuns > 0) Text('Ghost Guns: ${weapons.ghostGuns}'),
+              if (weapons.goldenGun > 0) Text('Golden Guns: ${weapons.goldenGun}'),
+              if (weapons.grenades > 0) Text('Grenades: ${weapons.grenades}'),
+              if (weapons.missileLauncher > 0) Text('Missile Launcher: ${weapons.missileLauncher}'),
+              if (weapons.missiles > 0) Text('Missiles: ${weapons.missiles}'),
+              if (weapons.rocketLauncher > 0) Text('Rocket Launcher: ${weapons.rocketLauncher}'),
+              if (weapons.flamethrower > 0) Text('Flamethrowers: ${weapons.flamethrower}'),
+              if (weapons.knife > 0) Text('Knives: ${weapons.knife}'),
+              if (weapons.sword > 0) Text('Swords: ${weapons.sword}'),
+              if (weapons.axe > 0) Text('Axes: ${weapons.axe}'),
+              if (weapons.barbedWireBat > 0) Text('Barbed Wire Bats: ${weapons.barbedWireBat}'),
+              if (weapons.vampireBat > 0) Text('Vampire Bats: ${weapons.vampireBat}'),
+              if (weapons.brassKnuckles > 0) Text('Brass Knuckles: ${weapons.brassKnuckles}'),
+              if (weapons.poisonBlowgun > 0) Text('Poison Blowguns: ${weapons.poisonBlowgun}'),
+              if (weapons.goldenSword > 0) Text('Golden Swords: ${weapons.goldenSword}'),
+              if (weapons.goldenAxe > 0) Text('Golden Axes: ${weapons.goldenAxe}'),
+              if (weapons.goldenKnife > 0) Text('Golden Knives: ${weapons.goldenKnife}'),
+              if (weapons.goldenUzi > 0) Text('Golden Uzis: ${weapons.goldenUzi}'),
+              if (weapons.goldenAr15 > 0) Text('Golden AR-15: ${weapons.goldenAr15}'),
+              if (weapons.vest > 0) Text('Body Armor: ${weapons.vest}'),
               const SizedBox(height: 15),
               const Text('Drugs:',
                   style: TextStyle(fontWeight: FontWeight.bold)),

@@ -20,6 +20,7 @@ class GameState with ChangeNotifier {
   int damage = 0;
   int currentScore = 0;
   String currentLocation = 'city';
+  double accuracy = 0.85; // Base accuracy rating
 
   Map<String, int> drugPrices = {
     'weed': 500,
@@ -45,7 +46,7 @@ class GameState with ChangeNotifier {
   // Gang HP system
   List<GangMember> gangMembers = [];
 
-  // Additional weapons
+  // Additional weapons (legacy - prefer weapons object)
   int machineGun = 0;
   int rocketLauncher = 0;
   int submachineGun = 0;
@@ -75,6 +76,7 @@ class GameState with ChangeNotifier {
     this.damage = 0,
     this.currentScore = 0,
     this.currentLocation = 'city',
+    this.accuracy = 0.85,
   });
 
   void updateCurrentScore() {
@@ -136,12 +138,11 @@ class GameState with ChangeNotifier {
       if (members > 100) members = 100;
     }
 
-    // Prostitutes generate income
+    // Prostitutes generate income: $3500 - $4800 per day
     final random = Random();
     int totalIncome = 0;
     for (int i = 0; i < prostitutes.count; i++) {
-      // Base income $1000 + quality variation up to $500
-      totalIncome += 1000 + random.nextInt(501);
+      totalIncome += 3500 + random.nextInt(1301); // 4800 - 3500 + 1
     }
     money += totalIncome;
 
@@ -162,6 +163,14 @@ class GameState with ChangeNotifier {
 
     updateDrugPrices();
     generateDrugTrends();
+    
+    // Custom message for prostitute income
+    String incomeMessage = '';
+    if (prostitutes.count > 0) {
+      incomeMessage = '\nYour prostitutes earned you \$$totalIncome tonight.';
+    }
+    
+    // We don't have direct access to gameMessage here, but it's handled in GameProvider
     notifyListeners();
   }
 
@@ -206,10 +215,11 @@ class GameState with ChangeNotifier {
     for (int i = 0; i < numTrends; i++) {
       final drug = shuffledDrugs[i];
       final isBust = random.nextBool();
+      final displayName = drug.replaceAll('_', ' ');
       if (isBust) {
-        drugTrends[drug] = 'The Feds just made a massive bust on a $drug shipment. Prices are gonna skyrocket tomorrow.';
+        drugTrends[drug] = 'The Feds just made a massive bust on a $displayName shipment. Prices are gonna skyrocket tomorrow.';
       } else {
-        drugTrends[drug] = 'Word is the market is being flooded with cheap $drug from the border. Prices are gonna tank soon.';
+        drugTrends[drug] = 'Word is the market is being flooded with cheap $displayName from the border. Prices are gonna tank soon.';
       }
     }
   }
@@ -234,6 +244,7 @@ class GameState with ChangeNotifier {
         'damage': damage,
         'currentScore': currentScore,
         'currentLocation': currentLocation,
+        'accuracy': accuracy,
         'drugPrices': drugPrices,
         'drugTrends': drugTrends,
         'flags': flags.toJson(),
@@ -273,6 +284,7 @@ class GameState with ChangeNotifier {
       damage: json['damage'] ?? 0,
       currentScore: json['currentScore'] ?? 0,
       currentLocation: json['currentLocation'] ?? 'city',
+      accuracy: (json['accuracy'] ?? 0.85).toDouble(),
     );
 
     state.drugPrices = Map<String, int>.from(json['drugPrices'] ?? {});
@@ -497,7 +509,7 @@ class Drugs {
         'coke': coke,
         'ice': ice,
         'percs': percs,
-        'pixieDust': pixieDust,
+        'pixie_dust': pixieDust,
       };
 
   factory Drugs.fromJson(Map<String, dynamic> json) {

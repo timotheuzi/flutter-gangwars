@@ -14,7 +14,7 @@ class CrackhouseScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Crackhouse - Droid Gangwar'),
+        title: const Text('The Ossuary - Droid Gangwar'),
         backgroundColor: Colors.purple.shade900,
         actions: [
           IconButton(
@@ -56,8 +56,14 @@ class CrackhouseScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Cash: \$${gameState.money}',
+                        'Blood Money: \$${gameState.money}',
                         style: const TextStyle(fontSize: 18, color: Colors.greenAccent),
+                      ),
+                      const SizedBox(height: 5),
+                      const Text(
+                        'The air is thick with the scent of chemical rot and shattered dreams. Walls bleed with graffiti of the damned.',
+                        style: TextStyle(color: Colors.white70, fontStyle: FontStyle.italic),
+                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
@@ -71,7 +77,7 @@ class CrackhouseScreen extends StatelessWidget {
                 child: ListTile(
                   leading: const PixelArtIcon(name: 'prostitute', size: 48),
                   title: const Text('Recruit Prostitutes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  subtitle: Text('Earn \$100/day. Cost: \$${gameState.prostitutes.price}', style: const TextStyle(color: Colors.white70)),
+                  subtitle: Text('Cost: \$${gameState.prostitutes.price}', style: const TextStyle(color: Colors.white70)),
                   trailing: ElevatedButton(
                     onPressed: () => gameProvider.recruitProstitute(),
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.pinkAccent),
@@ -82,7 +88,7 @@ class CrackhouseScreen extends StatelessWidget {
               
               const SizedBox(height: 10),
               const Text(
-                'Market Prices:',
+                'Market of the Damned:',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -104,7 +110,7 @@ class CrackhouseScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               GameButton(
-                text: 'Return to City',
+                text: 'Escape to City',
                 onPressed: () => gameProvider.navigateToScreen('city'),
                 icon: Icons.arrow_back,
                 backgroundColor: Colors.brown.shade800,
@@ -164,12 +170,12 @@ class CrackhouseScreen extends StatelessWidget {
                       ElevatedButton(
                         onPressed: () => _showBuyDialog(context, drugName, price),
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.green.shade800, padding: const EdgeInsets.symmetric(horizontal: 20)),
-                        child: const Text('BUY'),
+                        child: const Text('ACQUIRE'),
                       ),
                       ElevatedButton(
                         onPressed: quantity > 0 ? () => _showSellDialog(context, drugName, price) : null,
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade800, padding: const EdgeInsets.symmetric(horizontal: 20)),
-                        child: const Text('SELL'),
+                        child: const Text('LIQUIDATE'),
                       ),
                     ],
                   ),
@@ -194,13 +200,13 @@ class CrackhouseScreen extends StatelessWidget {
           children: [
             PixelArtIcon(name: drugName, size: 30),
             const SizedBox(width: 10),
-            Text('Buy $drugName', style: const TextStyle(color: Colors.white)),
+            Text('Acquire $drugName', style: const TextStyle(color: Colors.white)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Price: \$${price.toString()}/kg', style: const TextStyle(color: Colors.white70)),
+            Text('Tribute: \$${price.toString()}/kg', style: const TextStyle(color: Colors.white70)),
             const SizedBox(height: 10),
             TextField(
               controller: quantityController,
@@ -251,14 +257,14 @@ class CrackhouseScreen extends StatelessWidget {
           children: [
             PixelArtIcon(name: drugName, size: 30),
             const SizedBox(width: 10),
-            Text('Sell $drugName', style: const TextStyle(color: Colors.white)),
+            Text('Liquidate $drugName', style: const TextStyle(color: Colors.white)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Price: \$${price.toString()}/kg', style: const TextStyle(color: Colors.white70)),
-            Text('Available: $quantity kg', style: const TextStyle(color: Colors.white70)),
+            Text('Value: \$${price.toString()}/kg', style: const TextStyle(color: Colors.white70)),
+            Text('In Possession: $quantity kg', style: const TextStyle(color: Colors.white70)),
             const SizedBox(height: 10),
             TextField(
               controller: quantityController,

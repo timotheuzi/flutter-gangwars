@@ -137,7 +137,7 @@ class GameProvider with ChangeNotifier {
       'pistol' => 800,
       'bullets' => 400, // Balanced price for 50 bullets
       'exploding_bullets' => 400, // Balanced price for 20 bullets
-      'hollow_point_bullets' => 600, // Balanced price for 15 bullets
+      'hollow_point_bullets' => 300, // Fixed: 100 less than exploding
       'uzi' => 15000,
       'ar15' => 30000,
       'ghost_gun' => 2000,
@@ -218,8 +218,13 @@ class GameProvider with ChangeNotifier {
     }
   }
 
+  String _normalizeDrugType(String drugType) {
+    return drugType.toLowerCase().replaceAll(' ', '_');
+  }
+
   bool tradeDrug(String drugType, String action, int quantity) {
-    final price = _gameState.drugPrices[drugType] ?? 0;
+    final normalizedType = _normalizeDrugType(drugType);
+    final price = _gameState.drugPrices[normalizedType] ?? 0;
 
     if (action == 'buy') {
       final cost = price * quantity;
@@ -229,14 +234,14 @@ class GameProvider with ChangeNotifier {
         return false;
       }
 
-      _addDrug(drugType, quantity);
+      _addDrug(normalizedType, quantity);
       _gameMessage =
           'Bought $quantity kilo(s) of $drugType for \$${cost.toString()}!';
       saveGameState();
       notifyListeners();
       return true;
     } else if (action == 'sell') {
-      final currentQty = _getDrugQuantity(drugType);
+      final currentQty = _getDrugQuantity(normalizedType);
 
       if (currentQty < quantity) {
         _gameMessage = 'Not enough $drugType to sell!';
@@ -246,7 +251,7 @@ class GameProvider with ChangeNotifier {
 
       final revenue = price * quantity;
       _gameState.money += revenue;
-      _removeDrug(drugType, quantity);
+      _removeDrug(normalizedType, quantity);
 
       _gameMessage =
           'Sold $quantity kilo(s) of $drugType for \$${revenue.toString()}!';
@@ -269,7 +274,7 @@ class GameProvider with ChangeNotifier {
     if (_gameState.money >= _gameState.prostitutes.price) {
       _gameState.money -= _gameState.prostitutes.price;
       _gameState.prostitutes.count++;
-      _gameMessage = 'You recruited a new prostitute! Daily income increased.';
+      _gameMessage = 'You recruited a new prostitute!';
       saveGameState();
       notifyListeners();
       return true;
@@ -280,7 +285,8 @@ class GameProvider with ChangeNotifier {
   }
 
   int _getDrugQuantity(String drugType) {
-    return switch (drugType) {
+    final normalized = _normalizeDrugType(drugType);
+    return switch (normalized) {
       'weed' => _gameState.drugs.weed,
       'crack' => _gameState.drugs.crack,
       'coke' => _gameState.drugs.coke,
@@ -292,7 +298,8 @@ class GameProvider with ChangeNotifier {
   }
 
   void _addDrug(String drugType, int quantity) {
-    switch (drugType) {
+    final normalized = _normalizeDrugType(drugType);
+    switch (normalized) {
       case 'weed':
         _gameState.drugs.weed += quantity;
       case 'crack':
@@ -309,7 +316,8 @@ class GameProvider with ChangeNotifier {
   }
 
   void _removeDrug(String drugType, int quantity) {
-    switch (drugType) {
+    final normalized = _normalizeDrugType(drugType);
+    switch (normalized) {
       case 'weed':
         _gameState.drugs.weed -= quantity;
       case 'crack':
@@ -454,10 +462,29 @@ class GameProvider with ChangeNotifier {
     _gameState.steps++;
 
     if (_gameState.steps >= _gameState.maxSteps) {
-      _gameState.advanceDay();
-      _gameMessage = 'A new day begins! Day ${_gameState.day}';
+      _advanceDayWithIncome();
+    } else {
+      saveGameState();
+      notifyListeners();
     }
-
+  }
+  
+  void _advanceDayWithIncome() {
+    // Calculate income before advancing day
+    final random = Random();
+    int totalIncome = 0;
+    for (int i = 0; i < _gameState.prostitutes.count; i++) {
+      totalIncome += 3500 + random.nextInt(1301);
+    }
+    
+    _gameState.advanceDay();
+    
+    // Day message includes prostitute income
+    _gameMessage = 'A new day begins! Day ${_gameState.day}';
+    if (_gameState.prostitutes.count > 0) {
+      _gameMessage += '\nYour prostitutes earned you \$$totalIncome tonight.';
+    }
+    
     saveGameState();
     notifyListeners();
   }
@@ -473,8 +500,7 @@ class GameProvider with ChangeNotifier {
     _gameState.steps++;
 
     if (_gameState.steps >= _gameState.maxSteps) {
-      _gameState.advanceDay();
-      _gameMessage = 'A new day begins! Day ${_gameState.day}';
+      _advanceDayWithIncome();
       
       // Check for loan sharks at the start of a new day - now 2 days grace
       if (_gameState.loan > 0 && (_gameState.day - _gameState.loanDayTaken) >= 2) {
@@ -595,8 +621,12 @@ class GameProvider with ChangeNotifier {
           _gameState.members += value;
           messages.add('You gained $value gang member(s).');
         case 'drugs':
-          _gameState.drugs.weed += value; // Simplified, adds weed for now
-          messages.add('You got $value kg of product.');
+          // Correctly handle the random drug added via NPC
+          final drugType = event.description.contains('kilos of ') 
+              ? event.description.split('kilos of ')[1].split(' ')[0].replaceAll('.', '')
+              : 'weed';
+          _addDrug(drugType, value);
+          messages.add('You got $value kg of $drugType.');
       }
     });
     
