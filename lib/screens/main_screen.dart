@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
+import '../widgets/building_entry_animation.dart';
+import '../widgets/wandering_animation.dart';
 import 'main_menu_screen.dart';
 import 'city_screen.dart';
 import 'crackhouse_screen.dart';
@@ -19,6 +21,23 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context);
+
+    if (gameProvider.showingBuildingAnimation) {
+      return SafeArea(
+        child: BuildingEntryAnimation(
+          buildingType: gameProvider.buildingAnimationType,
+          onAnimationComplete: () => gameProvider.completeBuildingAnimation(),
+        ),
+      );
+    }
+
+    if (gameProvider.showingWanderingAnimation) {
+      return SafeArea(
+        child: WanderingAnimation(
+          onAnimationComplete: () => gameProvider.completeWanderingAnimation(),
+        ),
+      );
+    }
 
     return switch (gameProvider.currentScreen) {
       'main_menu' => const MainMenuScreen(),

@@ -66,8 +66,8 @@ droid_gangwar_flutter/
 │   ├── main.dart                  # App entry point
 │   ├── models/                   # Game state & logic (5 files)
 │   ├── providers/                # State management (1 file)
-│   ├── screens/                  # UI screens (3 files)
-│   └── widgets/                  # Reusable components (2 files)
+│   ├── screens/                  # UI screens (12 files)
+│   └── widgets/                  # Reusable components (9 files)
 ├── pubspec.yaml                  # Dependencies & assets
 ├── README.md                     # Comprehensive documentation
 ├── LICENSE                       # Legal information
@@ -134,7 +134,7 @@ droid_gangwar_flutter/
 |--------|--------|-------|-------------|
 | Platforms | 1 | 6 | +500% |
 | Code Size | 5,000+ | 2,500+ | -50% |
-| Files | 45+ | 15+ | -67% |
+| Files | 45+ | 28+ | -38% |
 | Build Time | 30s+ | 10s | -67% |
 | Code Reuse | 0% | 95%+ | +∞ |
 | Hot Reload | ❌ | ✅ | New |

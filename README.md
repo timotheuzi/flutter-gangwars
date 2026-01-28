@@ -131,19 +131,46 @@ make build-all
 droid_gangwar_flutter/
 ├── lib/
 │   ├── main.dart                  # App entry point
-│   ├── models/                   # Game state & logic
-│   ├── providers/                # State management
-│   ├── screens/                  # UI screens
-│   └── widgets/                  # Reusable components
-├── assets/                       # Game assets
-│   ├── images/                   # Images and icons
-│   ├── audio/                    # Sound effects and music
-│   ├── fonts/                    # Custom fonts
-│   └── data/                     # Game data files
-├── Makefile                      # Build system
-├── pubspec.yaml                  # Dependencies
-├── README.md                     # Documentation
-└── LICENSE                       # License information
+│   ├── models/                    # Game state & data models
+│   │   ├── combat_result.dart
+│   │   ├── combat_system.dart
+│   │   ├── game_state.dart
+│   │   ├── random_event.dart
+│   │   └── random_event_data.dart
+│   ├── providers/                 # State management
+│   │   └── game_provider.dart
+│   ├── screens/                   # UI screens
+│   │   ├── alleyway_screen.dart
+│   │   ├── bank_screen.dart
+│   │   ├── bar_screen.dart
+│   │   ├── city_screen.dart
+│   │   ├── crackhouse_screen.dart
+│   │   ├── credits_screen.dart
+│   │   ├── gunshack_screen.dart
+│   │   ├── infobooth_screen.dart
+│   │   ├── main_menu_screen.dart
+│   │   ├── main_screen.dart
+│   │   ├── mud_fight_screen.dart
+│   │   └── picknsave_screen.dart
+│   └── widgets/                   # Reusable UI components
+│       ├── blood_drop_icon.dart
+│       ├── event_animation.dart
+│       ├── fight_animation.dart
+│       ├── game_button.dart
+│       ├── location_card.dart
+│       ├── main_menu_background.dart
+│       ├── pixel_art_icon.dart
+│       ├── pixel_art_location.dart
+│       └── pixel_art_member.dart
+├── assets/                        # Game assets
+│   ├── audio/                     # Sound effects and music
+│   ├── data/                      # Game data files
+│   ├── fonts/                     # Custom fonts
+│   └── images/                    # Images and icons
+├── Makefile                       # Build system
+├── pubspec.yaml                   # Dependencies
+├── README.md                      # Documentation
+└── LICENSE                        # License information
 ```
 
 ### Code Style

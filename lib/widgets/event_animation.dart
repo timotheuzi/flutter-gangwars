@@ -27,7 +27,7 @@ class _EventAnimationState extends State<EventAnimation> with SingleTickerProvid
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    )..repeat();
+    )..forward();
   }
 
   @override

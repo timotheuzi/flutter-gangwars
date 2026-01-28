@@ -299,7 +299,7 @@ class CityScreen extends StatelessWidget {
             children: [
               Text('Name: ${gameState.playerName}'),
               Text('Gang: ${gameState.gangName}'),
-              Text('Day: ${gameState.day}'),
+              Text('Day: $gameState.day'),
               Text('Health: ${gameState.health}/${gameState.maxHealth}'),
               Text('Money: \$${gameState.money}'),
               Text('Bank Account: \$${gameState.account}'),
@@ -385,56 +385,39 @@ class CityScreen extends StatelessWidget {
 
   void _handleWander(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
-    final event = gameProvider.wanderWithEvent();
-    
-    if (event == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(gameProvider.gameMessage),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-      return;
-    }
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
-          String? selectedOption;
-          return AlertDialog(
-            backgroundColor: Colors.grey.shade900,
-            title: Text(event.title, style: const TextStyle(color: Colors.white)),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                EventAnimation(event: event, selectedOption: selectedOption),
-                const SizedBox(height: 15),
-                Text(event.description, style: const TextStyle(color: Colors.white70)),
-              ],
-            ),
-            actions: event.options.isNotEmpty 
-              ? event.options.map((option) {
-                  return TextButton(
-                    onPressed: () {
-                      setState(() => selectedOption = option);
-                      // Brief delay to show animation if needed
-                      Future.delayed(const Duration(milliseconds: 500), () {
-                        if (context.mounted) {
-                          Navigator.pop(context);
-                          _handleNpcOption(context, option, event);
-                        }
-                      });
-                    },
-                    child: Text(option),
-                  );
-                }).toList()
-              : [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
-          );
-        }
-      ),
-    );
+    // Start the wandering animation
+    gameProvider.startWanderingAnimation();
+
+    // Process the wander event after a delay to let animation start
+    Future.delayed(const Duration(milliseconds: 500), () {
+      final event = gameProvider.wanderWithEvent();
+
+      // If combat started during wandering, complete animation immediately
+      if (gameProvider.currentScreen == 'mud_fight') {
+        gameProvider.completeWanderingAnimation();
+        return;
+      }
+
+      if (event == null) {
+        // Complete animation after 4 seconds and show message
+        Future.delayed(const Duration(seconds: 4), () {
+          if (context.mounted) {
+            gameProvider.completeWanderingAnimation();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(gameProvider.gameMessage),
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
+        });
+        return;
+      }
+
+      // Set the event to be shown by the WanderingAnimation
+      gameProvider.currentWanderingEvent.value = event;
+    });
   }
   
   void _handleNpcOption(BuildContext context, String option, RandomEvent event) {
