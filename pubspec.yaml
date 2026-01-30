@@ -23,3 +23,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: PixelArt
+      fonts:
+        - asset: assets/fonts/pixel_art.ttf
+  assets:
+    - assets/images/
