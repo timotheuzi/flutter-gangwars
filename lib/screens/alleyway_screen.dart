@@ -4,7 +4,6 @@ import '../providers/game_provider.dart';
 import '../widgets/game_button.dart';
 import '../models/random_event.dart';
 import 'dart:math';
-import 'dart:async';
 
 class AlleywayScreen extends StatefulWidget {
   const AlleywayScreen({super.key});

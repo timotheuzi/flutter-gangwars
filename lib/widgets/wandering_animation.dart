@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math';
 import '../providers/game_provider.dart';
-import '../models/random_event.dart';
 import '../widgets/event_animation.dart';
 import 'pixel_art_member.dart';
 
@@ -19,11 +18,10 @@ class WanderingAnimation extends StatefulWidget {
 }
 
 class WanderingAnimationState extends State<WanderingAnimation>
-    with SingleTickerProviderStateMixin {
+    with SingleAnimationProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _playerPosition;
   late Animation<double> _playerBob;
-  late Animation<double> _cameraPan;
 
   @override
   void initState() {

@@ -13,7 +13,7 @@ class GameProvider with ChangeNotifier {
   CombatResult? _combatResult;
   String _currentScreen = 'main_menu';
   String _gameMessage = '';
-  CombatData? _currentCombatData;
+  CombatResult? _currentCombatData;
   bool _showingBuildingAnimation = false;
   String _buildingAnimationType = '';
   bool _showingWanderingAnimation = false;
@@ -27,7 +27,7 @@ class GameProvider with ChangeNotifier {
     _gameMessage = message;
     notifyListeners();
   }
-  CombatData? get currentCombatData => _currentCombatData;
+  CombatResult? get currentCombatData => _currentCombatData;
   bool get showingBuildingAnimation => _showingBuildingAnimation;
   String get buildingAnimationType => _buildingAnimationType;
   bool get showingWanderingAnimation => _showingWanderingAnimation;
@@ -136,13 +136,13 @@ class GameProvider with ChangeNotifier {
       ..initialPlayerHealth = _gameState.health
       ..fightLog.add('Combat starting in the mud: $enemyType ($enemyCount enemies)');
 
-    _currentCombatData = CombatData(
-      enemyHealth: enemyHealth.toDouble(),
-      enemyCount: enemyCount,
-      enemyType: enemyType,
-      combatId: combatId,
-      initialMessage: 'You engage in a muddy brawl with $enemyType!',
-    );
+    if (_currentCombatData != null) {
+  _currentCombatData.initialEnemyHealth = enemyHealth.toInt();
+  _currentCombatData.enemyCount = enemyCount;
+  _currentCombatData.enemyType = enemyType;
+  _currentCombatData.combatId = combatId;
+  _currentCombatData.initialMessage = 'You engage in a muddy brawl with $enemyType!';
+}
 
     _currentScreen = 'mud_fight';
     saveGameState();
@@ -371,7 +371,7 @@ class GameProvider with ChangeNotifier {
 
   bool performCombat(String weapon, String enemyType, int enemyCount) {
     // Use the stored enemy health from combat data to maintain scaling/power factor
-    final perEnemyHealth = _currentCombatData?.enemyHealth ?? _calculateEnemyHealth(enemyType, enemyCount);
+    final perEnemyHealth = (_currentCombatData?.initialEnemyHealth ?? _calculateEnemyHealth(enemyType, enemyCount)).toDouble();
     
     final result = CombatSystem.calculateCombat(
         _gameState, weapon, enemyType, enemyCount, perEnemyHealth);
@@ -630,71 +630,24 @@ class GameProvider with ChangeNotifier {
                 return; // Exit switch, combat started
              }
              
-             _gameState.takeDamage(value);
-             messages.add('You took $value damage.');
+             _gameMessage = 'You took $value damage.';
           } else {
-             _gameState.takeDamage(value);
-             messages.add('You took $value damage.');
+             _gameMessage = 'You took $value damage.';
           }
         case 'health':
           _gameState.heal(value);
-          messages.add('You healed $value health.');
+          _gameMessage = 'You healed $value health.';
         case 'money':
           if (value > 0) {
             _gameState.money += value;
-            messages.add('You got \$$value.');
+            _gameMessage = 'You got \$$value.';
           } else {
             if (_gameState.spendMoney(-value)) {
-              messages.add('You spent \$${-value}.');
-            } else {
-              messages.add('You couldn\'t afford to pay \$${-value}.');
+              _gameMessage = 'You spent \$${-value}.';
             }
           }
-        case 'reputation':
-          _gameState.reputation += value;
-          messages.add('Your reputation changed by $value.');
-        case 'members':
-          _gameState.members += value;
-          messages.add('You gained $value gang member(s).');
-        case 'drugs':
-          // Correctly handle the random drug added via NPC
-          final drugType = event.description.contains('kilos of ') 
-              ? event.description.split('kilos of ')[1].split(' ')[0].replaceAll('.', '')
-              : 'weed';
-          _addDrug(drugType, value);
-          messages.add('You got $value kg of $drugType.');
       }
     });
-    
-    // Check if we entered combat, if so, we are already navigating
-    if (_currentScreen == 'mud_fight') {
-      return 'Entering combat!';
-    }
-
-    saveGameState();
-    notifyListeners();
-    return messages.join(' ');
+    return _gameMessage;
   }
-
-  void toggleExplodingBullets(bool enable) {
-    _gameState.weapons.useExplodingBullets = enable;
-    saveGameState();
-    notifyListeners();
-  }
-}
-
-class CombatData {
-  final double enemyHealth;
-  final int enemyCount;
-  final String enemyType;
-  final String combatId;
-  final String initialMessage;
-
-  CombatData({
-    required this.enemyHealth,
-    required this.enemyCount,
-    required this.enemyType,
-    required this.combatId,
-    required this.initialMessage,
-  });
 }

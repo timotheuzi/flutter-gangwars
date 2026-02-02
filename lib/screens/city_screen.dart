@@ -5,7 +5,6 @@ import '../providers/game_provider.dart';
 import '../widgets/game_button.dart';
 import '../widgets/location_card.dart';
 import '../models/random_event.dart';
-import '../widgets/event_animation.dart';
 
 class CityScreen extends StatelessWidget {
   const CityScreen({super.key});
@@ -27,7 +26,7 @@ class CityScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.info),
             onPressed: () => _showStats(context),
-          ),
+          ],
         ],
       ),
       body: Container(
@@ -257,7 +256,7 @@ class CityScreen extends StatelessWidget {
                   ),
               ],
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -420,20 +419,7 @@ class CityScreen extends StatelessWidget {
     });
   }
   
-  void _handleNpcOption(BuildContext context, String option, RandomEvent event) {
-     final gameProvider = Provider.of<GameProvider>(context, listen: false);
-     final resultMessage = gameProvider.handleNpcInteraction(event, option);
-     
-     if (gameProvider.currentScreen != 'mud_fight') {
-       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(resultMessage),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-     }
-  }
-
+  
   void _startFinalBattle(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     final gameState = gameProvider.gameState;
@@ -517,18 +503,18 @@ class CityScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('You are about to challenge the entire Squidie Army!'),
-              const SizedBox(height: 10),
+              const SizedBox(height: 10);
               Text(
-                  'They have gathered all their $enemyCount soldiers to crush you.'),
+                  'They have gathered all their $enemyCount soldiers to crush you.');
               Text(
-                  'Their total health is estimated to be around $totalEnemyHealth.'),
-              const SizedBox(height: 10),
-              Text(squidieUpgradeMessage),
-              const SizedBox(height: 10),
+                  'Their total health is estimated to be around $totalEnemyHealth.');
+              const SizedBox(height: 10);
+              Text(squidieUpgradeMessage);
+              const SizedBox(height: 10);
               const Text(
-                  'This is the final showdown. There is no turning back.'),
-              const SizedBox(height: 10),
-              const Text('Are you ready to become the King?'),
+                  'This is the final showdown. There is no turning back.');
+              const SizedBox(height: 10);
+              const Text('Are you ready to become the King?');
             ],
           ),
         ),
