@@ -4,6 +4,7 @@ import '../providers/game_provider.dart';
 import '../widgets/game_button.dart';
 import '../models/random_event.dart';
 import 'dart:math';
+import 'dart:async';
 
 class AlleywayScreen extends StatefulWidget {
   const AlleywayScreen({super.key});
@@ -12,18 +13,56 @@ class AlleywayScreen extends StatefulWidget {
   State<AlleywayScreen> createState() => _AlleywayScreenState();
 }
 
-class _AlleywayScreenState extends State<AlleywayScreen> {
+class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStateMixin {
   // Simple dungeon navigation system
   int currentX = 0;
   int currentY = 0;
   Set<String> visitedRooms = {};
   Map<String, String> roomDescriptions = {};
   Map<String, List<String>> roomEvents = {};
+  AnimationController? _fogController;
+  Animation<double>? _fogAnimation;
+  AnimationController? _neonController;
+  Animation<double>? _neonAnimation;
 
   @override
   void initState() {
     super.initState();
     _generateDungeon();
+    _setupAnimations();
+  }
+
+  void _setupAnimations() {
+    _fogController = AnimationController(
+      duration: const Duration(seconds: 8),
+      vsync: this,
+    );
+    _fogAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _fogController!,
+        curve: const Interval(0.0, 1.0, curve: Curves.linear),
+      ),
+    );
+    _fogController!.repeat();
+
+    _neonController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _neonAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _neonController!,
+        curve: const Interval(0.0, 1.0, curve: Curves.easeInOut),
+      ),
+    );
+    _neonController!.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _fogController?.dispose();
+    _neonController?.dispose();
+    super.dispose();
   }
 
   void _generateDungeon() {
@@ -46,6 +85,11 @@ class _AlleywayScreenState extends State<AlleywayScreen> {
           'a makeshift shelter where homeless people huddle',
           'a hidden courtyard overgrown with weeds and debris',
           'a underground access point with a manhole cover',
+          'a graffiti-covered wall with gang tags',
+          'a puddle of stagnant water reflecting neon lights',
+          'a fire escape leading to upper floors',
+          'a dumpster overflowing with rotting trash',
+          'a chain-link fence topped with barbed wire',
         ];
         roomDescriptions[roomKey] = roomTypes[random.nextInt(roomTypes.length)];
 
@@ -61,10 +105,15 @@ class _AlleywayScreenState extends State<AlleywayScreen> {
           'Broken syringes crunch underfoot.',
           'A homeless person begs for spare change.',
           'You find a hidden cache of drugs.',
+          'A stray cat hisses at you from the shadows.',
+          'The sound of breaking glass echoes nearby.',
+          'You feel eyes watching you from the darkness.',
+          'A sudden gust of wind carries the smell of gunpowder.',
+          'You hear a distant scream cut short.',
         ];
         roomEvents[roomKey] = [events[random.nextInt(events.length)]];
-      }
-    }
+  }
+}
   }
 
   void _moveDirection(String direction) {
@@ -123,215 +172,314 @@ class _AlleywayScreenState extends State<AlleywayScreen> {
             ],
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.8),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.red.shade800,
-                    width: 2,
+        child: Stack(
+          children: [
+            // Background images
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/alleyway/background.png',
+                fit: BoxFit.cover,
+                color: Colors.black.withOpacity(0.3),
+                colorBlendMode: BlendMode.darken,
+              ),
+            ),
+            AnimatedBuilder(
+              animation: _fogAnimation!,
+              builder: (context, child) => Positioned.fill(
+                child: Opacity(
+                  opacity: _fogAnimation!.value * 0.3,
+                  child: Image.asset(
+                    'assets/images/alleyway/fog.png',
+                    fit: BoxFit.cover,
                   ),
                 ),
-                child: Column(
-                  children: [
-                    Text(
-                      '🏙️ DARK ALLEYWAY',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red.shade300,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Money: \$${gameState.money}',
-                      style: TextStyle(fontSize: 18, color: Colors.yellow.shade200, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'You are in $roomDesc.',
-                      style: TextStyle(fontSize: 16, color: Colors.grey.shade200, fontWeight: FontWeight.w500),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      roomEvent,
-                      style: TextStyle(fontSize: 14, color: Colors.red.shade300, fontStyle: FontStyle.italic),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Location: ($currentX, $currentY)',
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+              ),
+            ),
+            AnimatedBuilder(
+              animation: _neonAnimation!,
+              builder: (context, child) => Positioned(
+                top: 20,
+                right: 20,
+                child: Opacity(
+                  opacity: _neonAnimation!.value * 0.8,
+                  child: Image.asset(
+                    'assets/images/alleyway/neon_sign.png',
+                    width: 60,
+                    height: 60,
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      // Navigation Controls
-                      const Text(
-                        'Navigate:',
-                        style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // North
-                          ElevatedButton.icon(
-                            onPressed: _canMove('north') ? () => _moveDirection('north') : null,
-                            icon: const Icon(Icons.arrow_upward),
-                            label: const Text('North'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _canMove('north') ? Colors.green.shade700 : Colors.grey.shade700,
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // West
-                          ElevatedButton.icon(
-                            onPressed: _canMove('west') ? () => _moveDirection('west') : null,
-                            icon: const Icon(Icons.arrow_back),
-                            label: const Text('West'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _canMove('west') ? Colors.green.shade700 : Colors.grey.shade700,
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          // East
-                          ElevatedButton.icon(
-                            onPressed: _canMove('east') ? () => _moveDirection('east') : null,
-                            icon: const Icon(Icons.arrow_forward),
-                            label: const Text('East'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _canMove('east') ? Colors.green.shade700 : Colors.grey.shade700,
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // South
-                          ElevatedButton.icon(
-                            onPressed: _canMove('south') ? () => _moveDirection('south') : null,
-                            icon: const Icon(Icons.arrow_downward),
-                            label: const Text('South'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _canMove('south') ? Colors.green.shade700 : Colors.grey.shade700,
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
+            ),
 
-                      // Room Actions
-                      const Text(
-                        'Room Actions:',
-                        style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.red.shade800,
+                        width: 2,
                       ),
-                      const SizedBox(height: 15),
-                      Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        alignment: WrapAlignment.center,
-                        children: [
-                          ElevatedButton.icon(
-                            onPressed: () => _handleNpcEncounter(context, gameProvider),
-                            icon: const Icon(Icons.people),
-                            label: const Text('Find NPC'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blueGrey,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: () => _handleRandomFight(context, gameProvider),
-                            icon: const Icon(Icons.sports_mma),
-                            label: const Text('Random Fight'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red.shade700,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: () => _searchAlleyway(context, gameProvider),
-                            icon: const Icon(Icons.search),
-                            label: const Text('Search Area'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.amber.shade700,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: () => _findShortcuts(context, gameProvider),
-                            icon: const Icon(Icons.explore),
-                            label: const Text('Look Around'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green.shade700,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                          ),
-                          if (currentX == 0 && currentY == 0) // Boss room at center
-                            ElevatedButton.icon(
-                              onPressed: () => _enterBossRoom(context, gameProvider),
-                              icon: const Icon(Icons.warning),
-                              label: const Text('Boss Room'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.purple.shade700,
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      if (gameProvider.gameMessage.isNotEmpty)
-                        Card(
-                          color: Colors.black.withValues(alpha: 0.7),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Text(
-                              gameProvider.gameMessage,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          '🏙️ DARK ALLEYWAY',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red.shade300,
+                            fontFamily: 'PixelArt',
                           ),
                         ),
-                    ],
+                        const SizedBox(height: 12),
+                        Text(
+                          'Money: \$${gameState.money}',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.yellow.shade200,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'PixelArt',
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'You are in $roomDesc.',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey.shade200,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'PixelArt',
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          roomEvent,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.red.shade300,
+                            fontStyle: FontStyle.italic,
+                            fontFamily: 'PixelArt',
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Location: ($currentX, $currentY)',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade400,
+                            fontFamily: 'PixelArt',
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          // Navigation Controls
+                          const Text(
+                            'Navigate:',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'PixelArt',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // North
+                              ElevatedButton.icon(
+                                onPressed: _canMove('north') ? () => _moveDirection('north') : null,
+                                icon: const Icon(Icons.arrow_upward),
+                                label: const Text('North'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _canMove('north') ? Colors.green.shade700 : Colors.grey.shade700,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // West
+                              ElevatedButton.icon(
+                                onPressed: _canMove('west') ? () => _moveDirection('west') : null,
+                                icon: const Icon(Icons.arrow_back),
+                                label: const Text('West'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _canMove('west') ? Colors.green.shade700 : Colors.grey.shade700,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              // East
+                              ElevatedButton.icon(
+                                onPressed: _canMove('east') ? () => _moveDirection('east') : null,
+                                icon: const Icon(Icons.arrow_forward),
+                                label: const Text('East'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _canMove('east') ? Colors.green.shade700 : Colors.grey.shade700,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // South
+                              ElevatedButton.icon(
+                                onPressed: _canMove('south') ? () => _moveDirection('south') : null,
+                                icon: const Icon(Icons.arrow_downward),
+                                label: const Text('South'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _canMove('south') ? Colors.green.shade700 : Colors.grey.shade700,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Room Actions
+                          const Text(
+                            'Room Actions:',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'PixelArt',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 15),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 12,
+                            alignment: WrapAlignment.center,
+                            children: [
+                              ElevatedButton.icon(
+                                onPressed: () => _handleNpcEncounter(context, gameProvider),
+                                icon: const Icon(Icons.people),
+                                label: const Text('Find NPC'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blueGrey,
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                              ElevatedButton.icon(
+                                onPressed: () => _handleRandomFight(context, gameProvider),
+                                icon: const Icon(Icons.sports_mma),
+                                label: const Text('Random Fight'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red.shade700,
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                              ElevatedButton.icon(
+                                onPressed: () => _searchAlleyway(context, gameProvider),
+                                icon: const Icon(Icons.search),
+                                label: const Text('Search Area'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.amber.shade700,
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                              ElevatedButton.icon(
+                                onPressed: () => _findShortcuts(context, gameProvider),
+                                icon: const Icon(Icons.explore),
+                                label: const Text('Look Around'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green.shade700,
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                              if (currentX == 0 && currentY == 0) // Boss room at center
+                                ElevatedButton.icon(
+                                  onPressed: () => _enterBossRoom(context, gameProvider),
+                                  icon: const Icon(Icons.warning),
+                                  label: const Text('Boss Room'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.purple.shade700,
+                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          if (gameProvider.gameMessage.isNotEmpty)
+                            Card(
+                              color: Colors.black.withValues(alpha: 0.7),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  gameProvider.gameMessage,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                    fontFamily: 'PixelArt',
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  GameButton(
+                    text: 'Return to City',
+                    onPressed: () => gameProvider.navigateToScreen('city'),
+                    icon: Icons.arrow_back,
+                    backgroundColor: Colors.brown,
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
-              GameButton(
-                text: 'Return to City',
-                onPressed: () => gameProvider.navigateToScreen('city'),
-                icon: Icons.arrow_back,
-                backgroundColor: Colors.brown,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -400,19 +548,30 @@ class _AlleywayScreenState extends State<AlleywayScreen> {
   }
 
   String _getNpcDescription(String npcType) {
-    return switch (npcType) {
-      'Street Thug' => 'A scarred thug with fresh blood on his knuckles blocks your path. His eyes are wild with rage and cheap booze. "You lookin\' at me, punk? I\'ll carve your fuckin\' eyes out!" The stench of sweat and violence surrounds him.',
-      'Shady Dealer' => 'A gaunt figure in a blood-stained trench coat emerges from the shadows. Track marks line his arms like railroad tracks to hell. "Psst... I got the pure shit. But cross me and you\'ll be beggin\' for death."',
-      'Bouncer' => 'A mountain of a man with broken teeth and prison tattoos guards the entrance. His fists are the size of sledgehammers, scarred from countless beatings. "This area is off limits, or I\'ll snap your spine like a twig."',
-      'Homeless Person' => 'A wretched vagrant covered in filth and open sores mutters incoherently. His eyes dart wildly, seeing ghosts in the darkness. "Spare some change, boss? Or I\'ll slit your throat while you sleep..."',
-      'Corrupt Businessman' => 'A suited predator with gold rings stained red approaches with a crocodile smile. His manicured hands hide the blood of countless betrayals. "I have connections... for the right price. Or I\'ll have your family fed to the dogs."',
-      'Street Punk' => 'A feral youth with a switchblade and dead eyes challenges you. His face is a roadmap of scars from street fights gone wrong. "You think you\'re tough? I\'ll gut you like a fish and leave you bleeding in the gutter!"',
-      'Gang Recruit' => 'A desperate kid with fresh bruises and borrowed clothes looks up at you with hungry eyes. His hands tremble from withdrawal and fear. "I wanna be like you, boss. Let me join your crew... or I\'ll die trying."',
-      'Drug Addict' => 'A skeletal junkie with rotting teeth and haunted eyes staggers toward you. Pus oozes from infected wounds as he twitches violently. "Man, I need a fix... I can get you anything you want. Just don\'t let me die alone."',
-      'Informant' => 'A twitchy rat with yellow teeth and a face like melted wax whispers urgently. He reeks of fear and cheap cologne. "I know things... dangerous things. But if I talk, they\'ll cut out my tongue and feed it to me."',
-      'Rival Gang Member' => 'A hardened killer from a rival crew spots you, his hand instinctively going for the gun in his waistband. Fresh blood stains his clothes from his last victim. "This is our turf! I\'ll paint these walls with your brains!"',
-      _ => 'A shadowy figure approaches through the fog of blood and despair in the dark alleyway.',
-    };
+    switch (npcType) {
+      case 'Street Thug':
+        return 'A scarred thug with fresh blood on his knuckles blocks your path. His eyes are wild with rage and cheap booze. "You lookin\' at me, punk? I\'ll carve your fuckin\' eyes out!" The stench of sweat and violence surrounds him.';
+      case 'Shady Dealer':
+        return 'A gaunt figure in a blood-stained trench coat emerges from the shadows. Track marks line his arms like railroad tracks to hell. "Psst... I got the pure shit. But cross me and you\'ll be beggin\' for death."';
+      case 'Bouncer':
+        return 'A mountain of a man with broken teeth and prison tattoos guards the entrance. His fists are the size of sledgehammers, scarred from countless beatings. "This area is off limits, or I\'ll snap your spine like a twig."';
+      case 'Homeless Person':
+        return 'A wretched vagrant covered in filth and open sores mutters incoherently. His eyes dart wildly, seeing ghosts in the darkness. "Spare some change, boss? Or I\'ll slit your throat while you sleep..."';
+      case 'Corrupt Businessman':
+        return 'A suited predator with gold rings stained red approaches with a crocodile smile. His manicured hands hide the blood of countless betrayals. "I have connections... for the right price. Or I\'ll have your family fed to the dogs."';
+      case 'Street Punk':
+        return 'A feral youth with a switchblade and dead eyes challenges you. His face is a roadmap of scars from street fights gone wrong. "You think you\'re tough? I\'ll gut you like a fish and leave you bleeding in the gutter!"';
+      case 'Gang Recruit':
+        return 'A desperate kid with fresh bruises and borrowed clothes looks up at you with hungry eyes. His hands tremble from withdrawal and fear. "I wanna be like you, boss. Let me join your crew... or I\'ll die trying."';
+      case 'Drug Addict':
+        return 'A skeletal junkie with rotting teeth and haunted eyes staggers toward you. Pus oozes from infected wounds as he twitches violently. "Man, I need a fix... I can get you anything you want. Just don\'t let me die alone."';
+      case 'Informant':
+        return 'A twitchy rat with yellow teeth and a face like melted wax whispers urgently. He reeks of fear and cheap cologne. "I know things... dangerous things. But if I talk, they\'ll cut out my tongue and feed it to me."';
+      case 'Rival Gang Member':
+        return 'A hardened killer from a rival crew spots you, his hand instinctively going for the gun in his waistband. Fresh blood stains his clothes from his last victim. "This is our turf! I\'ll paint these walls with your brains!"';
+      default:
+        return 'A shadowy figure approaches through the fog of blood and despair in the dark alleyway.';
+    }
   }
 
   void _showNpcDialog(BuildContext context, GameProvider gameProvider, RandomEvent event) {
@@ -503,12 +662,24 @@ class _AlleywayScreenState extends State<AlleywayScreen> {
       final drugType = drugs[Random().nextInt(drugs.length)];
       
       switch (drugType) {
-        case 'weed': gameState.drugs.weed += effects['drugs']!;
-        case 'crack': gameState.drugs.crack += effects['drugs']!;
-        case 'coke': gameState.drugs.coke += effects['drugs']!;
-        case 'ice': gameState.drugs.ice += effects['drugs']!;
-        case 'percs': gameState.drugs.percs += effects['drugs']!;
-        case 'pixie_dust': gameState.drugs.pixieDust += effects['drugs']!;
+        case 'weed':
+          gameState.drugs.weed += effects['drugs']!;
+          break;
+        case 'crack':
+          gameState.drugs.crack += effects['drugs']!;
+          break;
+        case 'coke':
+          gameState.drugs.coke += effects['drugs']!;
+          break;
+        case 'ice':
+          gameState.drugs.ice += effects['drugs']!;
+          break;
+        case 'percs':
+          gameState.drugs.percs += effects['drugs']!;
+          break;
+        case 'pixie_dust':
+          gameState.drugs.pixieDust += effects['drugs']!;
+          break;
       }
       resultMessage += 'You obtained some $drugType!\n';
     }
@@ -577,12 +748,24 @@ class _AlleywayScreenState extends State<AlleywayScreen> {
       final drugs = ['weed', 'crack', 'coke', 'ice', 'percs', 'pixie_dust'];
       final drugType = drugs[random.nextInt(drugs.length)];
       switch (drugType) {
-        case 'weed': gameProvider.gameState.drugs.weed += 1;
-        case 'crack': gameProvider.gameState.drugs.crack += 1;
-        case 'coke': gameProvider.gameState.drugs.coke += 1;
-        case 'ice': gameProvider.gameState.drugs.ice += 1;
-        case 'percs': gameProvider.gameState.drugs.percs += 1;
-        case 'pixie_dust': gameProvider.gameState.drugs.pixieDust += 1;
+        case 'weed':
+          gameProvider.gameState.drugs.weed += 1;
+          break;
+        case 'crack':
+          gameProvider.gameState.drugs.crack += 1;
+          break;
+        case 'coke':
+          gameProvider.gameState.drugs.coke += 1;
+          break;
+        case 'ice':
+          gameProvider.gameState.drugs.ice += 1;
+          break;
+        case 'percs':
+          gameProvider.gameState.drugs.percs += 1;
+          break;
+        case 'pixie_dust':
+          gameProvider.gameState.drugs.pixieDust += 1;
+          break;
       }
     } else if (finding.contains('health')) {
       gameProvider.gameState.heal(15);

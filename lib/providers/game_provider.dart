@@ -14,6 +14,10 @@ class GameProvider with ChangeNotifier {
   String _currentScreen = 'main_menu';
   String _gameMessage = '';
   CombatData? _currentCombatData;
+  bool _showingBuildingAnimation = false;
+  String _buildingAnimationType = '';
+  bool _showingWanderingAnimation = false;
+  final currentWanderingEvent = ValueNotifier<RandomEvent?>(null);
 
   GameState get gameState => _gameState;
   CombatResult? get combatResult => _combatResult;
@@ -24,6 +28,9 @@ class GameProvider with ChangeNotifier {
     notifyListeners();
   }
   CombatData? get currentCombatData => _currentCombatData;
+  bool get showingBuildingAnimation => _showingBuildingAnimation;
+  String get buildingAnimationType => _buildingAnimationType;
+  bool get showingWanderingAnimation => _showingWanderingAnimation;
 
   GameProvider() {
     loadGameState();
@@ -85,9 +92,38 @@ class GameProvider with ChangeNotifier {
   }
 
   void navigateToScreen(String screen) {
-    _currentScreen = screen;
-    _gameState.currentLocation = screen;
+    final buildingScreens = [
+      'bank', 'bar', 'crackhouse', 'gunshack',
+      'infobooth', 'picknsave', 'alleyway'
+    ];
+
+    if (buildingScreens.contains(screen)) {
+      _showingBuildingAnimation = true;
+      _buildingAnimationType = screen;
+    } else {
+      _currentScreen = screen;
+      _gameState.currentLocation = screen;
+      saveGameState();
+    }
+    notifyListeners();
+  }
+
+  void completeBuildingAnimation() {
+    _showingBuildingAnimation = false;
+    _currentScreen = _buildingAnimationType;
+    _gameState.currentLocation = _buildingAnimationType;
+    _buildingAnimationType = '';
     saveGameState();
+    notifyListeners();
+  }
+
+  void startWanderingAnimation() {
+    _showingWanderingAnimation = true;
+    notifyListeners();
+  }
+
+  void completeWanderingAnimation() {
+    _showingWanderingAnimation = false;
     notifyListeners();
   }
 
@@ -480,7 +516,7 @@ class GameProvider with ChangeNotifier {
     _gameState.advanceDay();
     
     // Day message includes prostitute income
-    _gameMessage = 'A new day begins! Day ${_gameState.day}';
+    _gameMessage = 'A new day begins! Day $_gameState.day';
     if (_gameState.prostitutes.count > 0) {
       _gameMessage += '\nYour prostitutes earned you \$$totalIncome tonight.';
     }
