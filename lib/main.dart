@@ -7,13 +7,13 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) => GameProvider(),
-      child: const MyApp(),
+      child: const GangWars(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class GangWars extends StatelessWidget {
+  const GangWars({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,0 +1,33 @@
+# Workaround Makefile for Linux build without installation
+# This version avoids the permission error by not installing to /usr/local
+
+# Configuration
+APP_NAME := droid_gangwar_flutter
+FLUTTER := /home/bim/flutter/bin/flutter
+DART := /home/bim/flutter/bin/cache/dart-sdk/bin/dart
+PUB := /home/bim/flutter/bin/cache/dart-sdk/bin/pub
+
+# Colors for output
+RED := \033[0;31m
+GREEN := \033[0;32m
+YELLOW := \033[0;33m
+BLUE := \033[0;34m
+NC := \033[0m # No Color
+
+# Build targets
+build-linux-workaround:
+	@echo -e "${BLUE}Building Linux desktop version (workaround)...${NC}"
+	$(FLUTTER) clean
+	$(FLUTTER) build linux --release
+	@echo -e "${GREEN}Linux build complete!${NC}"
+	@echo -e "${YELLOW}Executable location: build/linux/x64/release/intermediates_do_not_run/droid_gangwar_flutter${NC}"
+	@echo -e "${YELLOW}To run: ./build/linux/x64/release/intermediates_do_not_run/droid_gangwar_flutter${NC}"
+
+# Copy to user-friendly location
+copy-linux-executable:
+	@echo -e "${BLUE}Copying executable to release directory...${NC}"
+	mkdir -p release
+	cp build/linux/x64/release/intermediates_do_not_run/droid_gangwar_flutter release/ 2>/dev/null || echo "Build not found, run build-linux-workaround first"
+	@echo -e "${GREEN}Executable copied to ./release/droid_gangwar_flutter${NC}"
+
+.PHONY: build-linux-workaround copy-linux-executable
