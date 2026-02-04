@@ -15,7 +15,7 @@ class WanderingAnimation extends StatefulWidget {
 }
 
 class WanderingAnimationState extends State<WanderingAnimation>
-    with SingleTickerProviderStateMixin {
+    with SingleAnimationProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _playerPosition;
   late Animation<double> _playerBob;
