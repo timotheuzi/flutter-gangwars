@@ -9,7 +9,8 @@ class MainMenuBackground extends StatefulWidget {
   State<MainMenuBackground> createState() => _MainMenuBackgroundState();
 }
 
-class _MainMenuBackgroundState extends State<MainMenuBackground> with SingleTickerProviderStateMixin {
+class _MainMenuBackgroundState extends State<MainMenuBackground>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   final List<Car> _cars = [];
   final List<Prostitute> _prostitutes = [];
@@ -25,10 +26,9 @@ class _MainMenuBackgroundState extends State<MainMenuBackground> with SingleTick
 
     // Initialize background elements
     for (int i = 0; i < 3; i++) {
-      _prostitutes.add(Prostitute(
-        x: 50.0 + (i * 100),
-        y: 450.0 + _random.nextDouble() * 50,
-      ));
+      _prostitutes.add(
+        Prostitute(x: 50.0 + (i * 100), y: 450.0 + _random.nextDouble() * 50),
+      );
     }
   }
 
@@ -40,12 +40,14 @@ class _MainMenuBackgroundState extends State<MainMenuBackground> with SingleTick
 
   void _spawnCar() {
     if (_random.nextDouble() < 0.02 && _cars.length < 3) {
-      _cars.add(Car(
-        x: -150,
-        y: 500.0 + _random.nextDouble() * 100,
-        speed: 2.0 + _random.nextDouble() * 3.0,
-        isDriveBy: _random.nextDouble() < 0.3,
-      ));
+      _cars.add(
+        Car(
+          x: -150,
+          y: 500.0 + _random.nextDouble() * 100,
+          speed: 2.0 + _random.nextDouble() * 3.0,
+          isDriveBy: _random.nextDouble() < 0.3,
+        ),
+      );
     }
   }
 
@@ -58,7 +60,9 @@ class _MainMenuBackgroundState extends State<MainMenuBackground> with SingleTick
         for (var car in _cars) {
           car.x += car.speed;
         }
-        _cars.removeWhere((car) => car.x > MediaQuery.of(context).size.width + 100);
+        _cars.removeWhere(
+          (car) => car.x > MediaQuery.of(context).size.width + 100,
+        );
 
         return Stack(
           children: [
@@ -76,7 +80,7 @@ class _MainMenuBackgroundState extends State<MainMenuBackground> with SingleTick
                 ),
               ),
             ),
-            
+
             // Graffiti Wall
             Positioned(
               top: 100,
@@ -96,30 +100,29 @@ class _MainMenuBackgroundState extends State<MainMenuBackground> with SingleTick
               bottom: 0,
               left: 0,
               right: 0,
-              child: Container(
-                height: 300,
-                color: Colors.grey.shade900,
-              ),
+              child: Container(height: 300, color: Colors.grey.shade900),
             ),
 
             // Prostitutes waving
-            ..._prostitutes.map((p) => Positioned(
-              left: p.x,
-              top: p.y,
-              child: PixelArtMember(
-                isPlayer: false, 
-                isAlive: true, 
-                isCheering: (sin(_controller.value * 20 + p.x) > 0), // Waving logic
-                size: 40,
+            ..._prostitutes.map(
+              (p) => Positioned(
+                left: p.x,
+                top: p.y,
+                child: PixelArtMember(
+                  isPlayer: false,
+                  isAlive: true,
+                  isCheering:
+                      (sin(_controller.value * 20 + p.x) > 0), // Waving logic
+                  size: 40,
+                ),
               ),
-            )),
+            ),
 
             // Cars / Drive-by
-            ..._cars.map((car) => Positioned(
-              left: car.x,
-              top: car.y,
-              child: _buildCar(car),
-            )),
+            ..._cars.map(
+              (car) =>
+                  Positioned(left: car.x, top: car.y, child: _buildCar(car)),
+            ),
           ],
         );
       },
@@ -148,19 +151,41 @@ class _MainMenuBackgroundState extends State<MainMenuBackground> with SingleTick
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Container(width: 30, height: 20, color: Colors.blue.withValues(alpha: 0.3)), // Window
-              Container(width: 30, height: 20, color: Colors.blue.withValues(alpha: 0.3)), // Window
+              Container(
+                width: 30,
+                height: 20,
+                color: Colors.blue.withValues(alpha: 0.3),
+              ), // Window
+              Container(
+                width: 30,
+                height: 20,
+                color: Colors.blue.withValues(alpha: 0.3),
+              ), // Window
             ],
           ),
         ),
         Row(
           children: [
             const SizedBox(width: 20),
-            Container(width: 20, height: 20, decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle)),
+            Container(
+              width: 20,
+              height: 20,
+              decoration: const BoxDecoration(
+                color: Colors.black,
+                shape: BoxShape.circle,
+              ),
+            ),
             const SizedBox(width: 40),
-            Container(width: 20, height: 20, decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle)),
+            Container(
+              width: 20,
+              height: 20,
+              decoration: const BoxDecoration(
+                color: Colors.black,
+                shape: BoxShape.circle,
+              ),
+            ),
           ],
-        )
+        ),
       ],
     );
   }
@@ -201,7 +226,12 @@ class Car {
   double y;
   double speed;
   bool isDriveBy;
-  Car({required this.x, required this.y, required this.speed, required this.isDriveBy});
+  Car({
+    required this.x,
+    required this.y,
+    required this.speed,
+    required this.isDriveBy,
+  });
 }
 
 class Prostitute {

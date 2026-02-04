@@ -4,8 +4,6 @@ import 'dart:math';
 import '../providers/game_provider.dart';
 import '../widgets/game_button.dart';
 import '../widgets/location_card.dart';
-import '../models/random_event.dart';
-import '../widgets/event_animation.dart';
 
 class CityScreen extends StatelessWidget {
   const CityScreen({super.key});
@@ -72,28 +70,37 @@ class CityScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             _buildStatColumn(
-                                'Health',
-                                '${gameState.health}/${gameState.maxHealth}',
-                                Icons.favorite),
-                            _buildStatColumn('Money', '\$${gameState.money}',
-                                Icons.attach_money),
-                            _buildStatColumn('Day', gameState.day.toString(),
-                                Icons.calendar_today),
+                              'Health',
+                              '${gameState.health}/${gameState.maxHealth}',
+                              Icons.favorite,
+                            ),
+                            _buildStatColumn(
+                              'Money',
+                              '\$${gameState.money}',
+                              Icons.attach_money,
+                            ),
+                            _buildStatColumn(
+                              'Day',
+                              gameState.day.toString(),
+                              Icons.calendar_today,
+                            ),
                           ],
                         ),
                         const SizedBox(height: 10),
                         LinearProgressIndicator(
                           value: gameState.health / gameState.maxHealth,
                           backgroundColor: Colors.grey[300],
-                          valueColor:
-                              const AlwaysStoppedAnimation<Color>(Colors.green),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Colors.green,
+                          ),
                         ),
                         const SizedBox(height: 5),
                         LinearProgressIndicator(
                           value: gameState.steps / gameState.maxSteps,
                           backgroundColor: Colors.grey[300],
-                          valueColor:
-                              const AlwaysStoppedAnimation<Color>(Colors.blue),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Colors.blue,
+                          ),
                         ),
                         const SizedBox(height: 10),
                         Text(
@@ -124,7 +131,9 @@ class CityScreen extends StatelessWidget {
                   children: gameState.drugPrices.entries.map((entry) {
                     final displayName = entry.key
                         .split('_')
-                        .map((word) => word[0].toUpperCase() + word.substring(1))
+                        .map(
+                          (word) => word[0].toUpperCase() + word.substring(1),
+                        )
                         .join(' ');
                     return Chip(
                       label: Text('$displayName: \$${entry.value}/kg'),
@@ -268,10 +277,7 @@ class CityScreen extends StatelessWidget {
       children: [
         Icon(icon, size: 30, color: Colors.deepPurple),
         const SizedBox(height: 5),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14, color: Colors.grey),
-        ),
+        Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
         Text(
           value,
           style: const TextStyle(
@@ -309,40 +315,64 @@ class CityScreen extends StatelessWidget {
               Text('Squidies: ${gameState.squidies}'),
               Text('Current Score: ${gameState.currentScore}'),
               const SizedBox(height: 15),
-              const Text('Weapons:',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                'Weapons:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               if (weapons.pistols > 0) Text('Pistols: ${weapons.pistols}'),
-              if (weapons.totalBullets > 0) Text('Total Bullets: ${weapons.totalBullets}'),
-              if (weapons.bullets > 0) Text('Standard Bullets: ${weapons.bullets}'),
-              if (weapons.hollowPointBullets > 0) Text('Hollow Point: ${weapons.hollowPointBullets}'),
-              if (weapons.explodingBullets > 0) Text('Exploding: ${weapons.explodingBullets}'),
+              if (weapons.totalBullets > 0)
+                Text('Total Bullets: ${weapons.totalBullets}'),
+              if (weapons.bullets > 0)
+                Text('Standard Bullets: ${weapons.bullets}'),
+              if (weapons.hollowPointBullets > 0)
+                Text('Hollow Point: ${weapons.hollowPointBullets}'),
+              if (weapons.explodingBullets > 0)
+                Text('Exploding: ${weapons.explodingBullets}'),
               if (weapons.uzis > 0) Text('Uzis: ${weapons.uzis}'),
               if (weapons.ar15 > 0) Text('AR-15: ${weapons.ar15}'),
-              if (weapons.machineGun > 0) Text('Machine Guns: ${weapons.machineGun}'),
-              if (weapons.submachineGun > 0) Text('Submachine Guns: ${weapons.submachineGun}'),
-              if (weapons.ghostGuns > 0) Text('Ghost Guns: ${weapons.ghostGuns}'),
-              if (weapons.goldenGun > 0) Text('Golden Guns: ${weapons.goldenGun}'),
+              if (weapons.machineGun > 0)
+                Text('Machine Guns: ${weapons.machineGun}'),
+              if (weapons.submachineGun > 0)
+                Text('Submachine Guns: ${weapons.submachineGun}'),
+              if (weapons.ghostGuns > 0)
+                Text('Ghost Guns: ${weapons.ghostGuns}'),
+              if (weapons.goldenGun > 0)
+                Text('Golden Guns: ${weapons.goldenGun}'),
               if (weapons.grenades > 0) Text('Grenades: ${weapons.grenades}'),
-              if (weapons.missileLauncher > 0) Text('Missile Launcher: ${weapons.missileLauncher}'),
+              if (weapons.missileLauncher > 0)
+                Text('Missile Launcher: ${weapons.missileLauncher}'),
               if (weapons.missiles > 0) Text('Missiles: ${weapons.missiles}'),
-              if (weapons.rocketLauncher > 0) Text('Rocket Launcher: ${weapons.rocketLauncher}'),
-              if (weapons.flamethrower > 0) Text('Flamethrowers: ${weapons.flamethrower}'),
+              if (weapons.rocketLauncher > 0)
+                Text('Rocket Launcher: ${weapons.rocketLauncher}'),
+              if (weapons.flamethrower > 0)
+                Text('Flamethrowers: ${weapons.flamethrower}'),
               if (weapons.knife > 0) Text('Knives: ${weapons.knife}'),
               if (weapons.sword > 0) Text('Swords: ${weapons.sword}'),
               if (weapons.axe > 0) Text('Axes: ${weapons.axe}'),
-              if (weapons.barbedWireBat > 0) Text('Barbed Wire Bats: ${weapons.barbedWireBat}'),
-              if (weapons.vampireBat > 0) Text('Vampire Bats: ${weapons.vampireBat}'),
-              if (weapons.brassKnuckles > 0) Text('Brass Knuckles: ${weapons.brassKnuckles}'),
-              if (weapons.poisonBlowgun > 0) Text('Poison Blowguns: ${weapons.poisonBlowgun}'),
-              if (weapons.goldenSword > 0) Text('Golden Swords: ${weapons.goldenSword}'),
-              if (weapons.goldenAxe > 0) Text('Golden Axes: ${weapons.goldenAxe}'),
-              if (weapons.goldenKnife > 0) Text('Golden Knives: ${weapons.goldenKnife}'),
-              if (weapons.goldenUzi > 0) Text('Golden Uzis: ${weapons.goldenUzi}'),
-              if (weapons.goldenAr15 > 0) Text('Golden AR-15: ${weapons.goldenAr15}'),
+              if (weapons.barbedWireBat > 0)
+                Text('Barbed Wire Bats: ${weapons.barbedWireBat}'),
+              if (weapons.vampireBat > 0)
+                Text('Vampire Bats: ${weapons.vampireBat}'),
+              if (weapons.brassKnuckles > 0)
+                Text('Brass Knuckles: ${weapons.brassKnuckles}'),
+              if (weapons.poisonBlowgun > 0)
+                Text('Poison Blowguns: ${weapons.poisonBlowgun}'),
+              if (weapons.goldenSword > 0)
+                Text('Golden Swords: ${weapons.goldenSword}'),
+              if (weapons.goldenAxe > 0)
+                Text('Golden Axes: ${weapons.goldenAxe}'),
+              if (weapons.goldenKnife > 0)
+                Text('Golden Knives: ${weapons.goldenKnife}'),
+              if (weapons.goldenUzi > 0)
+                Text('Golden Uzis: ${weapons.goldenUzi}'),
+              if (weapons.goldenAr15 > 0)
+                Text('Golden AR-15: ${weapons.goldenAr15}'),
               if (weapons.vest > 0) Text('Body Armor: ${weapons.vest}'),
               const SizedBox(height: 15),
-              const Text('Drugs:',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                'Drugs:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               Text('Weed: ${gameState.drugs.weed}kg'),
               Text('Crack: ${gameState.drugs.crack}kg'),
               Text('Coke: ${gameState.drugs.coke}kg'),
@@ -367,13 +397,21 @@ class CityScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Restart Game?'),
-        content: const Text('This will wipe all stats and progress. Are you sure you want to start a new legacy?'),
+        content: const Text(
+          'This will wipe all stats and progress. Are you sure you want to start a new legacy?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('CANCEL'),
+          ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              final gameProvider = Provider.of<GameProvider>(context, listen: false);
+              final gameProvider = Provider.of<GameProvider>(
+                context,
+                listen: false,
+              );
               gameProvider.restartGame(keepPersistentData: false);
             },
             child: const Text('RESTART', style: TextStyle(color: Colors.red)),
@@ -418,20 +456,6 @@ class CityScreen extends StatelessWidget {
       // Set the event to be shown by the WanderingAnimation
       gameProvider.currentWanderingEvent.value = event;
     });
-  }
-  
-  void _handleNpcOption(BuildContext context, String option, RandomEvent event) {
-     final gameProvider = Provider.of<GameProvider>(context, listen: false);
-     final resultMessage = gameProvider.handleNpcInteraction(event, option);
-     
-     if (gameProvider.currentScreen != 'mud_fight') {
-       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(resultMessage),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-     }
   }
 
   void _startFinalBattle(BuildContext context) {
@@ -519,14 +543,17 @@ class CityScreen extends StatelessWidget {
               Text('You are about to challenge the entire Squidie Army!'),
               const SizedBox(height: 10),
               Text(
-                  'They have gathered all their $enemyCount soldiers to crush you.'),
+                'They have gathered all their $enemyCount soldiers to crush you.',
+              ),
               Text(
-                  'Their total health is estimated to be around $totalEnemyHealth.'),
+                'Their total health is estimated to be around $totalEnemyHealth.',
+              ),
               const SizedBox(height: 10),
               Text(squidieUpgradeMessage),
               const SizedBox(height: 10),
               const Text(
-                  'This is the final showdown. There is no turning back.'),
+                'This is the final showdown. There is no turning back.',
+              ),
               const SizedBox(height: 10),
               const Text('Are you ready to become the King?'),
             ],

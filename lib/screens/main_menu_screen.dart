@@ -21,12 +21,17 @@ class MainMenuScreen extends StatelessWidget {
           Center(
             child: SingleChildScrollView(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 40,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                margin: const EdgeInsets.symmetric(horizontal: 20), // Reduced margin slightly
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                ), // Reduced margin slightly
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -64,13 +69,33 @@ class MainMenuScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 50),
-                    _buildMenuButton(context, 'NEW GAME', () => _startNewGame(context), Icons.add),
+                    _buildMenuButton(
+                      context,
+                      'NEW GAME',
+                      () => _startNewGame(context),
+                      Icons.add,
+                    ),
                     const SizedBox(height: 15),
-                    _buildMenuButton(context, 'CONTINUE', () => _continueGame(context), Icons.play_arrow),
+                    _buildMenuButton(
+                      context,
+                      'CONTINUE',
+                      () => _continueGame(context),
+                      Icons.play_arrow,
+                    ),
                     const SizedBox(height: 15),
-                    _buildMenuButton(context, 'CREDITS', () => _showCredits(context), Icons.info),
+                    _buildMenuButton(
+                      context,
+                      'CREDITS',
+                      () => _showCredits(context),
+                      Icons.info,
+                    ),
                     const SizedBox(height: 15),
-                    _buildMenuButton(context, 'QUIT', () => _quitGame(context), Icons.exit_to_app),
+                    _buildMenuButton(
+                      context,
+                      'QUIT',
+                      () => _quitGame(context),
+                      Icons.exit_to_app,
+                    ),
                     const SizedBox(height: 40),
                     const Text(
                       'STREETS NEVER SLEEP',
@@ -92,7 +117,12 @@ class MainMenuScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuButton(BuildContext context, String text, VoidCallback onPressed, IconData icon) {
+  Widget _buildMenuButton(
+    BuildContext context,
+    String text,
+    VoidCallback onPressed,
+    IconData icon,
+  ) {
     return SizedBox(
       width: 250,
       child: GameButton(
@@ -112,7 +142,13 @@ class MainMenuScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.grey.shade900,
-        title: const Text('NEW OPERATION', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'NEW OPERATION',
+          style: TextStyle(
+            color: Colors.redAccent,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -122,7 +158,9 @@ class MainMenuScreen extends StatelessWidget {
               decoration: const InputDecoration(
                 labelText: 'STREET NAME',
                 labelStyle: TextStyle(color: Colors.white70),
-                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.redAccent)),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.redAccent),
+                ),
               ),
             ),
             const SizedBox(height: 10),
@@ -132,7 +170,9 @@ class MainMenuScreen extends StatelessWidget {
               decoration: const InputDecoration(
                 labelText: 'GANG NAME',
                 labelStyle: TextStyle(color: Colors.white70),
-                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.redAccent)),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.redAccent),
+                ),
               ),
             ),
           ],
@@ -147,8 +187,10 @@ class MainMenuScreen extends StatelessWidget {
             onPressed: () {
               if (playerNameController.text.isNotEmpty &&
                   gangNameController.text.isNotEmpty) {
-                final gameProvider =
-                    Provider.of<GameProvider>(context, listen: false);
+                final gameProvider = Provider.of<GameProvider>(
+                  context,
+                  listen: false,
+                );
                 gameProvider.startNewGame(
                   playerNameController.text,
                   gangNameController.text,
@@ -156,7 +198,13 @@ class MainMenuScreen extends StatelessWidget {
                 Navigator.pop(context);
               }
             },
-            child: const Text('IGNITE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: const Text(
+              'IGNITE',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -184,8 +232,14 @@ class MainMenuScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.grey.shade900,
-        title: const Text('LEAVING?', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        content: const Text('The streets will remember your face.', style: TextStyle(color: Colors.white70)),
+        title: const Text(
+          'LEAVING?',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        content: const Text(
+          'The streets will remember your face.',
+          style: TextStyle(color: Colors.white70),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -200,7 +254,10 @@ class MainMenuScreen extends StatelessWidget {
                 exit(0);
               }
             },
-            child: const Text('EXIT', style: TextStyle(color: Colors.redAccent)),
+            child: const Text(
+              'EXIT',
+              style: TextStyle(color: Colors.redAccent),
+            ),
           ),
         ],
       ),

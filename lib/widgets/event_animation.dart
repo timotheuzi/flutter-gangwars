@@ -8,17 +8,14 @@ class EventAnimation extends StatefulWidget {
   final RandomEvent event;
   final String? selectedOption;
 
-  const EventAnimation({
-    super.key,
-    required this.event,
-    this.selectedOption,
-  });
+  const EventAnimation({super.key, required this.event, this.selectedOption});
 
   @override
   State<EventAnimation> createState() => _EventAnimationState();
 }
 
-class _EventAnimationState extends State<EventAnimation> with SingleTickerProviderStateMixin {
+class _EventAnimationState extends State<EventAnimation>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -62,7 +59,7 @@ class _EventAnimationState extends State<EventAnimation> with SingleTickerProvid
                 ),
               ),
             ),
-            
+
             // Animation content based on event type
             _buildAnimationLayer(),
           ],
@@ -107,7 +104,12 @@ class _EventAnimationState extends State<EventAnimation> with SingleTickerProvid
               );
             },
           ),
-          const PixelArtMember(isPlayer: true, isAlive: true, isCheering: true, size: 40),
+          const PixelArtMember(
+            isPlayer: true,
+            isAlive: true,
+            isCheering: true,
+            size: 40,
+          ),
         ],
       ),
     );
@@ -168,17 +170,18 @@ class _EventAnimationState extends State<EventAnimation> with SingleTickerProvid
   }
 
   Widget _buildNpcAnimation() {
-    final isFighting = widget.selectedOption == 'Fight' || widget.selectedOption == 'Challenge';
+    final isFighting = widget.selectedOption == 'Fight' ||
+        widget.selectedOption == 'Challenge';
     final isRecruiting = widget.selectedOption == 'Recruit';
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         PixelArtMember(
-          isPlayer: true, 
-          isAlive: true, 
+          isPlayer: true,
+          isAlive: true,
           isCheering: isRecruiting,
-          size: 40
+          size: 40,
         ),
         AnimatedBuilder(
           animation: _controller,
@@ -190,10 +193,10 @@ class _EventAnimationState extends State<EventAnimation> with SingleTickerProvid
           },
         ),
         PixelArtMember(
-          isPlayer: false, 
-          isAlive: !isFighting || _controller.value < 0.5, 
+          isPlayer: false,
+          isAlive: !isFighting || _controller.value < 0.5,
           isCheering: isRecruiting,
-          size: 40
+          size: 40,
         ),
       ],
     );
@@ -221,7 +224,11 @@ class _EventAnimationState extends State<EventAnimation> with SingleTickerProvid
         builder: (context, child) {
           return Transform.translate(
             offset: Offset(sin(_controller.value * 2 * pi) * 50, 0),
-            child: const PixelArtMember(isPlayer: true, isAlive: true, size: 40),
+            child: const PixelArtMember(
+              isPlayer: true,
+              isAlive: true,
+              size: 40,
+            ),
           );
         },
       ),

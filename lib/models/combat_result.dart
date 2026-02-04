@@ -7,7 +7,7 @@ class CombatResult {
   int gangDamageDealt = 0;
   int totalEnemyDamage = 0;
   String finalMessage = '';
-  
+
   // Real-time tracking for animations
   int remainingEnemyHealth = 0;
   int initialEnemyHealth = 0;

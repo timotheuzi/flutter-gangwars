@@ -22,9 +22,7 @@ class LocationCard extends StatelessWidget {
     return Card(
       elevation: 8,
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: InkWell(
         onTap: onPressed,
         child: Stack(
@@ -36,7 +34,7 @@ class LocationCard extends StatelessWidget {
                 child: PixelArtLocation(location: title, size: 150),
               ),
             ),
-            
+
             // Gradient Overlay for text readability
             Positioned.fill(
               child: Container(
@@ -65,10 +63,17 @@ class LocationCard extends StatelessWidget {
                     title.toUpperCase(),
                     style: const TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.w900, // Fixed: Changed from FontWeight.black to FontWeight.w900
+                      fontWeight: FontWeight
+                          .w900, // Fixed: Changed from FontWeight.black to FontWeight.w900
                       color: Colors.white,
                       fontFamily: 'Courier',
-                      shadows: [Shadow(color: Colors.black, blurRadius: 4, offset: Offset(2, 2))],
+                      shadows: [
+                        Shadow(
+                          color: Colors.black,
+                          blurRadius: 4,
+                          offset: Offset(2, 2),
+                        ),
+                      ],
                     ),
                   ),
                   Text(

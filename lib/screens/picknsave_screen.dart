@@ -89,7 +89,9 @@ class PickNSaveScreen extends StatelessWidget {
                         onPressed: () {
                           gameProvider.picknsaveAction('buy_medical');
                         },
-                        child: const Text('Buy Medical Supplies (\$500) - Balanced Price'),
+                        child: const Text(
+                          'Buy Medical Supplies (\$500) - Balanced Price',
+                        ),
                       ),
                       const SizedBox(height: 10),
                       ElevatedButton(
@@ -123,10 +125,7 @@ class PickNSaveScreen extends StatelessWidget {
                       ),
                       const Text(
                         'Healing and essential items now more affordable!',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white70,
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.white70),
                         textAlign: TextAlign.center,
                       ),
                     ],

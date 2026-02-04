@@ -27,6 +27,7 @@ class GameProvider with ChangeNotifier {
     _gameMessage = message;
     notifyListeners();
   }
+
   CombatData? get currentCombatData => _currentCombatData;
   bool get showingBuildingAnimation => _showingBuildingAnimation;
   String get buildingAnimationType => _buildingAnimationType;
@@ -64,10 +65,7 @@ class GameProvider with ChangeNotifier {
   }
 
   void startNewGame(String playerName, String gangName) {
-    _gameState = GameState(
-      playerName: playerName,
-      gangName: gangName,
-    );
+    _gameState = GameState(playerName: playerName, gangName: gangName);
     _currentScreen = 'city';
     saveGameState();
     notifyListeners();
@@ -93,8 +91,13 @@ class GameProvider with ChangeNotifier {
 
   void navigateToScreen(String screen) {
     final buildingScreens = [
-      'bank', 'bar', 'crackhouse', 'gunshack',
-      'infobooth', 'picknsave', 'alleyway'
+      'bank',
+      'bar',
+      'crackhouse',
+      'gunshack',
+      'infobooth',
+      'picknsave',
+      'alleyway',
     ];
 
     if (buildingScreens.contains(screen)) {
@@ -128,13 +131,19 @@ class GameProvider with ChangeNotifier {
   }
 
   void startMudFight(
-      int enemyHealth, int enemyCount, String enemyType, String combatId) {
+    int enemyHealth,
+    int enemyCount,
+    String enemyType,
+    String combatId,
+  ) {
     _combatResult = CombatResult()
       ..enemiesKilled = 0
       ..initialEnemyHealth = enemyHealth * enemyCount
       ..remainingEnemyHealth = enemyHealth * enemyCount
       ..initialPlayerHealth = _gameState.health
-      ..fightLog.add('Combat starting in the mud: $enemyType ($enemyCount enemies)');
+      ..fightLog.add(
+        'Combat starting in the mud: $enemyType ($enemyCount enemies)',
+      );
 
     _currentCombatData = CombatData(
       enemyHealth: enemyHealth.toDouble(),
@@ -161,8 +170,7 @@ class GameProvider with ChangeNotifier {
     }
 
     _addWeapon(weaponType, quantity);
-    _gameMessage =
-        'Purchased $quantity $weaponType(s) for \$${totalCost.toString()}!';
+    _gameMessage = 'Purchased $quantity $weaponType(s) for \$${totalCost}';
     saveGameState();
     notifyListeners();
     return true;
@@ -271,8 +279,7 @@ class GameProvider with ChangeNotifier {
       }
 
       _addDrug(normalizedType, quantity);
-      _gameMessage =
-          'Bought $quantity kilo(s) of $drugType for \$${cost.toString()}!';
+      _gameMessage = 'Bought $quantity kilo(s) of $drugType for \$${cost}';
       saveGameState();
       notifyListeners();
       return true;
@@ -289,8 +296,7 @@ class GameProvider with ChangeNotifier {
       _gameState.money += revenue;
       _removeDrug(normalizedType, quantity);
 
-      _gameMessage =
-          'Sold $quantity kilo(s) of $drugType for \$${revenue.toString()}!';
+      _gameMessage = 'Sold $quantity kilo(s) of $drugType for \$${revenue}';
 
       // Chance to recruit new member from big drug sales
       if (revenue >= 5000 && Random().nextDouble() < 0.25) {
@@ -371,10 +377,16 @@ class GameProvider with ChangeNotifier {
 
   bool performCombat(String weapon, String enemyType, int enemyCount) {
     // Use the stored enemy health from combat data to maintain scaling/power factor
-    final perEnemyHealth = _currentCombatData?.enemyHealth ?? _calculateEnemyHealth(enemyType, enemyCount);
-    
+    final perEnemyHealth = _currentCombatData?.enemyHealth ??
+        _calculateEnemyHealth(enemyType, enemyCount);
+
     final result = CombatSystem.calculateCombat(
-        _gameState, weapon, enemyType, enemyCount, perEnemyHealth);
+      _gameState,
+      weapon,
+      enemyType,
+      enemyCount,
+      perEnemyHealth,
+    );
     _combatResult = result;
 
     if (result.victory) {
@@ -445,7 +457,8 @@ class GameProvider with ChangeNotifier {
   }
 
   bool _buyMedical() {
-    if (!_gameState.spendMoney(500)) { // Balanced price
+    if (!_gameState.spendMoney(500)) {
+      // Balanced price
       _gameMessage = 'Not enough money!';
       return false;
     }
@@ -504,7 +517,7 @@ class GameProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   void _advanceDayWithIncome() {
     // Calculate income before advancing day
     final random = Random();
@@ -512,15 +525,15 @@ class GameProvider with ChangeNotifier {
     for (int i = 0; i < _gameState.prostitutes.count; i++) {
       totalIncome += 3500 + random.nextInt(1301);
     }
-    
+
     _gameState.advanceDay();
-    
+
     // Day message includes prostitute income
     _gameMessage = 'A new day begins! Day $_gameState.day';
     if (_gameState.prostitutes.count > 0) {
       _gameMessage += '\nYour prostitutes earned you \$$totalIncome tonight.';
     }
-    
+
     saveGameState();
     notifyListeners();
   }
@@ -537,19 +550,21 @@ class GameProvider with ChangeNotifier {
 
     if (_gameState.steps >= _gameState.maxSteps) {
       _advanceDayWithIncome();
-      
+
       // Check for loan sharks at the start of a new day - now 2 days grace
-      if (_gameState.loan > 0 && (_gameState.day - _gameState.loanDayTaken) >= 2) {
+      if (_gameState.loan > 0 &&
+          (_gameState.day - _gameState.loanDayTaken) >= 2) {
         _gameState.flags.hasAttractedLoanShark = true;
       }
-      
+
       return null;
     }
 
     // Check for loan shark encounter
     if (_gameState.loan > 0 &&
         _gameState.flags.hasAttractedLoanShark &&
-        Random().nextDouble() < 0.2) { // Increased chance
+        Random().nextDouble() < 0.2) {
+      // Increased chance
       final msg = _handleLoanSharkEncounter();
       _gameMessage = msg;
       return null; // Combat started or debt paid
@@ -591,7 +606,7 @@ class GameProvider with ChangeNotifier {
         // Other events handled by applyEventEffects or just informational
         break;
     }
-    
+
     _gameMessage = event.description;
     return event;
   }
@@ -600,7 +615,7 @@ class GameProvider with ChangeNotifier {
     final repaymentAmount = (_gameState.loan * 1.5).toInt();
 
     if (_gameState.money >= repaymentAmount) {
-      // Automatic repayment if money is available? Or force combat? 
+      // Automatic repayment if money is available? Or force combat?
       // Requirement says "hunted down", so let's trigger combat.
       startMudFight(200, 1, 'Loan Shark Enforcer', 'loan_shark_boss_fight');
       return 'A Loan Shark Enforcer corners you! "You owe us \$${repaymentAmount}, punk!"';
@@ -623,18 +638,18 @@ class GameProvider with ChangeNotifier {
       switch (key) {
         case 'damage':
           if (option == 'Fight' || option == 'Challenge') {
-             if (option == 'Fight' || option == 'Challenge') {
-                final enemyName = event.title.replaceFirst('NPC Encounter: ', '');
-                startMudFight(100, 1, enemyName, event.id);
-                messages.add('You attacked the $enemyName!');
-                return; // Exit switch, combat started
-             }
-             
-             _gameState.takeDamage(value);
-             messages.add('You took $value damage.');
+            if (option == 'Fight' || option == 'Challenge') {
+              final enemyName = event.title.replaceFirst('NPC Encounter: ', '');
+              startMudFight(100, 1, enemyName, event.id);
+              messages.add('You attacked the $enemyName!');
+              return; // Exit switch, combat started
+            }
+
+            _gameState.takeDamage(value);
+            messages.add('You took $value damage.');
           } else {
-             _gameState.takeDamage(value);
-             messages.add('You took $value damage.');
+            _gameState.takeDamage(value);
+            messages.add('You took $value damage.');
           }
         case 'health':
           _gameState.heal(value);
@@ -645,9 +660,9 @@ class GameProvider with ChangeNotifier {
             messages.add('You got \$$value.');
           } else {
             if (_gameState.spendMoney(-value)) {
-              messages.add('You spent \$${-value}.');
+              messages.add('You spent \$${-value}');
             } else {
-              messages.add('You couldn\'t afford to pay \$${-value}.');
+              messages.add('You couldn\'t afford to pay \$${-value}');
             }
           }
         case 'reputation':
@@ -658,14 +673,17 @@ class GameProvider with ChangeNotifier {
           messages.add('You gained $value gang member(s).');
         case 'drugs':
           // Correctly handle the random drug added via NPC
-          final drugType = event.description.contains('kilos of ') 
-              ? event.description.split('kilos of ')[1].split(' ')[0].replaceAll('.', '')
+          final drugType = event.description.contains('kilos of ')
+              ? event.description
+                  .split('kilos of ')[1]
+                  .split(' ')[0]
+                  .replaceAll('.', '')
               : 'weed';
           _addDrug(drugType, value);
           messages.add('You got $value kg of $drugType.');
       }
     });
-    
+
     // Check if we entered combat, if so, we are already navigating
     if (_currentScreen == 'mud_fight') {
       return 'Entering combat!';
