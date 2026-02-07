@@ -137,12 +137,12 @@ class GameProvider with ChangeNotifier {
       ..fightLog.add('Combat starting in the mud: $enemyType ($enemyCount enemies)');
 
     if (_currentCombatData != null) {
-  _currentCombatData.initialEnemyHealth = enemyHealth.toInt();
-  _currentCombatData.enemyCount = enemyCount;
-  _currentCombatData.enemyType = enemyType;
-  _currentCombatData.combatId = combatId;
-  _currentCombatData.initialMessage = 'You engage in a muddy brawl with $enemyType!';
-}
+      _currentCombatData.initialEnemyHealth = enemyHealth.toInt();
+      _currentCombatData.enemyCount = enemyCount;
+      _currentCombatData.enemyType = enemyType;
+      _currentCombatData.combatId = combatId;
+      _currentCombatData.initialMessage = 'You engage in a muddy brawl with $enemyType!';
+    }
 
     _currentScreen = 'mud_fight';
     saveGameState();
@@ -372,7 +372,7 @@ class GameProvider with ChangeNotifier {
   bool performCombat(String weapon, String enemyType, int enemyCount) {
     // Use the stored enemy health from combat data to maintain scaling/power factor
     final perEnemyHealth = (_currentCombatData?.initialEnemyHealth ?? _calculateEnemyHealth(enemyType, enemyCount)).toDouble();
-    
+
     final result = CombatSystem.calculateCombat(
         _gameState, weapon, enemyType, enemyCount, perEnemyHealth);
     _combatResult = result;
@@ -504,7 +504,7 @@ class GameProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   void _advanceDayWithIncome() {
     // Calculate income before advancing day
     final random = Random();
@@ -512,15 +512,15 @@ class GameProvider with ChangeNotifier {
     for (int i = 0; i < _gameState.prostitutes.count; i++) {
       totalIncome += 3500 + random.nextInt(1301);
     }
-    
+
     _gameState.advanceDay();
-    
+
     // Day message includes prostitute income
     _gameMessage = 'A new day begins! Day $_gameState.day';
     if (_gameState.prostitutes.count > 0) {
       _gameMessage += '\nYour prostitutes earned you \$$totalIncome tonight.';
     }
-    
+
     saveGameState();
     notifyListeners();
   }
@@ -537,12 +537,12 @@ class GameProvider with ChangeNotifier {
 
     if (_gameState.steps >= _gameState.maxSteps) {
       _advanceDayWithIncome();
-      
+
       // Check for loan sharks at the start of a new day - now 2 days grace
       if (_gameState.loan > 0 && (_gameState.day - _gameState.loanDayTaken) >= 2) {
         _gameState.flags.hasAttractedLoanShark = true;
       }
-      
+
       return null;
     }
 
@@ -591,7 +591,7 @@ class GameProvider with ChangeNotifier {
         // Other events handled by applyEventEffects or just informational
         break;
     }
-    
+
     _gameMessage = event.description;
     return event;
   }
@@ -600,7 +600,7 @@ class GameProvider with ChangeNotifier {
     final repaymentAmount = (_gameState.loan * 1.5).toInt();
 
     if (_gameState.money >= repaymentAmount) {
-      // Automatic repayment if money is available? Or force combat? 
+      // Automatic repayment if money is available? Or force combat?
       // Requirement says "hunted down", so let's trigger combat.
       startMudFight(200, 1, 'Loan Shark Enforcer', 'loan_shark_boss_fight');
       return 'A Loan Shark Enforcer corners you! "You owe us \$${repaymentAmount}, punk!"';
@@ -629,7 +629,7 @@ class GameProvider with ChangeNotifier {
                 messages.add('You attacked the $enemyName!');
                 return; // Exit switch, combat started
              }
-             
+
              _gameMessage = 'You took $value damage.';
           } else {
              _gameMessage = 'You took $value damage.';

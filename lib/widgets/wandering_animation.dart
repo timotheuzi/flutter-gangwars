@@ -17,8 +17,7 @@ class WanderingAnimation extends StatefulWidget {
   WanderingAnimationState createState() => WanderingAnimationState();
 }
 
-class WanderingAnimationState extends State<WanderingAnimation>
-    with SingleAnimationProviderStateMixin {
+class WanderingAnimationState extends State<WanderingAnimation> {
   late AnimationController _controller;
   late Animation<double> _playerPosition;
   late Animation<double> _playerBob;
@@ -45,14 +44,6 @@ class WanderingAnimationState extends State<WanderingAnimation>
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.linear,
-    ));
-
-    _cameraPan = Tween<double>(
-      begin: 0.0,
-      end: 50.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
     ));
 
     _controller.repeat();

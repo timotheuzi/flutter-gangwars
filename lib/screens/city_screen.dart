@@ -26,7 +26,7 @@ class CityScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.info),
             onPressed: () => _showStats(context),
-          ],
+          ),
         ],
       ),
       body: Container(
@@ -418,8 +418,8 @@ class CityScreen extends StatelessWidget {
       gameProvider.currentWanderingEvent.value = event;
     });
   }
-  
-  
+
+
   void _startFinalBattle(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     final gameState = gameProvider.gameState;

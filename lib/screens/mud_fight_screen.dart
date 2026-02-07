@@ -74,9 +74,9 @@ class _MudFightScreenState extends State<MudFightScreen> {
                     gangName: gameProvider.gameState.gangName,
                     enemyType: combatData.enemyType,
                     playerHealth: gameProvider.gameState.health,
-                    enemyHealth: combatResult?.remainingEnemyHealth ?? (combatData.enemyHealth * combatData.enemyCount).toInt(),
+                    enemyHealth: combatResult?.remainingEnemyHealth ?? (combatData.initialEnemyHealth / combatData.enemyCount).toInt(),
                     playerMaxHealth: gameProvider.gameState.maxHealth.toDouble(),
-                    enemyMaxHealth: combatData.enemyHealth * combatData.enemyCount,
+                    enemyMaxHealth: combatData.initialEnemyHealth,
                     playerMembers: gameProvider.gameState.members,
                     enemyCount: combatData.enemyCount,
                     currentWeapon: gameProvider.combatResult?.fightLog.isNotEmpty == true 
@@ -107,7 +107,7 @@ class _MudFightScreenState extends State<MudFightScreen> {
                           ),
                         ),
                         Text(
-                          '${combatData.enemyCount} enemies | Enemy HP: ${combatResult?.remainingEnemyHealth ?? (combatData.enemyHealth * combatData.enemyCount).toInt()}',
+                          '${combatData.enemyCount} enemies | Enemy HP: ${combatResult?.remainingEnemyHealth ?? (combatData.initialEnemyHealth / combatData.enemyCount).toInt()}',
                           style: const TextStyle(fontSize: 14, color: Colors.white),
                         ),
                         const SizedBox(height: 5),
