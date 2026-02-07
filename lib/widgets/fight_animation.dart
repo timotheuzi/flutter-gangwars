@@ -73,21 +73,42 @@ class BloodSplatterPainter extends CustomPainter {
     final gutPaint = Paint()..style = PaintingStyle.fill;
 
     for (var particle in particles) {
-      final currentOpacity = particle.opacity * (particle.life / particle.maxLife);
-      
+      final currentOpacity =
+          particle.opacity * (particle.life / particle.maxLife);
+
       if (particle.type == ParticleType.blood) {
         bloodPaint.color = particle.color.withValues(alpha: currentOpacity);
         canvas.save();
         canvas.translate(particle.position.dx, particle.position.dy);
         canvas.rotate(particle.rotation);
-        
+
         final path = Path();
         path.moveTo(0, -particle.size);
-        path.quadraticBezierTo(particle.size * 0.5, -particle.size * 0.8, particle.size, 0);
-        path.quadraticBezierTo(particle.size * 0.8, particle.size * 0.5, 0, particle.size);
-        path.quadraticBezierTo(-particle.size * 0.8, particle.size * 0.5, -particle.size, 0);
-        path.quadraticBezierTo(-particle.size * 0.5, -particle.size * 0.8, 0, -particle.size);
-        
+        path.quadraticBezierTo(
+          particle.size * 0.5,
+          -particle.size * 0.8,
+          particle.size,
+          0,
+        );
+        path.quadraticBezierTo(
+          particle.size * 0.8,
+          particle.size * 0.5,
+          0,
+          particle.size,
+        );
+        path.quadraticBezierTo(
+          -particle.size * 0.8,
+          particle.size * 0.5,
+          -particle.size,
+          0,
+        );
+        path.quadraticBezierTo(
+          -particle.size * 0.5,
+          -particle.size * 0.8,
+          0,
+          -particle.size,
+        );
+
         canvas.drawPath(path, bloodPaint);
         canvas.restore();
       } else {
@@ -96,14 +117,19 @@ class BloodSplatterPainter extends CustomPainter {
         canvas.save();
         canvas.translate(particle.position.dx, particle.position.dy);
         canvas.rotate(particle.rotation);
-        
+
         // Rect for a "chunk"
         canvas.drawRRect(
           RRect.fromRectAndRadius(
-            Rect.fromLTWH(-particle.size/2, -particle.size/4, particle.size, particle.size/2),
-            Radius.circular(particle.size / 4)
+            Rect.fromLTWH(
+              -particle.size / 2,
+              -particle.size / 4,
+              particle.size,
+              particle.size / 2,
+            ),
+            Radius.circular(particle.size / 4),
           ),
-          gutPaint
+          gutPaint,
         );
         canvas.restore();
       }
@@ -126,12 +152,14 @@ class FightAnimationState extends State<FightAnimation>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 16), // Approx 60fps
-    )..addListener(_updateParticles)..repeat();
+    )
+      ..addListener(_updateParticles)
+      ..repeat();
   }
 
   void _updateParticles() {
     if (!mounted) return;
-    
+
     setState(() {
       for (int i = _particles.length - 1; i >= 0; i--) {
         final p = _particles[i];
@@ -139,7 +167,7 @@ class FightAnimationState extends State<FightAnimation>
         p.velocity += const Offset(0, 0.2); // Gravity
         p.rotation += p.rotationSpeed;
         p.life--;
-        
+
         if (p.life <= 0) {
           _particles.removeAt(i);
         }
@@ -158,18 +186,27 @@ class FightAnimationState extends State<FightAnimation>
     for (int i = 0; i < count; i++) {
       final angle = _random.nextDouble() * 2 * pi;
       final speed = 1.0 + _random.nextDouble() * 4.0;
-      
-      _particles.add(Particle(
-        position: position,
-        velocity: Offset(cos(angle) * speed, sin(angle) * speed - 2), // Upward bias
-        size: isGut ? (4 + _random.nextDouble() * 6) : (2 + _random.nextDouble() * 5),
-        opacity: 0.8 + _random.nextDouble() * 0.2,
-        rotation: _random.nextDouble() * 2 * pi,
-        rotationSpeed: (_random.nextDouble() - 0.5) * 0.5,
-        color: isGut ? Colors.pink.shade300 : Colors.red.shade900,
-        type: isGut && _random.nextDouble() > 0.6 ? ParticleType.gut : ParticleType.blood,
-        maxLife: 40 + _random.nextInt(30),
-      ));
+
+      _particles.add(
+        Particle(
+          position: position,
+          velocity: Offset(
+            cos(angle) * speed,
+            sin(angle) * speed - 2,
+          ), // Upward bias
+          size: isGut
+              ? (4 + _random.nextDouble() * 6)
+              : (2 + _random.nextDouble() * 5),
+          opacity: 0.8 + _random.nextDouble() * 0.2,
+          rotation: _random.nextDouble() * 2 * pi,
+          rotationSpeed: (_random.nextDouble() - 0.5) * 0.5,
+          color: isGut ? Colors.pink.shade300 : Colors.red.shade900,
+          type: isGut && _random.nextDouble() > 0.6
+              ? ParticleType.gut
+              : ParticleType.blood,
+          maxLife: 40 + _random.nextInt(30),
+        ),
+      );
     }
   }
 
@@ -177,12 +214,18 @@ class FightAnimationState extends State<FightAnimation>
   void didUpdateWidget(FightAnimation oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.playerHealth < oldWidget.playerHealth) {
-      final pos = Offset(40 + _random.nextDouble() * 60, 100 + _random.nextDouble() * 50);
+      final pos = Offset(
+        40 + _random.nextDouble() * 60,
+        100 + _random.nextDouble() * 50,
+      );
       _addExplosion(pos, (oldWidget.playerHealth - widget.playerHealth) > 15);
     }
     if (widget.enemyHealth < oldWidget.enemyHealth) {
-      final pos = Offset(MediaQuery.of(context).size.width - 140 + _random.nextDouble() * 60, 100 + _random.nextDouble() * 50);
-       _addExplosion(pos, (oldWidget.enemyHealth - widget.enemyHealth) > 20);
+      final pos = Offset(
+        MediaQuery.of(context).size.width - 140 + _random.nextDouble() * 60,
+        100 + _random.nextDouble() * 50,
+      );
+      _addExplosion(pos, (oldWidget.enemyHealth - widget.enemyHealth) > 20);
     }
   }
 
@@ -224,10 +267,10 @@ class FightAnimationState extends State<FightAnimation>
     final totalCount = isPlayer ? widget.playerMembers : widget.enemyCount;
     final currentHealth = isPlayer ? widget.playerHealth : widget.enemyHealth;
     final maxHealth = isPlayer ? widget.playerMaxHealth : widget.enemyMaxHealth;
-    
+
     // Safety check
     if (totalCount <= 0) return const SizedBox();
-    
+
     final healthPerMember = maxHealth / totalCount;
 
     return Padding(
@@ -239,16 +282,27 @@ class FightAnimationState extends State<FightAnimation>
         children: List.generate(totalCount, (index) {
           final memberThreshold = index * healthPerMember;
           final isAlive = currentHealth > memberThreshold;
-          
-          final isVictorious = (isPlayer && widget.enemyHealth <= 0) || (!isPlayer && widget.playerHealth <= 0);
-          
-          return _buildMemberWithAnimation(isPlayer, isAlive, isAlive && isVictorious, index);
+
+          final isVictorious = (isPlayer && widget.enemyHealth <= 0) ||
+              (!isPlayer && widget.playerHealth <= 0);
+
+          return _buildMemberWithAnimation(
+            isPlayer,
+            isAlive,
+            isAlive && isVictorious,
+            index,
+          );
         }),
       ),
     );
   }
 
-  Widget _buildMemberWithAnimation(bool isPlayer, bool isAlive, bool isCheering, int index) {
+  Widget _buildMemberWithAnimation(
+    bool isPlayer,
+    bool isAlive,
+    bool isCheering,
+    int index,
+  ) {
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -263,7 +317,7 @@ class FightAnimationState extends State<FightAnimation>
           mainAxisSize: MainAxisSize.min,
           children: [
             if (isAlive && !isCheering && widget.currentWeapon != null)
-               _buildWeaponFloating(isPlayer),
+              _buildWeaponFloating(isPlayer),
             Transform.translate(
               offset: Offset(0, yOffset),
               child: PixelArtMember(
@@ -282,7 +336,10 @@ class FightAnimationState extends State<FightAnimation>
   Widget _buildWeaponFloating(bool isPlayer) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 2),
-      child: PixelArtIcon(name: _getSanitizedWeaponName(widget.currentWeapon!), size: 16),
+      child: PixelArtIcon(
+        name: _getSanitizedWeaponName(widget.currentWeapon!),
+        size: 16,
+      ),
     );
   }
 

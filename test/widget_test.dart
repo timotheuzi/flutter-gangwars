@@ -7,24 +7,28 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 
 import 'package:droid_gangwar_flutter/main.dart';
+import 'package:droid_gangwar_flutter/providers/game_provider.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const GangWars());
+  testWidgets('Game app builds without errors', (WidgetTester tester) async {
+    // Build our app with ChangeNotifierProvider and trigger a frame.
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => GameProvider(),
+        child: const MyApp(),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify that the app builds without errors
+    expect(find.byType(MyApp), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    // Just pump once to allow the widget tree to build
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // The app should build successfully
+    expect(tester.takeException(), isNull);
   });
 }

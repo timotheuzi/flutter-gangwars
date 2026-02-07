@@ -33,18 +33,12 @@ class BuildingEntryAnimationState extends State<BuildingEntryAnimation>
     _playerPosition = Tween<double>(
       begin: -50.0,
       end: MediaQuery.of(context).size.width + 50,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     _playerBob = Tween<double>(
       begin: 0.0,
       end: 2 * pi,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.linear,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
 
     _controller.forward().then((_) {
       widget.onAnimationComplete();
@@ -80,9 +74,7 @@ class BuildingEntryAnimationState extends State<BuildingEntryAnimation>
             left: 0,
             right: 0,
             height: 100,
-            child: Container(
-              color: Colors.brown.shade800,
-            ),
+            child: Container(color: Colors.brown.shade800),
           ),
 
           // Building on the right
@@ -145,9 +137,7 @@ class BuildingEntryAnimationState extends State<BuildingEntryAnimation>
     return SizedBox(
       width: 120,
       height: 150,
-      child: CustomPaint(
-        painter: BuildingPainter(buildingType),
-      ),
+      child: CustomPaint(painter: BuildingPainter(buildingType)),
     );
   }
 }
@@ -483,5 +473,5 @@ class BuildingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant BuildingPainter oldDelegate) =>
-    oldDelegate.buildingType != buildingType;
+      oldDelegate.buildingType != buildingType;
 }

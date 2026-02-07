@@ -28,7 +28,7 @@ class GameState with ChangeNotifier {
     'coke': 2000,
     'ice': 1500,
     'percs': 800,
-    'pixie_dust': 3000
+    'pixie_dust': 3000,
   };
 
   // Future drug trends
@@ -157,14 +157,15 @@ class GameState with ChangeNotifier {
       }
     } else {
       while (gangMembers.length < members) {
-        gangMembers
-            .add(GangMember('Member ${gangMembers.length + 1}', 100, []));
+        gangMembers.add(
+          GangMember('Member ${gangMembers.length + 1}', 100, []),
+        );
       }
     }
 
     updateDrugPrices();
     generateDrugTrends();
-    
+
     notifyListeners();
   }
 
@@ -193,7 +194,10 @@ class GameState with ChangeNotifier {
 
       final volatility = 0.15 + (day * 0.01);
       final variation = (random.nextDouble() * (volatility * 2)) - volatility;
-      drugPrices[drug] = max(10, (basePrice * modifier * (1 + variation)).toInt());
+      drugPrices[drug] = max(
+        10,
+        (basePrice * modifier * (1 + variation)).toInt(),
+      );
     }
   }
 
@@ -201,19 +205,21 @@ class GameState with ChangeNotifier {
     drugTrends.clear();
     final random = Random();
     final drugs = drugPrices.keys.toList();
-    
+
     // Always generate 2-3 significant trends to keep the bar talk active
-    final numTrends = random.nextInt(2) + 2; 
+    final numTrends = random.nextInt(2) + 2;
     final shuffledDrugs = List.from(drugs)..shuffle();
-    
+
     for (int i = 0; i < numTrends; i++) {
       final drug = shuffledDrugs[i];
       final isBust = random.nextBool();
       final displayName = drug.replaceAll('_', ' ');
       if (isBust) {
-        drugTrends[drug] = 'The Feds just made a massive bust on a $displayName shipment. Prices are gonna skyrocket tomorrow.';
+        drugTrends[drug] =
+            'The Feds just made a massive bust on a $displayName shipment. Prices are gonna skyrocket tomorrow.';
       } else {
-        drugTrends[drug] = 'Word is the market is being flooded with cheap $displayName from the border. Prices are gonna tank soon.';
+        drugTrends[drug] =
+            'Word is the market is being flooded with cheap $displayName from the border. Prices are gonna tank soon.';
       }
     }
   }
@@ -523,10 +529,7 @@ class Prostitutes {
 
   Prostitutes();
 
-  Map<String, dynamic> toJson() => {
-        'count': count,
-        'price': price,
-      };
+  Map<String, dynamic> toJson() => {'count': count, 'price': price};
 
   factory Prostitutes.fromJson(Map<String, dynamic> json) {
     return Prostitutes()

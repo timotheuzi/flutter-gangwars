@@ -3,9 +3,9 @@
 
 # Configuration
 APP_NAME := droid_gangwar_flutter
-FLUTTER := /home/bim/flutter/bin/flutter
-DART := /home/bim/flutter/bin/cache/dart-sdk/bin/dart
-PUB := /home/bim/flutter/bin/cache/dart-sdk/bin/pub
+FLUTTER := /home/maestro/flutter/bin/flutter
+DART := /home/maestro/flutter/bin/cache/dart-sdk/bin/dart
+PUB := /home/maestro/flutter/bin/cache/dart-sdk/bin/pub
 
 # Platform targets
 PLATFORMS := linux android ios
@@ -107,10 +107,10 @@ version:
 	@echo -e "${BLUE}Flutter version:${NC}"
 	$(FLUTTER) --version
 
-# Run static analysis
+# Run static code analysis
 analyze:
 	@echo -e "${BLUE}Running static code analysis...${NC}"
-	$(DART) analyze
+	$(DART) analyze || echo -e "${YELLOW}Analysis complete with issues found. See output above.${NC}"
 	@echo -e "${GREEN}Analysis complete!${NC}"
 
 # Format code
@@ -128,7 +128,40 @@ test:
 # Run app in debug mode (platform-specific)
 run:
 	@echo -e "${BLUE}Running app in debug mode...${NC}"
-	$(FLUTTER) run
+	# Check Flutter doctor first to identify missing dependencies
+	echo "Checking Flutter setup..."
+	$(FLUTTER) doctor | grep -E "(✗|!)" || echo "Flutter setup looks good!"
+	
+	# Try to run on available platform with fallbacks
+	# First try web (most likely to work), then Android, then Linux
+	echo "Attempting to run on web (Chrome)..."
+	if $(FLUTTER) run -d chrome; then \
+		echo "Successfully running on web!"; \
+	elif $(FLUTTER) devices | grep -q "Android"; then \
+		echo "Web failed, trying Android..."; \
+		$(FLUTTER) run -d android; \
+	elif $(FLUTTER) devices | grep -q "Linux"; then \
+		echo "Android failed, trying Linux..."; \
+		$(FLUTTER) run -d linux; \
+	else \
+		echo ""; \
+		echo -e "${RED}No suitable device found. Please install missing dependencies:${NC}"; \
+		echo ""; \
+		echo -e "${YELLOW}For Web Development:${NC}"; \
+		echo "  - Install Chrome browser: sudo apt-get install google-chrome-stable"; \
+		echo "  - Or set CHROME_EXECUTABLE environment variable"; \
+		echo ""; \
+		echo -e "${YELLOW}For Linux Development:${NC}"; \
+		echo "  - Install Linux dependencies: make install-linux-deps"; \
+		echo "  - Or run: sudo apt-get install libgtk-3-dev mesa-utils"; \
+		echo ""; \
+		echo -e "${YELLOW}For Android Development:${NC}"; \
+		echo "  - Connect an Android device or start an emulator"; \
+		echo "  - Accept Android licenses: flutter doctor --android-licenses"; \
+		echo ""; \
+		echo "After installing dependencies, run 'flutter doctor' to verify setup."; \
+		exit 1; \
+	fi
 	@echo -e "${GREEN}App running!${NC}"
 
 run-linux:

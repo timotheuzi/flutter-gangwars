@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:math';
 import '../providers/game_provider.dart';
 import '../widgets/game_button.dart';
 import '../models/random_event.dart';
-import 'dart:math';
 
 class AlleywayScreen extends StatefulWidget {
   const AlleywayScreen({super.key});
@@ -12,7 +12,8 @@ class AlleywayScreen extends StatefulWidget {
   State<AlleywayScreen> createState() => _AlleywayScreenState();
 }
 
-class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStateMixin {
+class _AlleywayScreenState extends State<AlleywayScreen>
+    with TickerProviderStateMixin {
   // Simple dungeon navigation system
   int currentX = 0;
   int currentY = 0;
@@ -111,17 +112,25 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
           'You hear a distant scream cut short.',
         ];
         roomEvents[roomKey] = [events[random.nextInt(events.length)]];
-  }
-}
+      }
+    }
   }
 
   void _moveDirection(String direction) {
     setState(() {
       switch (direction) {
-        case 'north': currentY += 1; break;
-        case 'south': currentY -= 1; break;
-        case 'east': currentX += 1; break;
-        case 'west': currentX -= 1; break;
+        case 'north':
+          currentY += 1;
+          break;
+        case 'south':
+          currentY -= 1;
+          break;
+        case 'east':
+          currentX += 1;
+          break;
+        case 'west':
+          currentX -= 1;
+          break;
       }
       // Keep within bounds
       currentX = currentX.clamp(-2, 2);
@@ -133,10 +142,18 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
     int testX = currentX;
     int testY = currentY;
     switch (direction) {
-      case 'north': testY += 1; break;
-      case 'south': testY -= 1; break;
-      case 'east': testX += 1; break;
-      case 'west': testX -= 1; break;
+      case 'north':
+        testY += 1;
+        break;
+      case 'south':
+        testY -= 1;
+        break;
+      case 'east':
+        testX += 1;
+        break;
+      case 'west':
+        testX -= 1;
+        break;
     }
     return testX >= -2 && testX <= 2 && testY >= -2 && testY <= 2;
   }
@@ -178,7 +195,7 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
               child: Image.asset(
                 'assets/images/alleyway/background.png',
                 fit: BoxFit.cover,
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 colorBlendMode: BlendMode.darken,
               ),
             ),
@@ -219,10 +236,7 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.8),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.red.shade800,
-                        width: 2,
-                      ),
+                      border: Border.all(color: Colors.red.shade800, width: 2),
                     ),
                     child: Column(
                       children: [
@@ -302,12 +316,19 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
                             children: [
                               // North
                               ElevatedButton.icon(
-                                onPressed: _canMove('north') ? () => _moveDirection('north') : null,
+                                onPressed: _canMove('north')
+                                    ? () => _moveDirection('north')
+                                    : null,
                                 icon: const Icon(Icons.arrow_upward),
                                 label: const Text('North'),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: _canMove('north') ? Colors.green.shade700 : Colors.grey.shade700,
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  backgroundColor: _canMove('north')
+                                      ? Colors.green.shade700
+                                      : Colors.grey.shade700,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -320,12 +341,19 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
                             children: [
                               // West
                               ElevatedButton.icon(
-                                onPressed: _canMove('west') ? () => _moveDirection('west') : null,
+                                onPressed: _canMove('west')
+                                    ? () => _moveDirection('west')
+                                    : null,
                                 icon: const Icon(Icons.arrow_back),
                                 label: const Text('West'),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: _canMove('west') ? Colors.green.shade700 : Colors.grey.shade700,
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  backgroundColor: _canMove('west')
+                                      ? Colors.green.shade700
+                                      : Colors.grey.shade700,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -334,12 +362,19 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
                               const SizedBox(width: 20),
                               // East
                               ElevatedButton.icon(
-                                onPressed: _canMove('east') ? () => _moveDirection('east') : null,
+                                onPressed: _canMove('east')
+                                    ? () => _moveDirection('east')
+                                    : null,
                                 icon: const Icon(Icons.arrow_forward),
                                 label: const Text('East'),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: _canMove('east') ? Colors.green.shade700 : Colors.grey.shade700,
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  backgroundColor: _canMove('east')
+                                      ? Colors.green.shade700
+                                      : Colors.grey.shade700,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -352,12 +387,19 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
                             children: [
                               // South
                               ElevatedButton.icon(
-                                onPressed: _canMove('south') ? () => _moveDirection('south') : null,
+                                onPressed: _canMove('south')
+                                    ? () => _moveDirection('south')
+                                    : null,
                                 icon: const Icon(Icons.arrow_downward),
                                 label: const Text('South'),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: _canMove('south') ? Colors.green.shade700 : Colors.grey.shade700,
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  backgroundColor: _canMove('south')
+                                      ? Colors.green.shade700
+                                      : Colors.grey.shade700,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -385,61 +427,82 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
                             alignment: WrapAlignment.center,
                             children: [
                               ElevatedButton.icon(
-                                onPressed: () => _handleNpcEncounter(context, gameProvider),
+                                onPressed: () =>
+                                    _handleNpcEncounter(context, gameProvider),
                                 icon: const Icon(Icons.people),
                                 label: const Text('Find NPC'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.blueGrey,
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 16,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
                               ),
                               ElevatedButton.icon(
-                                onPressed: () => _handleRandomFight(context, gameProvider),
+                                onPressed: () =>
+                                    _handleRandomFight(context, gameProvider),
                                 icon: const Icon(Icons.sports_mma),
                                 label: const Text('Random Fight'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red.shade700,
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 16,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
                               ),
                               ElevatedButton.icon(
-                                onPressed: () => _searchAlleyway(context, gameProvider),
+                                onPressed: () =>
+                                    _searchAlleyway(context, gameProvider),
                                 icon: const Icon(Icons.search),
                                 label: const Text('Search Area'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.amber.shade700,
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 16,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
                               ),
                               ElevatedButton.icon(
-                                onPressed: () => _findShortcuts(context, gameProvider),
+                                onPressed: () =>
+                                    _findShortcuts(context, gameProvider),
                                 icon: const Icon(Icons.explore),
                                 label: const Text('Look Around'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.green.shade700,
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 16,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
                               ),
-                              if (currentX == 0 && currentY == 0) // Boss room at center
+                              if (currentX == 0 &&
+                                  currentY == 0) // Boss room at center
                                 ElevatedButton.icon(
-                                  onPressed: () => _enterBossRoom(context, gameProvider),
+                                  onPressed: () =>
+                                      _enterBossRoom(context, gameProvider),
                                   icon: const Icon(Icons.warning),
                                   label: const Text('Boss Room'),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.purple.shade700,
-                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 16,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -496,7 +559,7 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
       'Gang Recruit',
       'Drug Addict',
       'Informant',
-      'Rival Gang Member'
+      'Rival Gang Member',
     ];
     final npcType = npcTypes[random.nextInt(npcTypes.length)];
 
@@ -514,12 +577,16 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
     optionEffects['Flee'] = {'damage': 5, 'money': -50};
 
     // Add special options based on NPC type
-    if (npcType == 'Shady Dealer' || npcType == 'Corrupt Businessman' || npcType == 'Drug Addict') {
+    if (npcType == 'Shady Dealer' ||
+        npcType == 'Corrupt Businessman' ||
+        npcType == 'Drug Addict') {
       options.add('Trade Drugs');
       optionEffects['Trade Drugs'] = {'money': -200, 'drugs': 2};
     }
 
-    if (npcType == 'Bouncer' || npcType == 'Street Punk' || npcType == 'Gang Recruit') {
+    if (npcType == 'Bouncer' ||
+        npcType == 'Street Punk' ||
+        npcType == 'Gang Recruit') {
       options.add('Recruit');
       optionEffects['Recruit'] = {'money': -5000, 'members': 1};
     }
@@ -573,7 +640,11 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
     }
   }
 
-  void _showNpcDialog(BuildContext context, GameProvider gameProvider, RandomEvent event) {
+  void _showNpcDialog(
+    BuildContext context,
+    GameProvider gameProvider,
+    RandomEvent event,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -584,8 +655,10 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
             children: [
               Text(event.description),
               const SizedBox(height: 15),
-              const Text('What do you want to do?',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                'What do you want to do?',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 10),
               Column(
                 children: event.options.map((option) {
@@ -614,10 +687,16 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
     );
   }
 
-  void _handleNpcOption(BuildContext context, GameProvider gameProvider, RandomEvent event, String option) {
+  void _handleNpcOption(
+    BuildContext context,
+    GameProvider gameProvider,
+    RandomEvent event,
+    String option,
+  ) {
     final effects = event.optionEffects[option] ?? {};
     final gameState = gameProvider.gameState;
-    String resultMessage = 'You chose to $option the ${event.title.split(': ').last}.\n\n';
+    String resultMessage =
+        'You chose to $option the ${event.title.split(': ').last}.\n\n';
 
     // Apply effects
     if (effects.containsKey('damage')) {
@@ -652,14 +731,15 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
 
     if (effects.containsKey('reputation')) {
       gameState.reputation += effects['reputation']!;
-      resultMessage += 'Your reputation increased by ${effects['reputation']}!\n';
+      resultMessage +=
+          'Your reputation increased by ${effects['reputation']}!\n';
     }
 
     if (effects.containsKey('drugs')) {
       // Add random drugs
       final drugs = ['weed', 'crack', 'coke', 'ice', 'percs', 'pixie_dust'];
       final drugType = drugs[Random().nextInt(drugs.length)];
-      
+
       switch (drugType) {
         case 'weed':
           gameState.drugs.weed += effects['drugs']!;
@@ -686,7 +766,12 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
     // Handle combat options
     if (option == 'Fight' || option == 'Challenge') {
       final enemyCount = option == 'Challenge' ? 2 : 1;
-      gameProvider.startMudFight(50, enemyCount, event.title.split(': ').last, 'npc_fight_${DateTime.now().millisecondsSinceEpoch}');
+      gameProvider.startMudFight(
+        50,
+        enemyCount,
+        event.title.split(': ').last,
+        'npc_fight_${DateTime.now().millisecondsSinceEpoch}',
+      );
       return;
     }
 
@@ -708,17 +793,24 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
       'Drug Dealers',
       'Police Officers',
       'Homeless Vigilantes',
-      'Alleyway Rats'
+      'Alleyway Rats',
     ];
     final enemyType = fightTypes[Random().nextInt(fightTypes.length)];
     final enemyCount = Random().nextInt(3) + 1;
     final enemyHealth = 30 + Random().nextInt(40);
 
-    gameProvider.startMudFight(enemyHealth, enemyCount, enemyType, 'random_fight_${DateTime.now().millisecondsSinceEpoch}');
+    gameProvider.startMudFight(
+      enemyHealth,
+      enemyCount,
+      enemyType,
+      'random_fight_${DateTime.now().millisecondsSinceEpoch}',
+    );
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('You encountered $enemyCount $enemyType! Prepare for battle!'),
+        content: Text(
+          'You encountered $enemyCount $enemyType! Prepare for battle!',
+        ),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -780,10 +872,7 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
     gameProvider.saveGameState();
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(finding),
-        duration: const Duration(seconds: 3),
-      ),
+      SnackBar(content: Text(finding), duration: const Duration(seconds: 3)),
     );
   }
 
@@ -805,7 +894,8 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
     if (result.contains('Gun Shack')) {
       gameProvider.gameState.reputation += 2;
     } else if (result.contains('Crackhouse')) {
-      gameProvider.gameState.drugPrices['crack'] = (gameProvider.gameState.drugPrices['crack']! * 0.9).toInt();
+      gameProvider.gameState.drugPrices['crack'] =
+          (gameProvider.gameState.drugPrices['crack']! * 0.9).toInt();
     } else if (result.contains('police')) {
       gameProvider.gameState.flags.hasId = true;
     } else if (result.contains('Bank')) {
@@ -815,10 +905,7 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
     gameProvider.saveGameState();
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(result),
-        duration: const Duration(seconds: 3),
-      ),
+      SnackBar(content: Text(result), duration: const Duration(seconds: 3)),
     );
   }
 
@@ -851,7 +938,7 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
       'Shadow Assassin',
       'Drug Lord',
       'Corrupt Cop',
-      'Gang War Veteran'
+      'Gang War Veteran',
     ];
     final bossType = bossTypes[Random().nextInt(bossTypes.length)];
 
@@ -871,8 +958,10 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
               Text('Boss Damage: High'),
               Text('Reward: \$5000 and rare weapons'),
               const SizedBox(height: 15),
-              const Text('Are you ready to face this challenge?',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                'Are you ready to face this challenge?',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ],
           ),
         ),
@@ -883,7 +972,12 @@ class _AlleywayScreenState extends State<AlleywayScreen> with TickerProviderStat
           ),
           TextButton(
             onPressed: () {
-              gameProvider.startMudFight(300, 1, bossType, 'boss_fight_${DateTime.now().millisecondsSinceEpoch}');
+              gameProvider.startMudFight(
+                300,
+                1,
+                bossType,
+                'boss_fight_${DateTime.now().millisecondsSinceEpoch}',
+              );
               Navigator.pop(context);
             },
             child: const Text('FIGHT!'),

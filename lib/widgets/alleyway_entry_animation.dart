@@ -5,10 +5,7 @@ import 'pixel_art_member.dart';
 class AlleywayEntryAnimation extends StatefulWidget {
   final VoidCallback onAnimationComplete;
 
-  const AlleywayEntryAnimation({
-    super.key,
-    required this.onAnimationComplete,
-  });
+  const AlleywayEntryAnimation({super.key, required this.onAnimationComplete});
 
   @override
   AlleywayEntryAnimationState createState() => AlleywayEntryAnimationState();
@@ -33,34 +30,22 @@ class AlleywayEntryAnimationState extends State<AlleywayEntryAnimation>
     _playerPosition = Tween<double>(
       begin: -50.0,
       end: MediaQuery.of(context).size.width + 50,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     _playerBob = Tween<double>(
       begin: 0.0,
       end: 2 * pi,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.linear,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
 
     _fogOpacity = Tween<double>(
       begin: 0.0,
       end: 0.8,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeIn,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     _shadowIntensity = Tween<double>(
       begin: 0.0,
       end: 0.6,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeIn,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     _controller.forward().then((_) {
       widget.onAnimationComplete();
@@ -88,11 +73,7 @@ class AlleywayEntryAnimationState extends State<AlleywayEntryAnimation>
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.grey.shade900,
-                      Colors.black,
-                      Colors.black,
-                    ],
+                    colors: [Colors.grey.shade900, Colors.black, Colors.black],
                   ),
                 ),
               ),
@@ -149,10 +130,7 @@ class AlleywayEntryAnimationState extends State<AlleywayEntryAnimation>
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.grey.shade800,
-                        Colors.black,
-                      ],
+                      colors: [Colors.grey.shade800, Colors.black],
                     ),
                   ),
                 ),
@@ -259,29 +237,23 @@ class AlleywayEntryAnimationState extends State<AlleywayEntryAnimation>
             (constraints.maxHeight / brickHeight).ceil(),
             (rowIndex) {
               return Row(
-                children: List.generate(
-                  4,
-                  (colIndex) {
-                    final isOffset = rowIndex % 2 == 1;
-                    return Container(
-                      width: brickWidth,
-                      height: brickHeight,
-                      margin: EdgeInsets.only(
-                        left: isOffset && colIndex == 0 ? brickWidth / 2 : 0,
-                        right: isOffset && colIndex == 3 ? brickWidth / 2 : 0,
-                      ),
-                      decoration: BoxDecoration(
-                        color: rowIndex % 3 == 0
-                            ? Colors.red.shade800
-                            : Colors.red.shade900,
-                        border: Border.all(
-                          color: Colors.red.shade50,
-                          width: 1,
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                children: List.generate(4, (colIndex) {
+                  final isOffset = rowIndex % 2 == 1;
+                  return Container(
+                    width: brickWidth,
+                    height: brickHeight,
+                    margin: EdgeInsets.only(
+                      left: isOffset && colIndex == 0 ? brickWidth / 2 : 0,
+                      right: isOffset && colIndex == 3 ? brickWidth / 2 : 0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: rowIndex % 3 == 0
+                          ? Colors.red.shade800
+                          : Colors.red.shade900,
+                      border: Border.all(color: Colors.red.shade50, width: 1),
+                    ),
+                  );
+                }),
               );
             },
           ),
@@ -338,7 +310,8 @@ class AlleywayEntryAnimationState extends State<AlleywayEntryAnimation>
     final particles = <Widget>[];
 
     for (int i = 0; i < 12; i++) {
-      final startX = 120 + random.nextDouble() * (MediaQuery.of(context).size.width - 240);
+      final startX =
+          120 + random.nextDouble() * (MediaQuery.of(context).size.width - 240);
       final startY = 100 + random.nextDouble() * 200;
       final endX = startX + (random.nextDouble() - 0.5) * 100;
       final endY = startY - 30 - random.nextDouble() * 60;
@@ -346,14 +319,16 @@ class AlleywayEntryAnimationState extends State<AlleywayEntryAnimation>
       final animation = Tween<Offset>(
         begin: Offset(startX, startY),
         end: Offset(endX, endY),
-      ).animate(CurvedAnimation(
-        parent: _controller,
-        curve: Interval(
-          random.nextDouble() * 0.6,
-          min(1.0, random.nextDouble() * 0.4 + 0.6),
-          curve: Curves.easeOut,
+      ).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Interval(
+            random.nextDouble() * 0.6,
+            min(1.0, random.nextDouble() * 0.4 + 0.6),
+            curve: Curves.easeOut,
+          ),
         ),
-      ));
+      );
 
       particles.add(
         AnimatedBuilder(

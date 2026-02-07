@@ -17,7 +17,7 @@ class CombatSystem {
     // Total enemy health
     final totalEnemyHealth = (enemyHealth * enemyCount).toInt();
     int remainingEnemyHealth = totalEnemyHealth;
-    
+
     // Store initial values for proper animation sync
     result.initialEnemyHealth = totalEnemyHealth;
     result.remainingEnemyHealth = totalEnemyHealth;
@@ -25,18 +25,22 @@ class CombatSystem {
 
     // Start fight log
     fightLog.add('*** COMBAT START: ${gameState.gangName} vs $enemyType ***');
-    fightLog.add('The air thickens with the stench of fear and blood as battle erupts!');
+    fightLog.add(
+      'The air thickens with the stench of fear and blood as battle erupts!',
+    );
 
     int rounds = 0;
     const maxRounds = 10;
 
-    while (remainingEnemyHealth > 0 && gameState.health > 0 && rounds < maxRounds) {
+    while (remainingEnemyHealth > 0 &&
+        gameState.health > 0 &&
+        rounds < maxRounds) {
       rounds++;
       fightLog.add('\n--- ROUND $rounds ---');
 
       // Track available weapons (one weapon per member)
       final availableWeapons = _getAvailableWeaponsMap(gameState);
-      
+
       // 1. PLAYER (Leader) ATTACK
       if (weapon == 'grenade') {
         if (gameState.weapons.grenades > 0) {
@@ -47,7 +51,8 @@ class CombatSystem {
         } else {
           weapon = 'fists';
         }
-      } else if (availableWeapons.containsKey(weapon) && availableWeapons[weapon]! > 0) {
+      } else if (availableWeapons.containsKey(weapon) &&
+          availableWeapons[weapon]! > 0) {
         availableWeapons[weapon] = availableWeapons[weapon]! - 1;
       } else if (weapon != 'fists') {
         weapon = 'fists';
@@ -55,14 +60,22 @@ class CombatSystem {
 
       final playerDmg = _getWeaponDamage(weapon, gameState);
       final isAuto = _isAutomatic(weapon, gameState);
-      final isMeleeMultiSwing = weapon == 'sword' || weapon == 'barbed_wire_bat' || weapon == 'axe' || weapon == 'vampire_bat' || weapon == 'knife' || weapon == 'fists' || weapon == 'brass_knuckles';
-      
+      final isMeleeMultiSwing = weapon == 'sword' ||
+          weapon == 'barbed_wire_bat' ||
+          weapon == 'axe' ||
+          weapon == 'vampire_bat' ||
+          weapon == 'knife' ||
+          weapon == 'fists' ||
+          weapon == 'brass_knuckles';
+
       if (isAuto) {
         // Uzi: 5-7 shots, AR15: 10-15 shots, Pistol (upgraded): 3-4 shots
         int shots = 1;
         if (weapon == 'uzi' || weapon == 'submachine_gun') {
           shots = 5 + random.nextInt(3); // 5-7
-        } else if (weapon == 'ar15' || weapon == 'machine_gun' || weapon == 'golden_gun') {
+        } else if (weapon == 'ar15' ||
+            weapon == 'machine_gun' ||
+            weapon == 'golden_gun') {
           shots = 10 + random.nextInt(6); // 10-15
         } else if (weapon == 'pistol') {
           shots = 3 + random.nextInt(2); // 3-4
@@ -72,17 +85,23 @@ class CombatSystem {
 
         for (int s = 1; s <= shots; s++) {
           if (remainingEnemyHealth <= 0) break;
-          
+
           // Accuracy Check
           if (random.nextDouble() > gameState.accuracy) {
             fightLog.add('SHOT $s: ${_getMissDescription(weapon)}');
             continue;
           }
 
-          final shotDmg = max(2, (playerDmg / shots).toInt() + random.nextInt(max(1, (playerDmg / (shots * 2)).toInt())));
+          final shotDmg = max(
+            2,
+            (playerDmg / shots).toInt() +
+                random.nextInt(max(1, (playerDmg / (shots * 2)).toInt())),
+          );
           remainingEnemyHealth -= shotDmg;
           result.playerDamageDealt += shotDmg;
-          fightLog.add('SHOT $s: ${_getShotDescription(weapon, gameState, shotDmg)}');
+          fightLog.add(
+            'SHOT $s: ${_getShotDescription(weapon, gameState, shotDmg)}',
+          );
         }
         result.remainingEnemyHealth = max(0, remainingEnemyHealth);
       } else if (isMeleeMultiSwing) {
@@ -90,28 +109,39 @@ class CombatSystem {
         final swings = 1 + random.nextInt(3);
         for (int s = 1; s <= swings; s++) {
           if (remainingEnemyHealth <= 0) break;
-          
+
           if (random.nextDouble() > gameState.accuracy) {
             fightLog.add('SWING $s: ${_getMissDescription(weapon)}');
             continue;
           }
-          
-          final actualPlayerDmg = max(5, (playerDmg / swings).toInt() + random.nextInt(max(1, playerDmg ~/ 4)));
+
+          final actualPlayerDmg = max(
+            5,
+            (playerDmg / swings).toInt() +
+                random.nextInt(max(1, playerDmg ~/ 4)),
+          );
           remainingEnemyHealth -= actualPlayerDmg;
           result.playerDamageDealt += actualPlayerDmg;
-          fightLog.add('SWING $s: ${_getPlayerAttackDetail(weapon, gameState, actualPlayerDmg)}');
+          fightLog.add(
+            'SWING $s: ${_getPlayerAttackDetail(weapon, gameState, actualPlayerDmg)}',
+          );
         }
         result.remainingEnemyHealth = max(0, remainingEnemyHealth);
       } else {
         // Other single use items like Grenades
         if (random.nextDouble() > gameState.accuracy) {
-           fightLog.add(_getMissDescription(weapon));
+          fightLog.add(_getMissDescription(weapon));
         } else {
-          final actualPlayerDmg = max(5, playerDmg + random.nextInt(max(1, playerDmg ~/ 2)));
+          final actualPlayerDmg = max(
+            5,
+            playerDmg + random.nextInt(max(1, playerDmg ~/ 2)),
+          );
           remainingEnemyHealth -= actualPlayerDmg;
           result.playerDamageDealt += actualPlayerDmg;
           result.remainingEnemyHealth = max(0, remainingEnemyHealth);
-          fightLog.add(_getPlayerAttackDetail(weapon, gameState, actualPlayerDmg));
+          fightLog.add(
+            _getPlayerAttackDetail(weapon, gameState, actualPlayerDmg),
+          );
         }
       }
 
@@ -119,37 +149,47 @@ class CombatSystem {
       if (gameState.members > 1 && remainingEnemyHealth > 0) {
         for (int i = 0; i < gameState.members - 1; i++) {
           if (remainingEnemyHealth <= 0) break;
-          
+
           final memberWeapon = _getStrongestFromMap(availableWeapons);
           if (memberWeapon != 'fists') {
-            availableWeapons[memberWeapon] = availableWeapons[memberWeapon]! - 1;
+            availableWeapons[memberWeapon] =
+                availableWeapons[memberWeapon]! - 1;
             if (memberWeapon == 'grenade') {
               gameState.weapons.grenades--;
             }
           }
-          
+
           if (random.nextDouble() > (gameState.accuracy - 0.1)) {
             continue;
           }
 
           final memberDmg = _getWeaponDamage(memberWeapon, gameState);
-          final actualDmg = max(2, memberDmg + random.nextInt(max(1, memberDmg ~/ 3)));
+          final actualDmg = max(
+            2,
+            memberDmg + random.nextInt(max(1, memberDmg ~/ 3)),
+          );
           remainingEnemyHealth -= actualDmg;
           result.gangDamageDealt += actualDmg;
-          
-          fightLog.add('[GANG MEMBER] Attacks with ${memberWeapon.toUpperCase()} for $actualDmg damage!');
+
+          fightLog.add(
+            '[GANG MEMBER] Attacks with ${memberWeapon.toUpperCase()} for $actualDmg damage!',
+          );
         }
-        
+
         result.remainingEnemyHealth = max(0, remainingEnemyHealth);
       }
 
       // 3. ENEMY COUNTERATTACK
       if (remainingEnemyHealth > 0) {
-        final baseEnemyDmg = _calculateEnemyDamage(enemyType, enemyCount, gameState);
+        final baseEnemyDmg = _calculateEnemyDamage(
+          enemyType,
+          enemyCount,
+          gameState,
+        );
         final enemyDmg = max(1, baseEnemyDmg - gameState.weapons.vest);
         gameState.takeDamage(enemyDmg);
         result.totalEnemyDamage += enemyDmg;
-        
+
         fightLog.add(_getEnemyAttackDetail(enemyType, enemyDmg));
 
         // Critical Hit chance
@@ -157,7 +197,9 @@ class CombatSystem {
           final crit = (enemyDmg * 0.5).toInt();
           gameState.takeDamage(crit);
           result.totalEnemyDamage += crit;
-          fightLog.add('*** CRITICAL! $enemyType lands a devastating blow, your lifeblood paints the mud for an extra $crit damage! ***');
+          fightLog.add(
+            '*** CRITICAL! $enemyType lands a devastating blow, your lifeblood paints the mud for an extra $crit damage! ***',
+          );
         }
       }
     }
@@ -166,17 +208,20 @@ class CombatSystem {
     fightLog.add('\n--- COMBAT RESULT ---');
     if (gameState.health <= 0) {
       result.defeat = true;
-      result.finalMessage = 'FATAL DEATH! Your life is extinguished in a torrent of agony, your body joining countless others in eternal darkness!';
+      result.finalMessage =
+          'FATAL DEATH! Your life is extinguished in a torrent of agony, your body joining countless others in eternal darkness!';
     } else if (remainingEnemyHealth <= 0) {
       result.victory = true;
       result.enemiesKilled = enemyCount;
-      result.finalMessage = 'VICTORY! You have annihilated every last one of these wretches, their blood staining the ground!';
-      
+      result.finalMessage =
+          'VICTORY! You have annihilated every last one of these wretches, their blood staining the ground!';
+
       final moneyReward = (enemyCount * 500) + random.nextInt(enemyCount * 200);
       gameState.money += moneyReward;
       fightLog.add('Looted \$$moneyReward from the mangled corpses.');
     } else {
-      result.finalMessage = 'STALEMATE: The battle ends in a bloody stalemate. Both sides retreat through the mud.';
+      result.finalMessage =
+          'STALEMATE: The battle ends in a bloody stalemate. Both sides retreat through the mud.';
     }
 
     fightLog.add(result.finalMessage);
@@ -224,47 +269,57 @@ class CombatSystem {
   }
 
   static bool _isFirearm(String weapon) {
-    return weapon == 'pistol' || 
-           weapon == 'uzi' || 
-           weapon == 'ar15' || 
-           weapon == 'ghost_gun' || 
-           weapon == 'machine_gun' || 
-           weapon == 'submachine_gun' ||
-           weapon == 'golden_gun';
+    return weapon == 'pistol' ||
+        weapon == 'uzi' ||
+        weapon == 'ar15' ||
+        weapon == 'ghost_gun' ||
+        weapon == 'machine_gun' ||
+        weapon == 'submachine_gun' ||
+        weapon == 'golden_gun';
   }
 
   static bool _isAutomatic(String weapon, GameState gameState) {
     if (weapon == 'pistol' && gameState.pistolUpgraded) return true;
-    return weapon == 'uzi' || weapon == 'machine_gun' || weapon == 'submachine_gun' || weapon == 'ar15' || weapon == 'golden_gun';
+    return weapon == 'uzi' ||
+        weapon == 'machine_gun' ||
+        weapon == 'submachine_gun' ||
+        weapon == 'ar15' ||
+        weapon == 'golden_gun';
   }
 
   static String _getMissDescription(String weapon) {
     final random = Random();
     final isGun = _isFirearm(weapon);
-    final msgs = isGun ? [
-      "The bullet whizzes past the target's ear! (MISS)",
-      "Your shot goes wide, striking a nearby dumpster! (MISS)",
-      "Recoil spoils your aim! The round hits the pavement! (MISS)",
-      "You pull the trigger but the enemy ducks just in time! (MISS)",
-      "A stray gust of wind carries your shot off target! (MISS)",
-      "The barrel smokes as your shot disappears into the void! (MISS)",
-      "Fear causes your hand to shake, the bullet missing by a mile! (MISS)",
-    ] : [
-      "You swing wildly but hit only thin air! (MISS)",
-      "The enemy sidesteps your clumsy strike! (MISS)",
-      "You overextend and stumble, missing your mark! (MISS)",
-      "Your weapon grazes their clothing but does no damage! (MISS)",
-      "A desperate dodge saves your foe from your blade! (MISS)",
-      "You strike the wall instead, sparks flying in the dark! (MISS)",
-      "The weight of your weapon causes you to mistime the swing! (MISS)",
-    ];
+    final msgs = isGun
+        ? [
+            "The bullet whizzes past the target's ear! (MISS)",
+            "Your shot goes wide, striking a nearby dumpster! (MISS)",
+            "Recoil spoils your aim! The round hits the pavement! (MISS)",
+            "You pull the trigger but the enemy ducks just in time! (MISS)",
+            "A stray gust of wind carries your shot off target! (MISS)",
+            "The barrel smokes as your shot disappears into the void! (MISS)",
+            "Fear causes your hand to shake, the bullet missing by a mile! (MISS)",
+          ]
+        : [
+            "You swing wildly but hit only thin air! (MISS)",
+            "The enemy sidesteps your clumsy strike! (MISS)",
+            "You overextend and stumble, missing your mark! (MISS)",
+            "Your weapon grazes their clothing but does no damage! (MISS)",
+            "A desperate dodge saves your foe from your blade! (MISS)",
+            "You strike the wall instead, sparks flying in the dark! (MISS)",
+            "The weight of your weapon causes you to mistime the swing! (MISS)",
+          ];
     return msgs[random.nextInt(msgs.length)];
   }
 
-  static String _getShotDescription(String weapon, GameState gameState, int damage) {
+  static String _getShotDescription(
+    String weapon,
+    GameState gameState,
+    int damage,
+  ) {
     final random = Random();
     final weapons = gameState.weapons;
-    
+
     if (weapons.useExplodingBullets && weapons.explodingBullets > 0) {
       final explodingMsgs = [
         "💥 A micro-detonation erupts inside the target's ribcage! ($damage damage)",
@@ -295,12 +350,18 @@ class CombatSystem {
     return msgs[random.nextInt(msgs.length)];
   }
 
-  static String _getPlayerAttackDetail(String weapon, GameState gameState, int damage) {
+  static String _getPlayerAttackDetail(
+    String weapon,
+    GameState gameState,
+    int damage,
+  ) {
     final random = Random();
     final weapons = gameState.weapons;
     final isFirearm = _isFirearm(weapon);
-    
-    if (isFirearm && weapons.useExplodingBullets && weapons.explodingBullets > 0) {
+
+    if (isFirearm &&
+        weapons.useExplodingBullets &&
+        weapons.explodingBullets > 0) {
       final explodingMsgs = [
         "You unleash a payload of death, the exploding rounds turning your foe into a grotesque fountain of gore! ($damage damage)",
         "The air screams as your special ammo erupts, shredding meat and melting armor! ($damage damage)",
@@ -309,8 +370,10 @@ class CombatSystem {
       ];
       return '💥 ${explodingMsgs[random.nextInt(explodingMsgs.length)]}';
     }
-    
-    if (isFirearm && weapons.useHollowPointBullets && weapons.hollowPointBullets > 0) {
+
+    if (isFirearm &&
+        weapons.useHollowPointBullets &&
+        weapons.hollowPointBullets > 0) {
       final hpMsgs = [
         "The hollow point slugs bite deep, expanding into jagged claws that rip the enemy apart from within! ($damage damage)",
         "You fire a series of expanding rounds that turn the target's chest into a cavity of shredded tissue! ($damage damage)",
@@ -389,7 +452,8 @@ class CombatSystem {
       ],
     };
 
-    final list = descriptions[weapon] ?? ["You unleash a torrent of savage violence for $damage damage!"];
+    final list = descriptions[weapon] ??
+        ["You unleash a torrent of savage violence for $damage damage!"];
     return list[random.nextInt(list.length)];
   }
 
@@ -444,32 +508,39 @@ class CombatSystem {
 
     double ammoMult = 1.0;
     if (_isFirearm(weapon)) {
-      if (gameState.weapons.useExplodingBullets && gameState.weapons.explodingBullets > 0) {
+      if (gameState.weapons.useExplodingBullets &&
+          gameState.weapons.explodingBullets > 0) {
         ammoMult = 1.8;
-      } else if (gameState.weapons.useHollowPointBullets && gameState.weapons.hollowPointBullets > 0) {
+      } else if (gameState.weapons.useHollowPointBullets &&
+          gameState.weapons.hollowPointBullets > 0) {
         ammoMult = 1.62;
       }
     }
 
     base = (base * ammoMult).toInt();
-    if (weapon == 'pistol' && gameState.pistolUpgraded) base = (base * 2.2).toInt();
+    if (weapon == 'pistol' && gameState.pistolUpgraded)
+      base = (base * 2.2).toInt();
 
     return base;
   }
 
-  static int _calculateEnemyDamage(String enemyType, int enemyCount, GameState gameState) {
+  static int _calculateEnemyDamage(
+    String enemyType,
+    int enemyCount,
+    GameState gameState,
+  ) {
     int base = switch (enemyType) {
       'Police Officers' => 15,
       'Squidie Hit Squad' => 20,
       'Loan Shark Enforcer' => 30,
       _ => 10,
     };
-    
+
     if (enemyType == 'Loan Shark Enforcer') {
-       final loanPower = (gameState.loan / 1000).clamp(1.0, 10.0);
-       base = (base * loanPower).toInt();
+      final loanPower = (gameState.loan / 1000).clamp(1.0, 10.0);
+      base = (base * loanPower).toInt();
     }
-    
+
     return base * enemyCount;
   }
 
@@ -484,30 +555,61 @@ class CombatSystem {
       _ => 0,
     };
 
-    if (drugCount <= 0) return DrugUseResult(success: false, message: 'You don\'t have any $drug!');
+    if (drugCount <= 0)
+      return DrugUseResult(
+        success: false,
+        message: 'You don\'t have any $drug!',
+      );
 
     switch (drug) {
-      case 'crack': gameState.drugs.crack--;
-      case 'coke': gameState.drugs.coke--;
-      case 'weed': gameState.drugs.weed--;
-      case 'ice': gameState.drugs.ice--;
-      case 'percs': gameState.drugs.percs--;
-      case 'pixie_dust': gameState.drugs.pixieDust--;
+      case 'crack':
+        gameState.drugs.crack--;
+      case 'coke':
+        gameState.drugs.coke--;
+      case 'weed':
+        gameState.drugs.weed--;
+      case 'ice':
+        gameState.drugs.ice--;
+      case 'percs':
+        gameState.drugs.percs--;
+      case 'pixie_dust':
+        gameState.drugs.pixieDust--;
     }
 
     return switch (drug) {
-      'crack' => DrugUseResult(success: true, message: 'You consume crack with desperate hunger, your body surging with unholy power! (+30 HP)', healthChange: 30),
-      'percs' => DrugUseResult(success: true, message: 'You swallow painkillers, dulling the agony and healing wounds through chemical oblivion! (+15 HP)', healthChange: 15),
-      _ => DrugUseResult(success: true, message: 'You ingest $drug, feeling its dark influence course through your veins!', healthChange: 10),
+      'crack' => DrugUseResult(
+          success: true,
+          message:
+              'You consume crack with desperate hunger, your body surging with unholy power! (+30 HP)',
+          healthChange: 30,
+        ),
+      'percs' => DrugUseResult(
+          success: true,
+          message:
+              'You swallow painkillers, dulling the agony and healing wounds through chemical oblivion! (+15 HP)',
+          healthChange: 15,
+        ),
+      _ => DrugUseResult(
+          success: true,
+          message:
+              'You ingest $drug, feeling its dark influence course through your veins!',
+          healthChange: 10,
+        ),
     };
   }
 
   static (bool, String) fleeCombat() {
     final random = Random();
     if (random.nextDouble() < 0.7) {
-      return (true, 'You flee into the shadows like a hunted animal, heart pounding with the terror of the pursuit!');
+      return (
+        true,
+        'You flee into the shadows like a hunted animal, heart pounding with the terror of the pursuit!',
+      );
     } else {
-      return (false, 'Your desperate flight fails, and the enemy descends upon you with renewed savagery!');
+      return (
+        false,
+        'Your desperate flight fails, and the enemy descends upon you with renewed savagery!',
+      );
     }
   }
 }

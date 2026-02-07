@@ -4,20 +4,14 @@ class PixelArtIcon extends StatelessWidget {
   final String name;
   final double size;
 
-  const PixelArtIcon({
-    super.key,
-    required this.name,
-    this.size = 40,
-  });
+  const PixelArtIcon({super.key, required this.name, this.size = 40});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(
-        painter: IconPainter(name),
-      ),
+      child: CustomPaint(painter: IconPainter(name)),
     );
   }
 }

@@ -54,9 +54,21 @@ class BankScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _buildStatItem('Money', '\$${gameState.money}', Colors.green),
-                          _buildStatItem('Account', '\$${gameState.account}', Colors.blue),
-                          _buildStatItem('Loan', '\$${gameState.loan}', Colors.red),
+                          _buildStatItem(
+                            'Money',
+                            '\$${gameState.money}',
+                            Colors.green,
+                          ),
+                          _buildStatItem(
+                            'Account',
+                            '\$${gameState.account}',
+                            Colors.blue,
+                          ),
+                          _buildStatItem(
+                            'Loan',
+                            '\$${gameState.loan}',
+                            Colors.red,
+                          ),
                         ],
                       ),
                       if (gameState.loan > 0) ...[
@@ -64,7 +76,9 @@ class BankScreen extends StatelessWidget {
                         Text(
                           'Loan Status: ${gameState.flags.hasAttractedLoanShark ? "HUNTED BY LOAN SHARKS" : "Due soon"}',
                           style: TextStyle(
-                            color: gameState.flags.hasAttractedLoanShark ? Colors.red : Colors.orange,
+                            color: gameState.flags.hasAttractedLoanShark
+                                ? Colors.red
+                                : Colors.orange,
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
@@ -107,7 +121,9 @@ class BankScreen extends StatelessWidget {
                       'Repay Loan',
                       'Clear your debt before they find you.',
                       Colors.red,
-                      gameState.loan > 0 ? () => _showRepayDialog(context) : null,
+                      gameState.loan > 0
+                          ? () => _showRepayDialog(context)
+                          : null,
                     ),
                   ],
                 ),
@@ -131,13 +147,29 @@ class BankScreen extends StatelessWidget {
   Widget _buildStatItem(String label, String value, Color color) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-        Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildBankActionCard(BuildContext context, String title, String description, Color color, VoidCallback? onPressed) {
+  Widget _buildBankActionCard(
+    BuildContext context,
+    String title,
+    String description,
+    Color color,
+    VoidCallback? onPressed,
+  ) {
     return Opacity(
       opacity: onPressed == null ? 0.5 : 1.0,
       child: Card(
@@ -145,7 +177,10 @@ class BankScreen extends StatelessWidget {
         child: InkWell(
           onTap: onPressed,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 10.0,
+            ),
             child: Row(
               children: [
                 Icon(Icons.account_balance_wallet, color: color),
@@ -164,7 +199,10 @@ class BankScreen extends StatelessWidget {
                       ),
                       Text(
                         description,
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
@@ -285,7 +323,9 @@ class BankScreen extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Warning: Loans must be repaid in 1 day or you will be hunted!'),
+            const Text(
+              'Warning: Loans must be repaid in 1 day or you will be hunted!',
+            ),
             const SizedBox(height: 10),
             TextField(
               controller: amountController,
@@ -308,12 +348,17 @@ class BankScreen extends StatelessWidget {
               if (amount > 0) {
                 gameProvider.gameState.money += amount;
                 gameProvider.gameState.loan += amount;
-                gameProvider.gameState.loanDayTaken = gameProvider.gameState.day;
+                gameProvider.gameState.loanDayTaken =
+                    gameProvider.gameState.day;
                 gameProvider.gameState.flags.hasAttractedLoanShark = false;
                 gameProvider.saveGameState();
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Took loan of \$${amount.toString()} - repay it FAST!')),
+                  SnackBar(
+                    content: Text(
+                      'Took loan of \$${amount.toString()} - repay it FAST!',
+                    ),
+                  ),
                 );
               }
             },
@@ -365,7 +410,9 @@ class BankScreen extends StatelessWidget {
                 gameProvider.saveGameState();
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Repaid \$${amount.toString()} on your loan')),
+                  SnackBar(
+                    content: Text('Repaid \$${amount.toString()} on your loan'),
+                  ),
                 );
               }
             },

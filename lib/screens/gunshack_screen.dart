@@ -81,16 +81,51 @@ class GunshackScreen extends StatelessWidget {
                   children: [
                     _buildWeaponCard(context, 'Pistol', 800, 'pistol'),
                     _buildPistolUpgradeCard(context),
-                    _buildWeaponCard(context, 'Pistol Bullets (50)', 400, 'bullets'),
-                    _buildWeaponCard(context, 'Hollow Point Bullets (15)', 600, 'hollow_point_bullets'),
-                    _buildWeaponCard(context, 'Exploding Bullets (20)', 400, 'exploding_bullets'),
-                    _buildWeaponCard(context, 'Barb Wired Bat', 2000, 'barbed_wire_bat'),
+                    _buildWeaponCard(
+                      context,
+                      'Pistol Bullets (50)',
+                      400,
+                      'bullets',
+                    ),
+                    _buildWeaponCard(
+                      context,
+                      'Hollow Point Bullets (15)',
+                      600,
+                      'hollow_point_bullets',
+                    ),
+                    _buildWeaponCard(
+                      context,
+                      'Exploding Bullets (20)',
+                      400,
+                      'exploding_bullets',
+                    ),
+                    _buildWeaponCard(
+                      context,
+                      'Barb Wired Bat',
+                      2000,
+                      'barbed_wire_bat',
+                    ),
                     _buildWeaponCard(context, 'Uzi', 15000, 'uzi'),
                     _buildWeaponCard(context, 'AR-15', 30000, 'ar15'),
                     _buildWeaponCard(context, 'Grenade', 800, 'grenade'),
-                    _buildWeaponCard(context, 'Vest (Light)', 25000, 'vest_light'),
-                    _buildWeaponCard(context, 'Vest (Medium)', 45000, 'vest_medium'),
-                    _buildWeaponCard(context, 'Vest (Heavy)', 65000, 'vest_heavy'),
+                    _buildWeaponCard(
+                      context,
+                      'Vest (Light)',
+                      25000,
+                      'vest_light',
+                    ),
+                    _buildWeaponCard(
+                      context,
+                      'Vest (Medium)',
+                      45000,
+                      'vest_medium',
+                    ),
+                    _buildWeaponCard(
+                      context,
+                      'Vest (Heavy)',
+                      65000,
+                      'vest_heavy',
+                    ),
                   ],
                 ),
               ),
@@ -108,7 +143,12 @@ class GunshackScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWeaponCard(BuildContext context, String weaponName, int price, String weaponType) {
+  Widget _buildWeaponCard(
+    BuildContext context,
+    String weaponName,
+    int price,
+    String weaponType,
+  ) {
     final gameProvider = Provider.of<GameProvider>(context);
     final gameState = gameProvider.gameState;
 
@@ -144,10 +184,7 @@ class GunshackScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
-                  'Owned: $quantity',
-                  style: const TextStyle(fontSize: 16),
-                ),
+                Text('Owned: $quantity', style: const TextStyle(fontSize: 16)),
               ],
             ),
             const SizedBox(height: 10),
@@ -182,20 +219,18 @@ class GunshackScreen extends StatelessWidget {
               children: [
                 const Text(
                   'Pistol Auto-Upgrade: \$5000',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Switch(
                   value: gameState.pistolUpgraded,
-                      onChanged: (value) {
+                  onChanged: (value) {
                     if (value && !gameState.pistolUpgraded) {
                       // Try to buy upgrade
                       if (gameState.money >= 5000) {
                         gameState.money -= 5000;
                         gameState.pistolUpgraded = true;
-                        gameProvider.gameMessage = 'Pistol upgraded to automatic! 3 shots per turn.';
+                        gameProvider.gameMessage =
+                            'Pistol upgraded to automatic! 3 shots per turn.';
                         gameProvider.saveGameState();
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -209,7 +244,8 @@ class GunshackScreen extends StatelessWidget {
                     } else if (!value && gameState.pistolUpgraded) {
                       // Downgrade (no refund)
                       gameState.pistolUpgraded = false;
-                      gameProvider.gameMessage = 'Pistol downgraded to single shot.';
+                      gameProvider.gameMessage =
+                          'Pistol downgraded to single shot.';
                       gameProvider.saveGameState();
                     }
                   },
@@ -224,7 +260,11 @@ class GunshackScreen extends StatelessWidget {
             if (gameState.pistolUpgraded)
               const Text(
                 'AUTOMATIC MODE ACTIVE',
-                style: TextStyle(fontSize: 16, color: Colors.green, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
           ],
         ),
