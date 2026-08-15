@@ -475,11 +475,10 @@ class WanderingAnimationState extends State<WanderingAnimation>
                         onPressed: () {
                           setState(() => selectedOption = option);
                           Future.delayed(const Duration(milliseconds: 500), () {
-                            if (!mounted) return;
+                            if (!mounted || !context.mounted) return;
                             final resultMessage = gameProvider
                                 .handleNpcInteraction(event, option);
                             if (gameProvider.currentScreen != 'mud_fight') {
-                              // ignore: use_build_context_synchronously
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(resultMessage),
@@ -489,7 +488,6 @@ class WanderingAnimationState extends State<WanderingAnimation>
                             }
                             gameProvider.completeWanderingAnimation();
                             gameProvider.currentWanderingEvent.value = null;
-                            // ignore: use_build_context_synchronously
                             Navigator.pop(context);
                           });
                         },

@@ -722,10 +722,10 @@ class FightAnimationState extends State<FightAnimation>
                     : '💥',
                 style: TextStyle(
                   fontSize: action.size,
-                  color: action.color,
+                  color: action.color.withValues(alpha: opacity),
                   shadows: [
                     BoxShadow(
-                      color: Colors.black.withAlpha(50),
+                      color: Colors.black.withValues(alpha: 0.2), // 50/255 ~= 0.2
                       blurRadius: 2,
                       offset: const Offset(1, 1),
                     ),

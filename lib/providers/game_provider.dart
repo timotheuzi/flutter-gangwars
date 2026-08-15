@@ -636,22 +636,17 @@ class GameProvider with ChangeNotifier {
     }
 
     final effects = event.optionEffects[option]!;
-    final messages = <String>[];
 
     effects.forEach((key, value) {
       switch (key) {
         case 'damage':
           if (option == 'Fight' || option == 'Challenge') {
-            if (option == 'Fight' || option == 'Challenge') {
-              final enemyName = event.title.replaceFirst('NPC Encounter: ', '');
-              startMudFight(100, 1, enemyName, event.id);
-              messages.add('You attacked the $enemyName!');
-              return; // Exit switch, combat started
-            }
-
-            _gameMessage = 'You took $value damage.';
+            final enemyName = event.title.replaceFirst('👤 DARK ENCOUNTER: ', '');
+            startMudFight(100, 1, enemyName, event.id);
+            _gameMessage = 'You attacked the $enemyName!';
           } else {
             _gameMessage = 'You took $value damage.';
+            _gameState.takeDamage(value);
           }
           break;
         case 'health':
@@ -670,6 +665,7 @@ class GameProvider with ChangeNotifier {
           break;
       }
     });
+    notifyListeners();
     return _gameMessage;
   }
 }

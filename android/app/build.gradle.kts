@@ -23,9 +23,9 @@ android {
 
     defaultConfig {
         applicationId = "com.gangwar.gangwars"
-        // Hardcode SDK versions to avoid Gradle lazy provider resolution failures
+        // Using stable SDK versions
         minSdk = flutter.minSdkVersion
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
     }

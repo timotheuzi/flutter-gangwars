@@ -104,21 +104,27 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/
 )
 
 # Install the icu data file.
-install(FILES "${ICU_DATA_FILE}" DESTINATION ${CMAKE_INSTALL_PREFIX}/data)
+if(FLUTTER_ICU_DATA_FILE)
+  install(FILES "${FLUTTER_ICU_DATA_FILE}" DESTINATION ${CMAKE_INSTALL_PREFIX}/data)
+endif()
 
 # Install the desktop file.
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/flutter.desktop"
-  "${CMAKE_CURRENT_BINARY_DIR}/flutter.desktop"
-  @ONLY
-)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/flutter.desktop"
-  DESTINATION "share/applications"
-  RENAME "${APPLICATION_ID}.desktop"
-)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/flutter.desktop")
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/flutter.desktop"
+    "${CMAKE_CURRENT_BINARY_DIR}/flutter.desktop"
+    @ONLY
+  )
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/flutter.desktop"
+    DESTINATION "share/applications"
+    RENAME "${APPLICATION_ID}.desktop"
+  )
+endif()
 
 # Install the icon.
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/flutter.png"
-  DESTINATION "share/icons/hicolor/128x128/apps"
-  RENAME "${APPLICATION_ID}.png"
-)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/flutter.png")
+  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/flutter.png"
+    DESTINATION "share/icons/hicolor/128x128/apps"
+    RENAME "${APPLICATION_ID}.png"
+  )
+endif()

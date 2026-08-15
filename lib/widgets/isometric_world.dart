@@ -1,6 +1,5 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:flame/input.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
@@ -53,8 +52,8 @@ class IsometricOpenWorld extends FlameGame {
     await add(_isoCamera);
 
     // Joystick for movement
-    final knobPaint = BasicPalette.blue.withAlpha(200).paint();
-    final backgroundPaint = BasicPalette.blue.withAlpha(100).paint();
+    final knobPaint = Paint()..color = BasicPalette.blue.color.withOpacity(0.78);
+    final backgroundPaint = Paint()..color = BasicPalette.blue.color.withOpacity(0.39);
     _joystick = IsometricJoystickComponent(
       isometricCamera: _isoCamera,
       knob: CircleComponent(radius: 25, paint: knobPaint),
@@ -176,9 +175,9 @@ class IsometricWorldPainterComponent extends PositionComponent {
 
         _sidePaint.color = Color.fromARGB(
           255,
-          (tile.surfaceColor.red * 0.7).round().clamp(0, 255),
-          (tile.surfaceColor.green * 0.7).round().clamp(0, 255),
-          (tile.surfaceColor.blue * 0.7).round().clamp(0, 255),
+          (tile.surfaceColor.r * 255 * 0.7).round().clamp(0, 255),
+          (tile.surfaceColor.g * 255 * 0.7).round().clamp(0, 255),
+          (tile.surfaceColor.b * 255 * 0.7).round().clamp(0, 255),
         );
         canvas.drawPath(rightPath, _sidePaint);
 
@@ -192,9 +191,9 @@ class IsometricWorldPainterComponent extends PositionComponent {
 
         _sidePaint.color = Color.fromARGB(
           255,
-          (tile.surfaceColor.red * 0.85).round().clamp(0, 255),
-          (tile.surfaceColor.green * 0.85).round().clamp(0, 255),
-          (tile.surfaceColor.blue * 0.85).round().clamp(0, 255),
+          (tile.surfaceColor.r * 255 * 0.85).round().clamp(0, 255),
+          (tile.surfaceColor.g * 255 * 0.85).round().clamp(0, 255),
+          (tile.surfaceColor.b * 255 * 0.85).round().clamp(0, 255),
         );
         canvas.drawPath(leftPath, _sidePaint);
       }
@@ -202,9 +201,9 @@ class IsometricWorldPainterComponent extends PositionComponent {
       // Edge border
       _edgePaint.color = Color.fromARGB(
         255,
-        (tile.surfaceColor.red * 0.6).round().clamp(0, 255),
-        (tile.surfaceColor.green * 0.6).round().clamp(0, 255),
-        (tile.surfaceColor.blue * 0.6).round().clamp(0, 255),
+        (tile.surfaceColor.r * 255 * 0.6).round().clamp(0, 255),
+        (tile.surfaceColor.g * 255 * 0.6).round().clamp(0, 255),
+        (tile.surfaceColor.b * 255 * 0.6).round().clamp(0, 255),
       );
       canvas.drawPath(path, _edgePaint);
     }
@@ -213,7 +212,7 @@ class IsometricWorldPainterComponent extends PositionComponent {
   void _drawProps(Canvas canvas) {
     for (final prop in worldData.props) {
       // Shadow
-      _shadowPaint.color = Colors.black.withValues(alpha: 0.15);
+      _shadowPaint.color = Colors.black.withOpacity(0.15);
       canvas.drawOval(
         Rect.fromCenter(
           center: Offset(prop.screenX + 2, prop.screenY + 2),
@@ -247,9 +246,9 @@ class IsometricWorldPainterComponent extends PositionComponent {
       leftFace.close();
       _paint.color = Color.fromARGB(
         255,
-        (building.color.red * 0.7).round().clamp(0, 255),
-        (building.color.green * 0.7).round().clamp(0, 255),
-        (building.color.blue * 0.7).round().clamp(0, 255),
+        (building.color.r * 255 * 0.7).round().clamp(0, 255),
+        (building.color.g * 255 * 0.7).round().clamp(0, 255),
+        (building.color.b * 255 * 0.7).round().clamp(0, 255),
       );
       canvas.drawPath(leftFace, _paint);
 
@@ -271,9 +270,9 @@ class IsometricWorldPainterComponent extends PositionComponent {
       roof.close();
       _paint.color = Color.fromARGB(
         255,
-        (building.color.red * 0.85).round().clamp(0, 255),
-        (building.color.green * 0.85).round().clamp(0, 255),
-        (building.color.blue * 0.85).round().clamp(0, 255),
+        (building.color.r * 255 * 0.85).round().clamp(0, 255),
+        (building.color.g * 255 * 0.85).round().clamp(0, 255),
+        (building.color.b * 255 * 0.85).round().clamp(0, 255),
       );
       canvas.drawPath(roof, _paint);
 
@@ -297,7 +296,7 @@ class IsometricWorldPainterComponent extends PositionComponent {
       final ny = npc.screenY;
 
       // Shadow
-      _shadowPaint.color = Colors.black.withValues(alpha: 0.12);
+      _shadowPaint.color = Colors.black.withOpacity(0.12);
       canvas.drawOval(
         Rect.fromCenter(center: Offset(nx + 1, ny + 1), width: 10, height: 4),
         _shadowPaint,
@@ -306,9 +305,9 @@ class IsometricWorldPainterComponent extends PositionComponent {
       // Legs
       _paint.color = Color.fromARGB(
         255,
-        (npc.color.red * 0.7).round().clamp(0, 255),
-        (npc.color.green * 0.7).round().clamp(0, 255),
-        (npc.color.blue * 0.7).round().clamp(0, 255),
+        (npc.color.r * 255 * 0.7).round().clamp(0, 255),
+        (npc.color.g * 255 * 0.7).round().clamp(0, 255),
+        (npc.color.b * 255 * 0.7).round().clamp(0, 255),
       );
       canvas.drawRect(
         Rect.fromCenter(center: Offset(nx - 2, ny), width: 3, height: 4),
@@ -397,7 +396,7 @@ class IsometricJoystickComponent extends JoystickComponent {
     super.update(dt);
 
     if (!delta.isZero()) {
-      final panSpeed = 200.0;
+      const panSpeed = 200.0;
       isometricCamera.panBy(
         Offset(-delta.x * panSpeed * dt, -delta.y * panSpeed * dt),
       );
@@ -439,7 +438,7 @@ class IsometricNPCComponent extends PositionComponent {
       _moveTimer += dt;
       _animTimer += dt;
 
-      // Change direction every 2-4 seconds
+      // Change direction every 2 to 4 seconds
       if (_moveTimer > 2.0 + _random.nextDouble() * 3.0) {
         _moveTimer = 0;
         final angle = _random.nextDouble() * 2 * math.pi;
@@ -461,7 +460,7 @@ class IsometricNPCComponent extends PositionComponent {
     final ny = _drawY;
 
     // Shadow
-    _shadowPaint.color = Colors.black.withValues(alpha: 0.12);
+    _shadowPaint.color = Colors.black.withOpacity(0.12);
     canvas.drawOval(
       Rect.fromCenter(center: Offset(nx + 1, ny + 1), width: 10, height: 4),
       _shadowPaint,
@@ -473,9 +472,9 @@ class IsometricNPCComponent extends PositionComponent {
     // Legs
     _legPaint.color = Color.fromARGB(
       255,
-      (npc.color.red * 0.7).round().clamp(0, 255),
-      (npc.color.green * 0.7).round().clamp(0, 255),
-      (npc.color.blue * 0.7).round().clamp(0, 255),
+      (npc.color.r * 255 * 0.7).round().clamp(0, 255),
+      (npc.color.g * 255 * 0.7).round().clamp(0, 255),
+      (npc.color.b * 255 * 0.7).round().clamp(0, 255),
     );
     canvas.drawRect(
       Rect.fromCenter(

@@ -180,8 +180,8 @@ class ProceduralPixelArt {
     int variant,
   ) {
     final pixels = List.generate(
-      16,
-      (_) => List.filled(16, Colors.transparent),
+      32,
+      (_) => List.filled(32, Colors.transparent),
     );
 
     // Base body shape
@@ -205,6 +205,9 @@ class ProceduralPixelArt {
         break;
       case CharacterType.police:
         _drawPolice(pixels, bodyColor, headColor, clothingColor, variant);
+        break;
+      case CharacterType.pimp:
+        _drawPimp(pixels, variant);
         break;
     }
 
@@ -369,27 +372,93 @@ class ProceduralPixelArt {
     Color clothes,
     int variant,
   ) {
+    // Offset for 32x32
+    int ox = 8;
+    int oy = 8;
     // Head
-    _fillRect(pixels, 6, 2, 4, 4, head);
+    _fillRect(pixels, ox + 6, oy + 2, 4, 4, head);
 
     // Body
-    _fillRect(pixels, 5, 7, 6, 6, clothes);
+    _fillRect(pixels, ox + 5, oy + 7, 6, 6, clothes);
 
     // Arms
-    _drawLine(pixels, 4, 8, 2, 10, body);
-    _drawLine(pixels, 11, 8, 13, 10, body);
+    _drawLine(pixels, ox + 4, oy + 8, ox + 2, oy + 10, body);
+    _drawLine(pixels, ox + 11, oy + 8, ox + 13, oy + 10, body);
 
     // Legs
-    _drawLine(pixels, 6, 13, 5, 15, body);
-    _drawLine(pixels, 9, 13, 10, 15, body);
+    _drawLine(pixels, ox + 6, oy + 13, ox + 5, oy + 15, body);
+    _drawLine(pixels, ox + 9, oy + 13, ox + 10, oy + 15, body);
 
     // Accessories based on variant
     if (variant % 2 == 0) {
-      _drawLine(pixels, 6, 3, 9, 3, Colors.black); // Hat
+      _drawLine(pixels, ox + 6, oy + 3, ox + 9, oy + 3, Colors.black); // Hat
     }
-    if (variant % 3 == 0) {
-      _fillRect(pixels, 7, 8, 2, 2, Colors.black); // Gun
-    }
+  }
+
+  void _drawPimp(List<List<Color>> pixels, int variant) {
+    final purple = Colors.purple.shade700;
+    final darkPurple = Colors.purple.shade900;
+    final yellow = Colors.yellow.shade600;
+    final skin = Colors.brown.shade700;
+    final hair = Colors.black87;
+    final white = Colors.white;
+
+    // Offset for 32x32 center
+    int ox = 8;
+    int oy = 4;
+
+    // Large Afro
+    _fillRect(pixels, ox + 3, oy + 3, 10, 8, hair);
+    _fillRect(pixels, ox + 2, oy + 5, 12, 4, hair);
+
+    // Hat (Purple with blue band)
+    _fillRect(pixels, ox + 4, oy + 1, 8, 3, purple);
+    _fillRect(pixels, ox + 2, oy + 4, 12, 2, purple);
+    _fillRect(pixels, ox + 4, oy + 3, 8, 1, Colors.blue.shade800);
+
+    // Face
+    _fillRect(pixels, ox + 5, oy + 6, 6, 6, skin);
+    // Eyes
+    _fillRect(pixels, ox + 6, oy + 8, 1, 1, white);
+    _fillRect(pixels, ox + 9, oy + 8, 1, 1, white);
+    // Mustache
+    _fillRect(pixels, ox + 5, oy + 10, 6, 1, hair);
+    // Mouth/Teeth (Gold tooth variant)
+    _fillRect(pixels, ox + 7, oy + 11, 2, 1, white);
+    if (variant % 2 == 0) _fillRect(pixels, ox + 8, oy + 11, 1, 1, yellow);
+
+    // Suit Jacket (Purple)
+    _fillRect(pixels, ox + 4, oy + 12, 8, 10, purple);
+    _fillRect(pixels, ox + 3, oy + 14, 10, 6, purple);
+
+    // Shirt (Yellow/Gold)
+    _fillRect(pixels, ox + 6, oy + 12, 4, 8, yellow);
+
+    // Gold Chain
+    _drawLine(pixels, ox + 5, oy + 12, ox + 7, oy + 15, yellow);
+    _drawLine(pixels, ox + 10, oy + 12, ox + 8, oy + 15, yellow);
+
+    // Arms
+    _fillRect(pixels, ox + 2, oy + 13, 3, 6, purple); // Left arm
+    _fillRect(pixels, ox + 11, oy + 13, 3, 6, purple); // Right arm
+    // Cuffs
+    _fillRect(pixels, ox + 2, oy + 18, 3, 1, yellow);
+    _fillRect(pixels, ox + 11, oy + 18, 3, 1, yellow);
+    // Hands
+    _fillRect(pixels, ox + 2, oy + 19, 3, 2, skin);
+    _fillRect(pixels, ox + 11, oy + 19, 3, 2, skin);
+
+    // Cane (Brown with gold head)
+    _fillRect(pixels, ox + 12, oy + 21, 1, 8, Colors.brown.shade800);
+    _fillRect(pixels, ox + 11, oy + 20, 3, 2, yellow);
+
+    // Pants (Purple)
+    _fillRect(pixels, ox + 5, oy + 22, 3, 8, purple);
+    _fillRect(pixels, ox + 8, oy + 22, 3, 8, purple);
+
+    // Shoes (Black)
+    _fillRect(pixels, ox + 5, oy + 30, 3, 1, hair);
+    _fillRect(pixels, ox + 8, oy + 30, 3, 1, hair);
   }
 
   void _drawDealer(
@@ -399,24 +468,21 @@ class ProceduralPixelArt {
     Color clothes,
     int variant,
   ) {
+    int ox = 8;
+    int oy = 8;
     // Head
-    _fillRect(pixels, 6, 2, 4, 4, head);
+    _fillRect(pixels, ox + 6, oy + 2, 4, 4, head);
 
     // Body
-    _fillRect(pixels, 5, 7, 6, 6, clothes);
+    _fillRect(pixels, ox + 5, oy + 7, 6, 6, clothes);
 
     // Arms
-    _drawLine(pixels, 4, 8, 1, 9, body);
-    _drawLine(pixels, 11, 8, 14, 9, body);
+    _drawLine(pixels, ox + 4, oy + 8, ox + 1, oy + 9, body);
+    _drawLine(pixels, ox + 11, oy + 8, ox + 14, oy + 9, body);
 
     // Legs
-    _drawLine(pixels, 6, 13, 5, 15, body);
-    _drawLine(pixels, 9, 13, 10, 15, body);
-
-    // Drug bag
-    if (variant % 2 == 0) {
-      _fillRect(pixels, 2, 9, 2, 2, Colors.green);
-    }
+    _drawLine(pixels, ox + 6, oy + 13, ox + 5, oy + 15, body);
+    _drawLine(pixels, ox + 9, oy + 13, ox + 10, oy + 15, body);
   }
 
   void _drawProstitute(
@@ -426,25 +492,21 @@ class ProceduralPixelArt {
     Color clothes,
     int variant,
   ) {
+    int ox = 8;
+    int oy = 8;
     // Head
-    _fillRect(pixels, 6, 2, 4, 4, head);
+    _fillRect(pixels, ox + 6, oy + 2, 4, 4, head);
 
     // Body
-    _fillRect(pixels, 5, 7, 6, 4, clothes);
+    _fillRect(pixels, ox + 5, oy + 7, 6, 4, clothes);
 
     // Arms
-    _drawLine(pixels, 4, 8, 1, 8, body);
-    _drawLine(pixels, 11, 8, 14, 8, body);
+    _drawLine(pixels, ox + 4, oy + 8, ox + 1, oy + 8, body);
+    _drawLine(pixels, ox + 11, oy + 8, ox + 14, oy + 8, body);
 
     // Legs
-    _drawLine(pixels, 6, 11, 4, 15, body);
-    _drawLine(pixels, 9, 11, 11, 15, body);
-
-    // High heels
-    if (variant % 2 == 0) {
-      _fillRect(pixels, 3, 15, 1, 1, Colors.red);
-      _fillRect(pixels, 10, 15, 1, 1, Colors.red);
-    }
+    _drawLine(pixels, ox + 6, oy + 11, ox + 4, oy + 15, body);
+    _drawLine(pixels, ox + 9, oy + 11, ox + 11, oy + 15, body);
   }
 
   void _drawVictim(
@@ -454,25 +516,21 @@ class ProceduralPixelArt {
     Color clothes,
     int variant,
   ) {
+    int ox = 8;
+    int oy = 8;
     // Head
-    _fillRect(pixels, 6, 2, 4, 4, head);
+    _fillRect(pixels, ox + 6, oy + 2, 4, 4, head);
 
     // Body (fallen)
-    _fillRect(pixels, 4, 7, 8, 3, clothes);
+    _fillRect(pixels, ox + 4, oy + 7, 8, 3, clothes);
 
     // Arms (spread)
-    _drawLine(pixels, 3, 8, 0, 10, body);
-    _drawLine(pixels, 12, 8, 15, 10, body);
+    _drawLine(pixels, ox + 3, oy + 8, ox + 0, oy + 10, body);
+    _drawLine(pixels, ox + 12, oy + 8, ox + 15, oy + 10, body);
 
     // Legs (twisted)
-    _drawLine(pixels, 5, 10, 3, 13, body);
-    _drawLine(pixels, 10, 10, 12, 13, body);
-
-    // Blood splatter
-    if (variant % 2 == 0) {
-      _fillRect(pixels, 2, 12, 2, 2, Colors.red);
-      _fillRect(pixels, 12, 12, 2, 2, Colors.red);
-    }
+    _drawLine(pixels, ox + 5, oy + 10, ox + 3, oy + 13, body);
+    _drawLine(pixels, ox + 10, oy + 10, ox + 12, oy + 13, body);
   }
 
   void _drawPolice(
@@ -482,24 +540,21 @@ class ProceduralPixelArt {
     Color clothes,
     int variant,
   ) {
+    int ox = 8;
+    int oy = 8;
     // Head
-    _fillRect(pixels, 6, 2, 4, 4, head);
+    _fillRect(pixels, ox + 6, oy + 2, 4, 4, head);
 
     // Body
-    _fillRect(pixels, 5, 7, 6, 6, clothes);
+    _fillRect(pixels, ox + 5, oy + 7, 6, 6, clothes);
 
     // Arms
-    _drawLine(pixels, 4, 8, 1, 10, body);
-    _drawLine(pixels, 11, 8, 14, 10, body);
+    _drawLine(pixels, ox + 4, oy + 8, ox + 1, oy + 10, body);
+    _drawLine(pixels, ox + 11, oy + 8, ox + 14, oy + 10, body);
 
     // Legs
-    _drawLine(pixels, 6, 13, 5, 15, body);
-    _drawLine(pixels, 9, 13, 10, 15, body);
-
-    // Badge
-    if (variant % 2 == 0) {
-      _fillRect(pixels, 7, 8, 2, 2, Colors.yellow);
-    }
+    _drawLine(pixels, ox + 6, oy + 13, ox + 5, oy + 15, body);
+    _drawLine(pixels, ox + 9, oy + 13, ox + 10, oy + 15, body);
   }
 
   // Building drawing methods
@@ -526,12 +581,6 @@ class ProceduralPixelArt {
 
     // Door
     _fillRect(pixels, 14, 28, 4, 4, door);
-
-    // Sign
-    if (variant % 2 == 0) {
-      _fillRect(pixels, 8, 10, 16, 2, Colors.purple);
-      _drawText(pixels, "CRACK", 10, 10, Colors.white);
-    }
   }
 
   void _drawGunShack(
@@ -555,11 +604,6 @@ class ProceduralPixelArt {
 
     // Door
     _fillRect(pixels, 14, 28, 4, 4, door);
-
-    // Gun display
-    if (variant % 2 == 0) {
-      _drawPistol(pixels, Colors.black, Colors.brown, Colors.grey, 0);
-    }
   }
 
   void _drawBank(
@@ -583,12 +627,6 @@ class ProceduralPixelArt {
 
     // Door
     _fillRect(pixels, 14, 28, 4, 4, door);
-
-    // Bank sign
-    if (variant % 2 == 0) {
-      _fillRect(pixels, 8, 10, 16, 2, Colors.yellow);
-      _drawText(pixels, "BANK", 10, 10, Colors.white);
-    }
   }
 
   void _drawBar(
@@ -612,12 +650,6 @@ class ProceduralPixelArt {
 
     // Door
     _fillRect(pixels, 14, 28, 4, 4, door);
-
-    // Bar sign
-    if (variant % 2 == 0) {
-      _fillRect(pixels, 8, 10, 16, 2, Colors.red);
-      _drawText(pixels, "BAR", 12, 10, Colors.white);
-    }
   }
 
   void _drawAlleyway(
@@ -634,12 +666,6 @@ class ProceduralPixelArt {
 
     // Ground
     _fillRect(pixels, 8, 24, 16, 8, Colors.grey[800]!);
-
-    // Trash
-    if (variant % 2 == 0) {
-      _fillRect(pixels, 10, 26, 2, 2, Colors.brown);
-      _fillRect(pixels, 20, 26, 2, 2, Colors.brown);
-    }
   }
 
   // Utility drawing methods
@@ -709,19 +735,15 @@ class ProceduralPixelArt {
     int y3,
     Color color,
   ) {
-    // Simple triangle fill using scanline algorithm
     final minY = y1 < y2 ? (y1 < y3 ? y1 : y3) : (y2 < y3 ? y2 : y3);
     final maxY = y1 > y2 ? (y1 > y3 ? y1 : y3) : (y2 > y3 ? y2 : y3);
 
     for (int y = minY; y <= maxY; y++) {
       List<int> intersections = [];
-
       _addIntersection(y1, y2, x1, x2, y, intersections);
       _addIntersection(y2, y3, x2, x3, y, intersections);
       _addIntersection(y3, y1, x3, x1, y, intersections);
-
       intersections.sort();
-
       for (int i = 0; i < intersections.length - 1; i += 2) {
         for (int x = intersections[i]; x <= intersections[i + 1]; x++) {
           if (x >= 0 && x < pixels.length && y >= 0 && y < pixels[0].length) {
@@ -746,31 +768,6 @@ class ProceduralPixelArt {
     }
   }
 
-  void _drawText(
-    List<List<Color>> pixels,
-    String text,
-    int x,
-    int y,
-    Color color,
-  ) {
-    // Simple ASCII art text rendering
-    for (int i = 0; i < text.length; i++) {
-      final char = text[i];
-      // Basic character mapping (simplified)
-      if (char == 'C') {
-        _fillRect(pixels, x + i * 4, y, 1, 3, color);
-        _fillRect(pixels, x + i * 4, y, 3, 1, color);
-        _fillRect(pixels, x + i * 4, y + 2, 3, 1, color);
-      } else if (char == 'R') {
-        _fillRect(pixels, x + i * 4, y, 1, 3, color);
-        _fillRect(pixels, x + i * 4, y, 3, 1, color);
-        _fillRect(pixels, x + i * 4 + 2, y + 1, 1, 2, color);
-        _drawLine(pixels, x + i * 4, y + 1, x + i * 4 + 2, y + 1, color);
-      }
-      // Add more characters as needed
-    }
-  }
-
   // Weapon drawing methods
   void _drawPistol(
     List<List<Color>> pixels,
@@ -779,19 +776,8 @@ class ProceduralPixelArt {
     Color detail,
     int variant,
   ) {
-    // Grip
     _fillRect(pixels, 4, 8, 3, 6, wood);
-
-    // Barrel
     _fillRect(pixels, 7, 6, 6, 2, metal);
-
-    // Trigger guard
-    _drawLine(pixels, 6, 9, 8, 9, metal);
-
-    // Details
-    if (variant % 2 == 0) {
-      _fillRect(pixels, 9, 6, 1, 1, detail); // Sight
-    }
   }
 
   List<List<Color>> _drawVehiclePixels(
@@ -803,27 +789,13 @@ class ProceduralPixelArt {
       24,
       (_) => List.filled(16, Colors.transparent),
     );
-
     final bodyColor = scheme.primary;
     final wheelColor = scheme.secondary;
     final detailColor = scheme.surface;
-
-    // Car body
     _fillRect(pixels, 4, 6, 16, 6, bodyColor);
-
-    // Wheels
     _fillRect(pixels, 6, 12, 2, 2, wheelColor);
     _fillRect(pixels, 16, 12, 2, 2, wheelColor);
-
-    // Windows
     _fillRect(pixels, 8, 7, 8, 2, detailColor);
-
-    // Details
-    if (variant % 2 == 0) {
-      _fillRect(pixels, 6, 8, 1, 1, Colors.yellow); // Headlight
-      _fillRect(pixels, 19, 8, 1, 1, Colors.red); // Taillight
-    }
-
     return pixels;
   }
 
@@ -834,19 +806,9 @@ class ProceduralPixelArt {
     Color detail,
     int variant,
   ) {
-    // Body
     _fillRect(pixels, 2, 6, 10, 4, metal);
-
-    // Stock
     _fillRect(pixels, 12, 4, 2, 6, wood);
-
-    // Magazine
     _fillRect(pixels, 4, 10, 2, 4, metal);
-
-    // Details
-    if (variant % 2 == 0) {
-      _fillRect(pixels, 8, 6, 1, 1, detail); // Sight
-    }
   }
 
   void _drawKnife(
@@ -856,14 +818,8 @@ class ProceduralPixelArt {
     Color detail,
     int variant,
   ) {
-    // Handle
     _fillRect(pixels, 2, 8, 4, 2, wood);
-
-    // Blade
     _fillRect(pixels, 6, 6, 6, 4, metal);
-
-    // Tip
-    _fillRect(pixels, 12, 7, 2, 2, metal);
   }
 
   void _drawBat(
@@ -873,16 +829,8 @@ class ProceduralPixelArt {
     Color detail,
     int variant,
   ) {
-    // Handle
     _fillRect(pixels, 2, 6, 2, 8, wood);
-
-    // Head
     _fillRect(pixels, 4, 4, 6, 4, wood);
-
-    // Metal reinforcement
-    if (variant % 2 == 0) {
-      _fillRect(pixels, 4, 4, 6, 1, metal);
-    }
   }
 
   // Environment drawing methods
@@ -894,35 +842,13 @@ class ProceduralPixelArt {
     Color detail,
     int variant,
   ) {
-    // Sky
     _fillRect(pixels, 0, 0, 64, 32, sky);
-
-    // Buildings
     for (int i = 0; i < 8; i++) {
       final height = 20 + (variant + i) % 15;
       final width = 6 + (variant + i * 2) % 6;
       final x = i * 8 + (variant + i) % 3;
-
       _fillRect(pixels, x, 32 - height, width, height, building);
-
-      // Windows
-      for (int j = 0; j < height ~/ 4; j++) {
-        for (int k = 0; k < width ~/ 2; k++) {
-          if ((variant + i + j + k) % 3 == 0) {
-            _fillRect(
-              pixels,
-              x + 1 + k * 2,
-              32 - height + 2 + j * 4,
-              1,
-              2,
-              detail,
-            );
-          }
-        }
-      }
     }
-
-    // Ground
     _fillRect(pixels, 0, 32, 64, 32, ground);
   }
 
@@ -934,19 +860,9 @@ class ProceduralPixelArt {
     Color detail,
     int variant,
   ) {
-    // Walls
     _fillRect(pixels, 0, 0, 8, 64, building);
     _fillRect(pixels, 56, 0, 8, 64, building);
-
-    // Ground
     _fillRect(pixels, 8, 48, 48, 16, ground);
-
-    // Trash and details
-    for (int i = 0; i < 5; i++) {
-      if ((variant + i) % 3 == 0) {
-        _fillRect(pixels, 10 + i * 8, 50, 2, 2, detail);
-      }
-    }
   }
 
   void _drawStreet(
@@ -957,21 +873,9 @@ class ProceduralPixelArt {
     Color detail,
     int variant,
   ) {
-    // Sky
     _fillRect(pixels, 0, 0, 64, 24, sky);
-
-    // Road
     _fillRect(pixels, 0, 24, 64, 16, ground);
-
-    // Buildings
     _fillRect(pixels, 0, 16, 64, 8, building);
-
-    // Road markings
-    for (int i = 0; i < 16; i++) {
-      if (i % 2 == 0) {
-        _fillRect(pixels, i * 4, 31, 2, 2, detail);
-      }
-    }
   }
 
   // Animation generation methods
@@ -981,8 +885,6 @@ class ProceduralPixelArt {
     int variant,
   ) {
     final animations = <ProceduralAnimation>[];
-
-    // Walking animation
     animations.add(
       ProceduralAnimation(
         type: AnimationType.walk,
@@ -990,8 +892,6 @@ class ProceduralPixelArt {
         frameDuration: 100,
       ),
     );
-
-    // Idle animation
     animations.add(
       ProceduralAnimation(
         type: AnimationType.idle,
@@ -999,16 +899,6 @@ class ProceduralPixelArt {
         frameDuration: 500,
       ),
     );
-
-    // Action animation (fight, shoot, etc.)
-    animations.add(
-      ProceduralAnimation(
-        type: AnimationType.action,
-        frames: _generateActionFrames(type, scheme, variant),
-        frameDuration: 200,
-      ),
-    );
-
     return animations;
   }
 
@@ -1018,33 +908,41 @@ class ProceduralPixelArt {
     int variant,
   ) {
     final frames = <List<List<Color>>>[];
-
     for (int i = 0; i < 4; i++) {
       final pixels = List.generate(
-        16,
-        (_) => List.filled(16, Colors.transparent),
+        32,
+        (_) => List.filled(32, Colors.transparent),
       );
-
-      // Generate walking pose based on frame
-      final offset = (i % 2 == 0) ? 1 : -1;
-
-      // Head
-      _fillRect(pixels, 6, 2, 4, 4, scheme.secondary);
-
-      // Body
-      _fillRect(pixels, 5, 7, 6, 6, scheme.surface);
-
-      // Arms (swinging)
-      _drawLine(pixels, 4, 8, 2 + offset, 10, scheme.primary);
-      _drawLine(pixels, 11, 8, 13 - offset, 10, scheme.primary);
-
-      // Legs (walking)
-      _drawLine(pixels, 6, 13, 4 + offset * 2, 15, scheme.primary);
-      _drawLine(pixels, 9, 13, 11 - offset * 2, 15, scheme.primary);
-
-      frames.add(pixels);
+      if (type == CharacterType.pimp) {
+        // Simple bobbing for pimp walk
+        int oy = (i % 2 == 0) ? 0 : 1;
+        _drawPimp(pixels, variant);
+        // Transform the pixels (y offset)
+        if (oy != 0) {
+          final newPixels = List.generate(
+            32,
+            (_) => List.filled(32, Colors.transparent),
+          );
+          for (int py = 0; py < 32 - oy; py++) {
+            newPixels[py + oy] = List.from(pixels[py]);
+          }
+          frames.add(newPixels);
+        } else {
+          frames.add(pixels);
+        }
+      } else {
+        int ox = 8;
+        int oy = 8;
+        final offset = (i % 2 == 0) ? 1 : -1;
+        _fillRect(pixels, ox + 6, oy + 2, 4, 4, scheme.secondary);
+        _fillRect(pixels, ox + 5, oy + 7, 6, 6, scheme.surface);
+        _drawLine(pixels, ox + 4, oy + 8, ox + 2 + offset, oy + 10, scheme.primary);
+        _drawLine(pixels, ox + 11, oy + 8, ox + 13 - offset, oy + 10, scheme.primary);
+        _drawLine(pixels, ox + 6, oy + 13, ox + 4 + offset * 2, oy + 15, scheme.primary);
+        _drawLine(pixels, ox + 9, oy + 13, ox + 11 - offset * 2, oy + 15, scheme.primary);
+        frames.add(pixels);
+      }
     }
-
     return frames;
   }
 
@@ -1054,63 +952,27 @@ class ProceduralPixelArt {
     int variant,
   ) {
     final frames = <List<List<Color>>>[];
-
     for (int i = 0; i < 2; i++) {
       final pixels = List.generate(
-        16,
-        (_) => List.filled(16, Colors.transparent),
+        32,
+        (_) => List.filled(32, Colors.transparent),
       );
-
-      // Head bob
-      final bob = (i == 0) ? 0 : 1;
-
-      _fillRect(pixels, 6, 2 + bob, 4, 4, scheme.secondary);
-      _fillRect(pixels, 5, 7, 6, 6, scheme.surface);
-      _drawLine(pixels, 4, 8, 2, 10, scheme.primary);
-      _drawLine(pixels, 11, 8, 13, 10, scheme.primary);
-      _drawLine(pixels, 6, 13, 5, 15, scheme.primary);
-      _drawLine(pixels, 9, 13, 10, 15, scheme.primary);
-
-      frames.add(pixels);
-    }
-
-    return frames;
-  }
-
-  List<List<List<Color>>> _generateActionFrames(
-    CharacterType type,
-    ColorScheme scheme,
-    int variant,
-  ) {
-    final frames = <List<List<Color>>>[];
-
-    for (int i = 0; i < 3; i++) {
-      final pixels = List.generate(
-        16,
-        (_) => List.filled(16, Colors.transparent),
-      );
-
-      _fillRect(pixels, 6, 2, 4, 4, scheme.secondary);
-      _fillRect(pixels, 5, 7, 6, 6, scheme.surface);
-
-      // Action pose
-      if (i == 0) {
-        _drawLine(pixels, 4, 8, 0, 8, scheme.primary); // Punching
-        _drawLine(pixels, 11, 8, 15, 8, scheme.primary);
-      } else if (i == 1) {
-        _drawLine(pixels, 4, 8, 1, 6, scheme.primary); // Shooting
-        _drawLine(pixels, 11, 8, 14, 10, scheme.primary);
+      if (type == CharacterType.pimp) {
+        _drawPimp(pixels, variant);
+        frames.add(pixels);
       } else {
-        _drawLine(pixels, 4, 8, 2, 10, scheme.primary); // Stabbing
-        _drawLine(pixels, 11, 8, 13, 6, scheme.primary);
+        int ox = 8;
+        int oy = 8;
+        final bob = (i == 0) ? 0 : 1;
+        _fillRect(pixels, ox + 6, oy + 2 + bob, 4, 4, scheme.secondary);
+        _fillRect(pixels, ox + 5, oy + 7, 6, 6, scheme.surface);
+        _drawLine(pixels, ox + 4, oy + 8, ox + 2, oy + 10, scheme.primary);
+        _drawLine(pixels, ox + 11, oy + 8, ox + 13, oy + 10, scheme.primary);
+        _drawLine(pixels, ox + 6, oy + 13, ox + 5, oy + 15, scheme.primary);
+        _drawLine(pixels, ox + 9, oy + 13, ox + 10, oy + 15, scheme.primary);
+        frames.add(pixels);
       }
-
-      _drawLine(pixels, 6, 13, 5, 15, scheme.primary);
-      _drawLine(pixels, 9, 13, 10, 15, scheme.primary);
-
-      frames.add(pixels);
     }
-
     return frames;
   }
 
@@ -1120,7 +982,6 @@ class ProceduralPixelArt {
     int variant,
   ) {
     final animations = <ProceduralAnimation>[];
-
     animations.add(
       ProceduralAnimation(
         type: AnimationType.idle,
@@ -1128,15 +989,6 @@ class ProceduralPixelArt {
         frameDuration: 300,
       ),
     );
-
-    animations.add(
-      ProceduralAnimation(
-        type: AnimationType.action,
-        frames: _generateWeaponActionFrames(type, scheme, variant),
-        frameDuration: 150,
-      ),
-    );
-
     return animations;
   }
 
@@ -1146,62 +998,18 @@ class ProceduralPixelArt {
     int variant,
   ) {
     final frames = <List<List<Color>>>[];
-
     for (int i = 0; i < 2; i++) {
       final pixels = List.generate(
         16,
         (_) => List.filled(16, Colors.transparent),
       );
-
-      // Slight bobbing motion
       final bob = (i == 0) ? 0 : 1;
-
       if (type == WeaponType.pistol) {
         _fillRect(pixels, 4 + bob, 8, 3, 6, scheme.secondary);
         _fillRect(pixels, 7 + bob, 6, 6, 2, scheme.primary);
-      } else if (type == WeaponType.uzi) {
-        _fillRect(pixels, 2 + bob, 6, 10, 4, scheme.primary);
-        _fillRect(pixels, 12 + bob, 4, 2, 6, scheme.secondary);
       }
-
       frames.add(pixels);
     }
-
-    return frames;
-  }
-
-  List<List<List<Color>>> _generateWeaponActionFrames(
-    WeaponType type,
-    ColorScheme scheme,
-    int variant,
-  ) {
-    final frames = <List<List<Color>>>[];
-
-    for (int i = 0; i < 3; i++) {
-      final pixels = List.generate(
-        16,
-        (_) => List.filled(16, Colors.transparent),
-      );
-
-      if (type == WeaponType.pistol) {
-        if (i == 0) {
-          _fillRect(pixels, 4, 8, 3, 6, scheme.secondary);
-          _fillRect(pixels, 7, 6, 6, 2, scheme.primary);
-        } else if (i == 1) {
-          // Recoil
-          _fillRect(pixels, 4, 9, 3, 6, scheme.secondary);
-          _fillRect(pixels, 7, 7, 6, 2, scheme.primary);
-          // Muzzle flash
-          _fillRect(pixels, 13, 6, 2, 2, Colors.yellow);
-        } else {
-          _fillRect(pixels, 4, 8, 3, 6, scheme.secondary);
-          _fillRect(pixels, 7, 6, 6, 2, scheme.primary);
-        }
-      }
-
-      frames.add(pixels);
-    }
-
     return frames;
   }
 
@@ -1211,7 +1019,6 @@ class ProceduralPixelArt {
     int variant,
   ) {
     final animations = <ProceduralAnimation>[];
-
     animations.add(
       ProceduralAnimation(
         type: AnimationType.move,
@@ -1219,7 +1026,6 @@ class ProceduralPixelArt {
         frameDuration: 200,
       ),
     );
-
     return animations;
   }
 
@@ -1229,26 +1035,17 @@ class ProceduralPixelArt {
     int variant,
   ) {
     final frames = <List<List<Color>>>[];
-
     for (int i = 0; i < 4; i++) {
       final pixels = List.generate(
         24,
         (_) => List.filled(16, Colors.transparent),
       );
-
-      // Moving wheels
       final wheelOffset = (i % 2 == 0) ? 0 : 1;
-
-      // Body
       _fillRect(pixels, 4, 6, 16, 6, scheme.primary);
-
-      // Wheels
       _fillRect(pixels, 6 + wheelOffset, 12, 2, 2, scheme.secondary);
       _fillRect(pixels, 16 + wheelOffset, 12, 2, 2, scheme.secondary);
-
       frames.add(pixels);
     }
-
     return frames;
   }
 
@@ -1258,7 +1055,6 @@ class ProceduralPixelArt {
     int variant,
   ) {
     final animations = <ProceduralAnimation>[];
-
     animations.add(
       ProceduralAnimation(
         type: AnimationType.idle,
@@ -1266,7 +1062,6 @@ class ProceduralPixelArt {
         frameDuration: 1000,
       ),
     );
-
     return animations;
   }
 
@@ -1276,44 +1071,25 @@ class ProceduralPixelArt {
     int variant,
   ) {
     final frames = <List<List<Color>>>[];
-
     for (int i = 0; i < 2; i++) {
       final pixels = List.generate(
         32,
         (_) => List.filled(32, Colors.transparent),
       );
-
-      // Flickering lights
-      final lightOn = (i == 0) || (variant % 3 == 0);
-
       _fillRect(pixels, 8, 12, 16, 20, scheme.primary);
       _drawTriangle(pixels, 6, 12, 24, 12, 15, 6, scheme.secondary);
-
-      if (lightOn) {
-        for (int j = 0; j < 3; j++) {
-          for (int k = 0; k < 2; k++) {
-            _fillRect(pixels, 10 + j * 4, 16 + k * 4, 2, 2, scheme.surface);
-          }
-        }
-      }
-
       _fillRect(pixels, 14, 28, 4, 4, scheme.error);
-
       frames.add(pixels);
     }
-
     return frames;
   }
 
-  // Parallax layer generation
   List<ParallaxLayer> _generateParallaxLayers(
     EnvironmentType type,
     ColorScheme scheme,
     int variant,
   ) {
     final layers = <ParallaxLayer>[];
-
-    // Background layer (slowest)
     layers.add(
       ParallaxLayer(
         pixels: _generateParallaxBackground(type, scheme, variant),
@@ -1321,25 +1097,6 @@ class ProceduralPixelArt {
         zIndex: 1,
       ),
     );
-
-    // Midground layer (medium speed)
-    layers.add(
-      ParallaxLayer(
-        pixels: _generateParallaxMidground(type, scheme, variant),
-        speed: 0.5,
-        zIndex: 2,
-      ),
-    );
-
-    // Foreground layer (fastest)
-    layers.add(
-      ParallaxLayer(
-        pixels: _generateParallaxForeground(type, scheme, variant),
-        speed: 1.0,
-        zIndex: 3,
-      ),
-    );
-
     return layers;
   }
 
@@ -1352,112 +1109,26 @@ class ProceduralPixelArt {
       128,
       (_) => List.filled(64, Colors.transparent),
     );
-
-    // Distant buildings/skyline
     for (int i = 0; i < 20; i++) {
       final height = 10 + (variant + i) % 20;
       final width = 4 + (variant + i * 2) % 4;
       final x = i * 6 + (variant + i) % 3;
-
-      _fillRect(
-        pixels,
-        x,
-        32 - height,
-        width,
-        height,
-        scheme.primary.withOpacity(0.5),
-      );
+      _fillRect(pixels, x, 32 - height, width, height, scheme.primary.withValues(alpha: 0.5));
     }
-
-    return pixels;
-  }
-
-  List<List<Color>> _generateParallaxMidground(
-    EnvironmentType type,
-    ColorScheme scheme,
-    int variant,
-  ) {
-    final pixels = List.generate(
-      128,
-      (_) => List.filled(64, Colors.transparent),
-    );
-
-    // Mid-range buildings
-    for (int i = 0; i < 15; i++) {
-      final height = 20 + (variant + i) % 25;
-      final width = 6 + (variant + i * 2) % 6;
-      final x = i * 8 + (variant + i) % 4;
-
-      _fillRect(
-        pixels,
-        x,
-        32 - height,
-        width,
-        height,
-        scheme.primary.withOpacity(0.8),
-      );
-
-      // Windows
-      for (int j = 0; j < height ~/ 4; j++) {
-        for (int k = 0; k < width ~/ 2; k++) {
-          if ((variant + i + j + k) % 3 == 0) {
-            _fillRect(
-              pixels,
-              x + 1 + k * 2,
-              32 - height + 2 + j * 4,
-              1,
-              2,
-              scheme.surface.withOpacity(0.6),
-            );
-          }
-        }
-      }
-    }
-
-    return pixels;
-  }
-
-  List<List<Color>> _generateParallaxForeground(
-    EnvironmentType type,
-    ColorScheme scheme,
-    int variant,
-  ) {
-    final pixels = List.generate(
-      128,
-      (_) => List.filled(64, Colors.transparent),
-    );
-
-    // Street level details
-    _fillRect(pixels, 0, 48, 128, 16, scheme.secondary);
-
-    // Street lamps
-    for (int i = 0; i < 10; i++) {
-      final x = i * 12 + (variant + i) % 4;
-      _drawLine(pixels, x + 6, 40, x + 6, 48, scheme.primary);
-      _fillRect(pixels, x + 4, 38, 4, 2, scheme.surface);
-    }
-
-    // Trash/debris
-    for (int i = 0; i < 8; i++) {
-      if ((variant + i) % 3 == 0) {
-        _fillRect(pixels, 10 + i * 14, 50, 2, 2, scheme.error);
-      }
-    }
-
     return pixels;
   }
 
   int _randomColor(int minR, int minG, int minB, int alpha) {
-    final r = minR + _random.nextInt(255 - minR);
-    final g = minG + _random.nextInt(255 - minG);
-    final b = minB + _random.nextInt(255 - minB);
+    final r = minR + _random.nextInt(256 - minR);
+    final g = minG + _random.nextInt(256 - minG);
+    final b = minB + _random.nextInt(256 - minB);
     return (alpha << 24) | (r << 16) | (g << 8) | b;
   }
 }
 
 // Data classes for procedural generation
 
-enum CharacterType { gangster, dealer, prostitute, victim, police }
+enum CharacterType { gangster, dealer, prostitute, victim, police, pimp }
 
 enum BuildingType { crackhouse, gunshack, bank, bar, alleyway }
 
@@ -1479,6 +1150,7 @@ extension CharacterTypeColorTheme on CharacterType {
     switch (this) {
       case CharacterType.gangster:
       case CharacterType.police:
+      case CharacterType.pimp:
         return ColorTheme.gangster;
       case CharacterType.dealer:
         return ColorTheme.drug;
@@ -1542,20 +1214,6 @@ extension EnvironmentTypeColorTheme on EnvironmentType {
         return ColorTheme.city;
     }
   }
-}
-
-class BuildingDetail {
-  final DetailType type;
-  final Offset position;
-  final Color color;
-  final String? text;
-
-  BuildingDetail({
-    required this.type,
-    required this.position,
-    required this.color,
-    this.text,
-  });
 }
 
 class ColorScheme {

@@ -102,8 +102,8 @@ class GangwarWorld extends FlameGame
     camera.follow(player);
 
     // Joystick
-    final knobPaint = BasicPalette.blue.withAlpha(200).paint();
-    final backgroundPaint = BasicPalette.blue.withAlpha(100).paint();
+    final knobPaint = Paint()..color = BasicPalette.purple.color.withValues(alpha: 0.39);
+    final backgroundPaint = Paint()..color = BasicPalette.blue.color.withValues(alpha: 0.39);
     joystick = JoystickComponent(
       knob: CircleComponent(radius: 25, paint: knobPaint),
       background: CircleComponent(radius: 60, paint: backgroundPaint),
