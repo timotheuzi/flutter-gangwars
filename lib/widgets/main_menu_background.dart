@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'pixel_art_member.dart';
+import 'pixel_art_icon.dart';
 
 class MainMenuBackground extends StatefulWidget {
   const MainMenuBackground({super.key});
@@ -14,6 +15,8 @@ class _MainMenuBackgroundState extends State<MainMenuBackground>
   late AnimationController _controller;
   final List<Car> _cars = [];
   final List<Prostitute> _prostitutes = [];
+  final List<DrugDealer> _dealers = [];
+  final List<PixelGangMember> _gangMembers = [];
   final Random _random = Random();
 
   @override
@@ -28,6 +31,15 @@ class _MainMenuBackgroundState extends State<MainMenuBackground>
     for (int i = 0; i < 3; i++) {
       _prostitutes.add(
         Prostitute(x: 50.0 + (i * 100), y: 450.0 + _random.nextDouble() * 50),
+      );
+      _dealers.add(
+        DrugDealer(x: 200.0 + (i * 120), y: 480.0 + _random.nextDouble() * 30),
+      );
+      _gangMembers.add(
+        PixelGangMember(
+          x: 350.0 + (i * 80),
+          y: 460.0 + _random.nextDouble() * 40,
+        ),
       );
     }
   }
@@ -118,6 +130,18 @@ class _MainMenuBackgroundState extends State<MainMenuBackground>
               ),
             ),
 
+            // Drug dealers with product
+            ..._dealers.map(
+              (d) =>
+                  Positioned(left: d.x, top: d.y, child: _buildDrugDealer(d)),
+            ),
+
+            // Gang members patrolling
+            ..._gangMembers.map(
+              (g) =>
+                  Positioned(left: g.x, top: g.y, child: _buildGangMember(g)),
+            ),
+
             // Cars / Drive-by
             ..._cars.map(
               (car) =>
@@ -189,6 +213,56 @@ class _MainMenuBackgroundState extends State<MainMenuBackground>
       ],
     );
   }
+
+  Widget _buildDrugDealer(DrugDealer dealer) {
+    return Column(
+      children: [
+        // Floating drug icon
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Transform.translate(
+              offset: Offset(0, sin(_controller.value * 4 * pi) * 5),
+              child: child,
+            );
+          },
+          child: PixelArtIcon(name: dealer.currentProduct, size: 24),
+        ),
+        // Dealer character
+        PixelArtMember(
+          isPlayer: false,
+          isAlive: true,
+          isCheering: false,
+          size: 36,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGangMember(PixelGangMember member) {
+    return Column(
+      children: [
+        // Floating weapon
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Transform.rotate(
+              angle: sin(_controller.value * 6 * pi) * 0.2,
+              child: child,
+            );
+          },
+          child: PixelArtIcon(name: member.currentWeapon, size: 20),
+        ),
+        // Gang member character
+        PixelArtMember(
+          isPlayer: false,
+          isAlive: true,
+          isCheering: false,
+          size: 36,
+        ),
+      ],
+    );
+  }
 }
 
 class GraffitiPainter extends CustomPainter {
@@ -238,4 +312,30 @@ class Prostitute {
   double x;
   double y;
   Prostitute({required this.x, required this.y});
+}
+
+class DrugDealer {
+  double x;
+  double y;
+  String currentProduct;
+  DrugDealer({required this.x, required this.y})
+    : currentProduct = [
+        'crack',
+        'weed',
+        'coke',
+        'ice',
+      ].elementAt(Random().nextInt(4));
+}
+
+class PixelGangMember {
+  double x;
+  double y;
+  String currentWeapon;
+  PixelGangMember({required this.x, required this.y})
+    : currentWeapon = [
+        'pistol',
+        'uzi',
+        'knife',
+        'bat',
+      ].elementAt(Random().nextInt(4));
 }

@@ -13,7 +13,7 @@ class BankScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bank - Droid Gangwar'),
+        title: const Text('Bank - Gangwars'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => gameProvider.navigateToScreen('city'),

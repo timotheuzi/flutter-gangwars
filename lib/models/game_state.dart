@@ -226,42 +226,42 @@ class GameState with ChangeNotifier {
 
   // Convert to JSON for saving
   Map<String, dynamic> toJson() => {
-        'playerName': playerName,
-        'gangName': gangName,
-        'money': money,
-        'account': account,
-        'loan': loan,
-        'loanDayTaken': loanDayTaken,
-        'members': members,
-        'reputation': reputation,
-        'squidies': squidies,
-        'day': day,
-        'health': health,
-        'maxHealth': maxHealth,
-        'steps': steps,
-        'maxSteps': maxSteps,
-        'lives': lives,
-        'damage': damage,
-        'currentScore': currentScore,
-        'currentLocation': currentLocation,
-        'accuracy': accuracy,
-        'drugPrices': drugPrices,
-        'drugTrends': drugTrends,
-        'flags': flags.toJson(),
-        'weapons': weapons.toJson(),
-        'drugs': drugs.toJson(),
-        'prostitutes': prostitutes.toJson(),
-        'squidiesGainedToday': squidiesGainedToday,
-        'squidiesCriticalHitChance': squidiesCriticalHitChance,
-        'gangMembers': gangMembers.map((m) => m.toJson()).toList(),
-        'machineGun': machineGun,
-        'rocketLauncher': rocketLauncher,
-        'submachineGun': submachineGun,
-        'flamethrower': flamethrower,
-        'pistolUpgradeType': pistolUpgradeType,
-        'pistolUpgraded': pistolUpgraded,
-        'pistolUpgradeToggle': pistolUpgradeToggle,
-      };
+    'playerName': playerName,
+    'gangName': gangName,
+    'money': money,
+    'account': account,
+    'loan': loan,
+    'loanDayTaken': loanDayTaken,
+    'members': members,
+    'reputation': reputation,
+    'squidies': squidies,
+    'day': day,
+    'health': health,
+    'maxHealth': maxHealth,
+    'steps': steps,
+    'maxSteps': maxSteps,
+    'lives': lives,
+    'damage': damage,
+    'currentScore': currentScore,
+    'currentLocation': currentLocation,
+    'accuracy': accuracy,
+    'drugPrices': drugPrices,
+    'drugTrends': drugTrends,
+    'flags': flags.toJson(),
+    'weapons': weapons.toJson(),
+    'drugs': drugs.toJson(),
+    'prostitutes': prostitutes.toJson(),
+    'squidiesGainedToday': squidiesGainedToday,
+    'squidiesCriticalHitChance': squidiesCriticalHitChance,
+    'gangMembers': gangMembers.map((m) => m.toJson()).toList(),
+    'machineGun': machineGun,
+    'rocketLauncher': rocketLauncher,
+    'submachineGun': submachineGun,
+    'flamethrower': flamethrower,
+    'pistolUpgradeType': pistolUpgradeType,
+    'pistolUpgraded': pistolUpgraded,
+    'pistolUpgradeToggle': pistolUpgradeToggle,
+  };
 
   // Create from JSON
   factory GameState.fromJson(Map<String, dynamic> json) {
@@ -294,8 +294,8 @@ class GameState with ChangeNotifier {
     state.drugs = Drugs.fromJson(json['drugs'] ?? {});
     state.prostitutes = Prostitutes.fromJson(json['prostitutes'] ?? {});
     state.squidiesGainedToday = json['squidiesGainedToday'] ?? 0;
-    state.squidiesCriticalHitChance =
-        (json['squidiesCriticalHitChance'] ?? 0.1).toDouble();
+    state.squidiesCriticalHitChance = (json['squidiesCriticalHitChance'] ?? 0.1)
+        .toDouble();
     state.gangMembers = (json['gangMembers'] as List? ?? [])
         .map((m) => GangMember.fromJson(m))
         .toList();
@@ -319,10 +319,10 @@ class GangMember {
   GangMember(this.name, this.health, this.equippedWeapons);
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'health': health,
-        'equippedWeapons': equippedWeapons,
-      };
+    'name': name,
+    'health': health,
+    'equippedWeapons': equippedWeapons,
+  };
 
   factory GangMember.fromJson(Map<String, dynamic> json) {
     return GangMember(
@@ -342,11 +342,11 @@ class Flags {
   Flags(); // Default constructor
 
   Map<String, dynamic> toJson() => {
-        'hasId': hasId,
-        'hasInfo': hasInfo,
-        'hasSwitch': hasSwitch,
-        'hasAttractedLoanShark': hasAttractedLoanShark,
-      };
+    'hasId': hasId,
+    'hasInfo': hasInfo,
+    'hasSwitch': hasSwitch,
+    'hasAttractedLoanShark': hasAttractedLoanShark,
+  };
 
   factory Flags.fromJson(Map<String, dynamic> json) {
     return Flags()
@@ -417,37 +417,37 @@ class Weapons {
   bool canFightWithFlamethrower() => flamethrower > 0;
 
   Map<String, dynamic> toJson() => {
-        'pistols': pistols,
-        'bullets': bullets,
-        'explodingBullets': explodingBullets,
-        'hollowPointBullets': hollowPointBullets,
-        'useExplodingBullets': useExplodingBullets,
-        'useHollowPointBullets': useHollowPointBullets,
-        'uzis': uzis,
-        'grenades': grenades,
-        'barbedWireBat': barbedWireBat,
-        'brassKnuckles': brassKnuckles,
-        'vampireBat': vampireBat,
-        'missileLauncher': missileLauncher,
-        'missiles': missiles,
-        'ar15': ar15,
-        'vest': vest,
-        'knife': knife,
-        'ghostGuns': ghostGuns,
-        'sword': sword,
-        'axe': axe,
-        'goldenGun': goldenGun,
-        'poisonBlowgun': poisonBlowgun,
-        'goldenSword': goldenSword,
-        'goldenAxe': goldenAxe,
-        'goldenKnife': goldenKnife,
-        'goldenUzi': goldenUzi,
-        'goldenAr15': goldenAr15,
-        'machineGun': machineGun,
-        'rocketLauncher': rocketLauncher,
-        'submachineGun': submachineGun,
-        'flamethrower': flamethrower,
-      };
+    'pistols': pistols,
+    'bullets': bullets,
+    'explodingBullets': explodingBullets,
+    'hollowPointBullets': hollowPointBullets,
+    'useExplodingBullets': useExplodingBullets,
+    'useHollowPointBullets': useHollowPointBullets,
+    'uzis': uzis,
+    'grenades': grenades,
+    'barbedWireBat': barbedWireBat,
+    'brassKnuckles': brassKnuckles,
+    'vampireBat': vampireBat,
+    'missileLauncher': missileLauncher,
+    'missiles': missiles,
+    'ar15': ar15,
+    'vest': vest,
+    'knife': knife,
+    'ghostGuns': ghostGuns,
+    'sword': sword,
+    'axe': axe,
+    'goldenGun': goldenGun,
+    'poisonBlowgun': poisonBlowgun,
+    'goldenSword': goldenSword,
+    'goldenAxe': goldenAxe,
+    'goldenKnife': goldenKnife,
+    'goldenUzi': goldenUzi,
+    'goldenAr15': goldenAr15,
+    'machineGun': machineGun,
+    'rocketLauncher': rocketLauncher,
+    'submachineGun': submachineGun,
+    'flamethrower': flamethrower,
+  };
 
   factory Weapons.fromJson(Map<String, dynamic> json) {
     return Weapons()
@@ -504,13 +504,13 @@ class Drugs {
   }
 
   Map<String, dynamic> toJson() => {
-        'weed': weed,
-        'crack': crack,
-        'coke': coke,
-        'ice': ice,
-        'percs': percs,
-        'pixie_dust': pixieDust,
-      };
+    'weed': weed,
+    'crack': crack,
+    'coke': coke,
+    'ice': ice,
+    'percs': percs,
+    'pixie_dust': pixieDust,
+  };
 
   factory Drugs.fromJson(Map<String, dynamic> json) {
     return Drugs()

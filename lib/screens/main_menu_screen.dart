@@ -85,6 +85,13 @@ class MainMenuScreen extends StatelessWidget {
                     const SizedBox(height: 15),
                     _buildMenuButton(
                       context,
+                      '3D OPEN WORLD',
+                      () => _enter3DWorld(context),
+                      Icons.terrain,
+                    ),
+                    const SizedBox(height: 15),
+                    _buildMenuButton(
+                      context,
                       'CREDITS',
                       () => _showCredits(context),
                       Icons.info,
@@ -225,6 +232,11 @@ class MainMenuScreen extends StatelessWidget {
   void _showCredits(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     gameProvider.navigateToScreen('credits');
+  }
+
+  void _enter3DWorld(BuildContext context) {
+    final gameProvider = Provider.of<GameProvider>(context, listen: false);
+    gameProvider.navigateToScreen('procedural_open_world');
   }
 
   void _quitGame(BuildContext context) {

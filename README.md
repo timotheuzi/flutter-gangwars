@@ -1,12 +1,12 @@
-# Droid Gangwar Flutter
+# Gangwar
 
-![Droid Gangwar Logo](assets/images/logo.png)
+![Gangwar Logo](assets/images/logo.png)
 
 A cross-platform Flutter adaptation of the classic Gangwar game, now available on Android, iOS, Linux, Windows, macOS, and Web.
 
 ## 🎮 About the Game
 
-Droid Gangwar is a strategic street gang simulation game where you build your criminal empire, trade drugs, acquire weapons, and battle rival gangs to dominate the city streets.
+Gangwar is a strategic street gang simulation game where you build your criminal empire, trade drugs, acquire weapons, and battle rival gangs to dominate the city streets.
 
 ## 🚀 Getting Started
 
@@ -45,17 +45,24 @@ Droid Gangwar is a strategic street gang simulation game where you build your cr
 
 ## 📱 Platform-Specific Builds
 
+### Android Build (Google Play Ready)
+Build the App Bundle for Google Play:
+```bash
+flutter build appbundle
+```
+Output: `build/app/outputs/bundle/release/app-release.aab`
+
+Or build the APK:
+```bash
+make build-android
+```
+Output: `build/app/outputs/flutter-apk/app-release.apk`
+
 ### Linux Build
 ```bash
 make build-linux
 ```
 Output: `build/linux/x64/release/bundle/`
-
-### Android Build
-```bash
-make build-android
-```
-Output: `build/app/outputs/flutter-apk/app-release.apk`
 
 ### iOS Build
 ```bash
@@ -69,10 +76,9 @@ make build-web
 ```
 Output: `build/web/`
 
-### Build All Platforms
-```bash
-make build-all
-```
+## 📖 User Guide
+
+For detailed gameplay instructions, check out the [USER_GUIDE.md](USER_GUIDE.md).
 
 ## 🎯 Game Features
 
@@ -100,251 +106,27 @@ make build-all
 
 ## 🏗️ Development
 
-### Available Makefile Commands
-
-| Command | Description |
-|---------|-------------|
-| `make help` | Show all available commands |
-| `make install-deps` | Install dependencies |
-| `make upgrade-deps` | Upgrade dependencies |
-| `make run` | Run app in debug mode |
-| `make run-linux` | Run Linux version |
-| `make run-android` | Run Android version |
-| `make run-ios` | Run iOS version |
-| `make build-linux` | Build Linux release |
-| `make build-android` | Build Android APK |
-| `make build-ios` | Build iOS app |
-| `make build-web` | Build web version |
-| `make build-all` | Build all platforms |
-| `make test` | Run all tests |
-| `make analyze` | Run static code analysis |
-| `make format` | Format code |
-| `make clean` | Clean build artifacts |
-| `make clean-all` | Deep clean all files |
-| `make kill` | Kill all Flutter processes |
-| `make doctor` | Check Flutter installation |
-| `make version` | Show Flutter version |
-
 ### Project Structure
 
 ```
-droid_gangwar_flutter/
+gangwar/
 ├── lib/
 │   ├── main.dart                  # App entry point
 │   ├── models/                    # Game state & data models
-│   │   ├── combat_result.dart
-│   │   ├── combat_system.dart
-│   │   ├── game_state.dart
-│   │   ├── random_event.dart
-│   │   └── random_event_data.dart
 │   ├── providers/                 # State management
-│   │   └── game_provider.dart
 │   ├── screens/                   # UI screens
-│   │   ├── alleyway_screen.dart
-│   │   ├── bank_screen.dart
-│   │   ├── bar_screen.dart
-│   │   ├── city_screen.dart
-│   │   ├── crackhouse_screen.dart
-│   │   ├── credits_screen.dart
-│   │   ├── gunshack_screen.dart
-│   │   ├── infobooth_screen.dart
-│   │   ├── main_menu_screen.dart
-│   │   ├── main_screen.dart
-│   │   ├── mud_fight_screen.dart
-│   │   └── picknsave_screen.dart
 │   └── widgets/                   # Reusable UI components
-│       ├── blood_drop_icon.dart
-│       ├── event_animation.dart
-│       ├── fight_animation.dart
-│       ├── game_button.dart
-│       ├── location_card.dart
-│       ├── main_menu_background.dart
-│       ├── pixel_art_icon.dart
-│       ├── pixel_art_location.dart
-│       └── pixel_art_member.dart
 ├── assets/                        # Game assets
-│   ├── audio/                     # Sound effects and music
-│   ├── data/                      # Game data files
-│   ├── fonts/                     # Custom fonts
-│   └── images/                    # Images and icons
+├── android/                       # Android configuration (com.gangwar.gangwars)
 ├── Makefile                       # Build system
 ├── pubspec.yaml                   # Dependencies
 ├── README.md                      # Documentation
-└── LICENSE                        # License information
+└── USER_GUIDE.md                  # Gameplay instructions
 ```
-
-### Code Style
-
-- Follow **Dart style guide** conventions
-- Use **lowerCamelCase** for variables and functions
-- Use **UpperCamelCase** for classes and types
-- Use **snake_case** for file names
-- Keep lines under **80 characters** when possible
-- Use **trailing commas** for collections
-
-### Testing
-
-Run tests with:
-```bash
-make test
-```
-
-Run static analysis:
-```bash
-make analyze
-```
-
-Format code:
-```bash
-make format
-```
-
-## 🔧 Configuration
-
-### pubspec.yaml
-
-The project uses the following main dependencies:
-
-- `flutter`: SDK for cross-platform development
-- `provider`: State management solution
-- `shared_preferences`: Cross-platform persistence
-- `flame`: Game engine (optional for future enhancements)
-- `audioplayers`: Audio playback
-- `flutter_svg`: SVG support
-
-### Platform-Specific Configuration
-
-**Android**: `android/app/build.gradle`
-**iOS**: `ios/Runner/Info.plist`
-**Linux**: `linux/flutter/generated_plugin_registrant.cc`
-**Windows**: `windows/flutter/generated_plugin_registrant.cc`
-**macOS**: `macos/Runner/Info.plist`
-**Web**: `web/index.html`
-
-## 📦 Deployment
-
-### Android Deployment
-
-1. Build APK:
-   ```bash
-   make build-android
-   ```
-
-2. Build App Bundle:
-   ```bash
-   make build-android-bundle
-   ```
-
-3. Install on device:
-   ```bash
-   flutter install
-   ```
-
-### iOS Deployment
-
-1. Build for release:
-   ```bash
-   make build-ios
-   ```
-
-2. Archive for App Store:
-   ```bash
-   cd ios && xcodebuild archive && cd ..
-   ```
-
-### Linux Deployment
-
-1. Build Linux app:
-   ```bash
-   make build-linux
-   ```
-
-2. Create AppImage:
-   ```bash
-   appimagetool ./build/linux/x64/release/bundle
-   ```
-
-### Windows Deployment
-
-1. Build Windows app:
-   ```bash
-   flutter build windows --release
-   ```
-
-2. Create installer (using NSIS):
-   ```bash
-   makensis windows_installer.nsi
-   ```
-
-### macOS Deployment
-
-1. Build macOS app:
-   ```bash
-   make build-macos
-   ```
-
-2. Create DMG:
-   ```bash
-   create-dmg ./build/macos/Build/Products/Release
-   ```
-
-### Web Deployment
-
-1. Build web app:
-   ```bash
-   make build-web
-   ```
-
-2. Deploy to Firebase:
-   ```bash
-   firebase deploy
-   ```
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these guidelines:
-
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/your-feature`
-3. **Commit your changes**: `git commit -am 'Add some feature'`
-4. **Push to the branch**: `git push origin feature/your-feature`
-5. **Submit a pull request**
-
-### Contribution Guidelines
-
-- Follow existing code style
-- Write tests for new features
-- Update documentation
-- Keep commits focused and descriptive
-- Include screenshots for UI changes
-
-## 📚 Documentation
-
-- [Flutter Documentation](https://flutter.dev/docs)
-- [Provider Package](https://pub.dev/packages/provider)
-- [Shared Preferences](https://pub.dev/packages/shared_preferences)
-- [Dart Language Tour](https://dart.dev/guides/language/language-tour)
-
-## 📝 Changelog
-
-### Version 1.0.0 (Current)
-- Complete migration from Android to Flutter
-- Cross-platform support for 6 platforms
-- All original game features implemented
-- Modern UI with Material Design
-- Comprehensive build system
-
-## 🎓 Credits
-
-- **Original Game**: Gang War MUD by timotheuzi@hotmail.com
-- **Flutter Adaptation**: Built with Flutter for cross-platform support
-- **Special Thanks**: Original Gang War community and beta testers
-
-## 📞 Support
-
-For issues, questions, or suggestions:
-- **Email**: timotheuzi@hotmail.com
-- **GitHub Issues**: https://github.com/timotheuzi/flutter-gangwars/issues
+Contributions are welcome! Please follow the existing code style and include screenshots for UI changes.
 
 ## 🏆 License
 
@@ -352,7 +134,3 @@ This project is licensed under the **MaggotCorp Proprietary License**. See [LICE
 
 **© 2025 MaggotCorp. All rights reserved.**
 **Original Game: timotheuzi@hotmail.com**
-
----
-
-**The streets are now open on all platforms!** 💰🔫🏙️

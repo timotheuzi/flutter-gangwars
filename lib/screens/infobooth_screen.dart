@@ -13,7 +13,7 @@ class InfoBoothScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Info Booth - Droid Gangwar'),
+        title: const Text('Info Booth - Gangwars'),
         actions: [
           IconButton(
             icon: const Icon(Icons.arrow_back),

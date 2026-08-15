@@ -5,30 +5,23 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
-import 'package:droid_gangwar_flutter/main.dart';
-import 'package:droid_gangwar_flutter/providers/game_provider.dart';
+import 'package:gangwar/main.dart';
+import 'package:gangwar/providers/game_provider.dart';
 
 void main() {
-  testWidgets('Game app builds without errors', (WidgetTester tester) async {
-    // Build our app with ChangeNotifierProvider and trigger a frame.
+  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
     await tester.pumpWidget(
       ChangeNotifierProvider(
-        create: (_) => GameProvider(),
-        child: const MyApp(),
+        create: (context) => GameProvider(),
+        child: const GangWars(),
       ),
     );
 
-    // Verify that the app builds without errors
-    expect(find.byType(MyApp), findsOneWidget);
-
-    // Just pump once to allow the widget tree to build
-    await tester.pump();
-
-    // The app should build successfully
-    expect(tester.takeException(), isNull);
+    // Verify that our game starts at the main menu.
+    expect(find.text('GANGWAR'), findsOneWidget);
   });
 }

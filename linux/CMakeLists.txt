@@ -1,13 +1,13 @@
 # Project-level configuration.
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.10)
 project(runner LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
-set(BINARY_NAME "droid_gangwar_flutter")
+set(BINARY_NAME "gangwar")
 # The unique GTK application identifier for this application. See:
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
-set(APPLICATION_ID "com.example.droid_gangwar_flutter")
+set(APPLICATION_ID "com.example.gangwar")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
@@ -19,11 +19,11 @@ set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
 # Root filesystem for cross-building.
 if(FLUTTER_TARGET_PLATFORM_SYSROOT)
   set(CMAKE_SYSROOT ${FLUTTER_TARGET_PLATFORM_SYSROOT})
-  set(CMAKE_FIND_ROOT_PATH ${CMAKE_SYSROOT})
+  set(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} ${CMAKE_SYSROOT})
   set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-  set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
   set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
   set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+  set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 endif()
 
 # Define build configuration options.
@@ -34,95 +34,91 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     "Debug" "Profile" "Release")
 endif()
 
-# Compilation settings that should be applied to most targets.
-#
-# Be cautious about adding new options here, as plugins use this function by
-# default. In most cases, you should add new options to specific targets instead
-# of modifying this function.
-function(APPLY_STANDARD_SETTINGS TARGET)
-  target_compile_features(${TARGET} PUBLIC cxx_std_14)
-  target_compile_options(${TARGET} PRIVATE -Wall -Werror)
-  target_compile_options(${TARGET} PRIVATE "$<$<NOT:$<CONFIG:Debug>>:-O3>")
-  target_compile_definitions(${TARGET} PRIVATE "$<$<NOT:$<CONFIG:Debug>>:NDEBUG>")
-endfunction()
+# Define settings for the runner's C++ code.
+# Platform-specific code is handled inside the application.
+add_library(runner INTERFACE)
 
-# Flutter library and tool build rules.
-set(FLUTTER_MANAGED_DIR "${CMAKE_CURRENT_SOURCE_DIR}/flutter")
-add_subdirectory(${FLUTTER_MANAGED_DIR})
+# Source files common to all platforms.
+set(COMMON_SOURCES
+  my_application.cc
+)
 
-# System-level dependencies.
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
+# Define the application target. To change the name of the binary produced,
+# assign a new value to BINARY_NAME above.
+add_executable(${BINARY_NAME}
+  main.cc
+  ${COMMON_SOURCES}
+)
 
-# Application build; see runner/CMakeLists.txt.
-add_subdirectory("runner")
+# Apply the standard set of build settings. This can be removed for applications
+# that need different build settings.
+target_link_libraries(${BINARY_NAME} PRIVATE flutter)
+target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_definitions(${BINARY_NAME} PRIVATE
+  $<$<BOOL:${FLUTTER_BUILD_NUMBER}>:FLUTTER_BUILD_NUMBER="${FLUTTER_BUILD_NUMBER}">
+  APPLICATION_ID="${APPLICATION_ID}"
+)
+
+# Disable Windows macros that collide with C++ standard library functions.
+target_compile_definitions(${BINARY_NAME} PRIVATE "NOMINMAX")
+
+# Add dependency libraries and include directories. Add any application-specific
+# dependencies here.
+target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
+target_include_directories(${BINARY_NAME} PRIVATE
+  "${CMAKE_CURRENT_SOURCE_DIR}/.."
+)
 
 # Run the Flutter tool portions of the build. This must not be removed.
 add_dependencies(${BINARY_NAME} flutter_assemble)
 
-# Only the install-generated bundle's copy of the executable will launch
-# correctly, since the resources must in the right relative locations. To avoid
-# people trying to run the unbundled copy, put it in a subdirectory instead of
-# the default top-level location.
-set_target_properties(${BINARY_NAME}
-  PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/intermediates_do_not_run"
+# Only the install-generated bundle's executables use certain build directories.
+set_target_properties(${BINARY_NAME} PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bundle/bin"
 )
-
 
 # Generated plugin build rules, which manage building the plugins and adding
 # them to the application.
 include(flutter/generated_plugins.cmake)
 
-
 # === Installation ===
 # By default, "installing" just makes a relocatable bundle in the build
 # directory.
-set(BUILD_BUNDLE_DIR "${PROJECT_BINARY_DIR}/bundle")
+set(BUILD_BUNDLE_DIR "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}")
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX "${BUILD_BUNDLE_DIR}" CACHE PATH "..." FORCE)
+  set(CMAKE_INSTALL_PREFIX "runner/${CMAKE_BUILD_TYPE}" CACHE PATH "..." FORCE)
 endif()
 
-# Start with a clean build bundle directory every time.
-install(CODE "
-  file(REMOVE_RECURSE \"${BUILD_BUNDLE_DIR}/\")
-  " COMPONENT Runtime)
+# Start with installing the runtime.
+install(TARGETS ${BINARY_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX})
 
-set(INSTALL_BUNDLE_DATA_DIR "${CMAKE_INSTALL_PREFIX}/data")
-set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+# Install the lib/ directory.
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${FLUTTER_PLUGIN_INSTALL_DIR}/
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+  FILES_MATCHING PATTERN "*.so*"
+)
 
-install(TARGETS ${BINARY_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
-  COMPONENT Runtime)
+# Install the data/ directory.
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/data
+)
 
-install(FILES "${FLUTTER_ICU_DATA_FILE}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
-  COMPONENT Runtime)
+# Install the icu data file.
+install(FILES "${ICU_DATA_FILE}" DESTINATION ${CMAKE_INSTALL_PREFIX}/data)
 
-install(FILES "${FLUTTER_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-  COMPONENT Runtime)
+# Install the desktop file.
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/flutter.desktop"
+  "${CMAKE_CURRENT_BINARY_DIR}/flutter.desktop"
+  @ONLY
+)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/flutter.desktop"
+  DESTINATION "share/applications"
+  RENAME "${APPLICATION_ID}.desktop"
+)
 
-foreach(bundled_library ${PLUGIN_BUNDLED_LIBRARIES})
-  install(FILES "${bundled_library}"
-    DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-    COMPONENT Runtime)
-endforeach(bundled_library)
-
-# Copy the native assets provided by the build.dart from all packages.
-set(NATIVE_ASSETS_DIR "${PROJECT_BUILD_DIR}native_assets/linux/")
-install(DIRECTORY "${NATIVE_ASSETS_DIR}"
-   DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-   COMPONENT Runtime)
-
-# Fully re-copy the assets directory on each build to avoid having stale files
-# from a previous install.
-set(FLUTTER_ASSET_DIR_NAME "flutter_assets")
-install(CODE "
-  file(REMOVE_RECURSE \"${INSTALL_BUNDLE_DATA_DIR}/${FLUTTER_ASSET_DIR_NAME}\")
-  " COMPONENT Runtime)
-install(DIRECTORY "${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}"
-  DESTINATION "${INSTALL_BUNDLE_DATA_DIR}" COMPONENT Runtime)
-
-# Install the AOT library on non-Debug builds only.
-if(NOT CMAKE_BUILD_TYPE MATCHES "Debug")
-  install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-    COMPONENT Runtime)
-endif()
+# Install the icon.
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/flutter.png"
+  DESTINATION "share/icons/hicolor/128x128/apps"
+  RENAME "${APPLICATION_ID}.png"
+)

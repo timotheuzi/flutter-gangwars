@@ -13,7 +13,7 @@ class PickNSaveScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pick n Save - Droid Gangwar'),
+        title: const Text('Pick n Save - Gangwars'),
         actions: [
           IconButton(
             icon: const Icon(Icons.arrow_back),

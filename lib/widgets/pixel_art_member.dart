@@ -5,6 +5,7 @@ class PixelArtMember extends StatelessWidget {
   final bool isAlive;
   final bool isCheering;
   final double size;
+  final String? enemyType;
 
   const PixelArtMember({
     super.key,
@@ -12,6 +13,7 @@ class PixelArtMember extends StatelessWidget {
     required this.isAlive,
     this.isCheering = false,
     this.size = 32,
+    this.enemyType,
   });
 
   @override
@@ -19,7 +21,10 @@ class PixelArtMember extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(painter: MemberPainter(isPlayer, isAlive, isCheering)),
+      child: CustomPaint(
+        painter: MemberPainter(isPlayer, isAlive, isCheering, enemyType),
+        size: Size(size, size),
+      ),
     );
   }
 }
@@ -28,8 +33,9 @@ class MemberPainter extends CustomPainter {
   final bool isPlayer;
   final bool isAlive;
   final bool isCheering;
+  final String? enemyType;
 
-  MemberPainter(this.isPlayer, this.isAlive, this.isCheering);
+  MemberPainter(this.isPlayer, this.isAlive, this.isCheering, this.enemyType);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -51,7 +57,7 @@ class MemberPainter extends CustomPainter {
     if (isPlayer) {
       _drawPlayer(drawPixel);
     } else {
-      _drawEnemy(drawPixel);
+      _drawEnemy(drawPixel, enemyType ?? 'default');
     }
   }
 
@@ -108,9 +114,32 @@ class MemberPainter extends CustomPainter {
     }
   }
 
-  void _drawEnemy(Function(int, int, Color) d) {
-    final skin = Colors.green.shade800;
-    final clothes = Colors.deepPurple.shade900;
+  void _drawEnemy(Function(int, int, Color) d, String enemyType) {
+    Color skin;
+    Color clothes;
+    Color eyes;
+
+    switch (enemyType) {
+      case 'Police Officers':
+        skin = Colors.blue.shade800;
+        clothes = Colors.blue.shade900;
+        eyes = Colors.white;
+        break;
+      case 'Squidie Hit Squad':
+        skin = Colors.purple.shade800;
+        clothes = Colors.purple.shade900;
+        eyes = Colors.yellow;
+        break;
+      case 'Rival Gang Members':
+        skin = Colors.red.shade800;
+        clothes = Colors.red.shade900;
+        eyes = Colors.black;
+        break;
+      default:
+        skin = Colors.green.shade800;
+        clothes = Colors.deepPurple.shade900;
+        eyes = Colors.red;
+    }
 
     // Head
     for (int x = 6; x < 11; x++) {
@@ -118,9 +147,9 @@ class MemberPainter extends CustomPainter {
         d(x, y, skin);
       }
     }
-    // Eyes (Glowy)
-    d(7, 4, Colors.red);
-    d(9, 4, Colors.red);
+    // Eyes
+    d(7, 4, eyes);
+    d(9, 4, eyes);
     // Body
     for (int x = 5; x < 12; x++) {
       for (int y = 7; y < 13; y++) {
@@ -197,5 +226,6 @@ class MemberPainter extends CustomPainter {
   bool shouldRepaint(covariant MemberPainter oldDelegate) =>
       oldDelegate.isPlayer != isPlayer ||
       oldDelegate.isAlive != isAlive ||
-      oldDelegate.isCheering != isCheering;
+      oldDelegate.isCheering != isCheering ||
+      oldDelegate.enemyType != enemyType;
 }

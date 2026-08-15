@@ -1,0 +1,5 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pixelated percs pill sprite -->
+  <circle cx="16" cy="16" r="8" fill="#FFA500" /> <!-- Orange pill -->
+  <rect x="12" y="14" width="8" height="4" fill="#FFFFFF" /> <!-- Pill line -->
+</svg>

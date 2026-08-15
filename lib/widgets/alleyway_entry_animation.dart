@@ -316,19 +316,20 @@ class AlleywayEntryAnimationState extends State<AlleywayEntryAnimation>
       final endX = startX + (random.nextDouble() - 0.5) * 100;
       final endY = startY - 30 - random.nextDouble() * 60;
 
-      final animation = Tween<Offset>(
-        begin: Offset(startX, startY),
-        end: Offset(endX, endY),
-      ).animate(
-        CurvedAnimation(
-          parent: _controller,
-          curve: Interval(
-            random.nextDouble() * 0.6,
-            min(1.0, random.nextDouble() * 0.4 + 0.6),
-            curve: Curves.easeOut,
-          ),
-        ),
-      );
+      final animation =
+          Tween<Offset>(
+            begin: Offset(startX, startY),
+            end: Offset(endX, endY),
+          ).animate(
+            CurvedAnimation(
+              parent: _controller,
+              curve: Interval(
+                random.nextDouble() * 0.6,
+                min(1.0, random.nextDouble() * 0.4 + 0.6),
+                curve: Curves.easeOut,
+              ),
+            ),
+          );
 
       particles.add(
         AnimatedBuilder(

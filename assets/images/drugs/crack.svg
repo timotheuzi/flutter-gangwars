@@ -1,0 +1,5 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pixelated crack drug sprite -->
+  <rect x="12" y="12" width="8" height="8" fill="#FFFFFF" /> <!-- White crystal -->
+  <rect x="10" y="10" width="12" height="12" fill="#F5F5F5" opacity="0.8" /> <!-- Crystal edges -->
+</svg>

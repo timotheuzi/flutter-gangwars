@@ -33,13 +33,12 @@ class _MudFightScreenState extends State<MudFightScreen> {
     if (combatData == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Combat Error')),
-        body: const Center(
-          child: Text('No combat data available'),
-        ),
+        body: const Center(child: Text('No combat data available')),
       );
     }
 
-    final isDefeated = gameProvider.gameState.health <= 0 || combatResult?.defeat == true;
+    final isDefeated =
+        gameProvider.gameState.health <= 0 || combatResult?.defeat == true;
     final isVictorious = combatResult?.victory == true;
 
     return Scaffold(
@@ -52,11 +51,7 @@ class _MudFightScreenState extends State<MudFightScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.brown.shade900,
-              Colors.red.shade900,
-              Colors.black,
-            ],
+            colors: [Colors.brown.shade900, Colors.red.shade900, Colors.black],
           ),
         ),
         child: SingleChildScrollView(
@@ -74,17 +69,27 @@ class _MudFightScreenState extends State<MudFightScreen> {
                     gangName: gameProvider.gameState.gangName,
                     enemyType: combatData.enemyType,
                     playerHealth: gameProvider.gameState.health,
-                    enemyHealth: combatResult?.remainingEnemyHealth ?? (combatData.initialEnemyHealth / combatData.enemyCount).toInt(),
-                    playerMaxHealth: gameProvider.gameState.maxHealth.toDouble(),
-                    enemyMaxHealth: combatData.initialEnemyHealth,
+                    enemyHealth:
+                        combatResult?.remainingEnemyHealth ??
+                        (combatData.initialEnemyHealth / combatData.enemyCount)
+                            .toInt(),
+                    playerMaxHealth: gameProvider.gameState.maxHealth
+                        .toDouble(),
+                    enemyMaxHealth: combatData.initialEnemyHealth.toDouble(),
                     playerMembers: gameProvider.gameState.members,
                     enemyCount: combatData.enemyCount,
-                    currentWeapon: gameProvider.combatResult?.fightLog.isNotEmpty == true 
-                        ? _extractLastWeapon(gameProvider.combatResult!.fightLog.last) 
+                    currentWeapon:
+                        gameProvider.combatResult?.fightLog.isNotEmpty == true
+                        ? _extractLastWeapon(
+                            gameProvider.combatResult!.fightLog.last,
+                          )
                         : 'fists',
-                    showBloodEffects: (gameProvider.gameState.health < gameProvider.gameState.maxHealth * 0.7) ||
-                                     (combatResult?.totalEnemyDamage != null && combatResult!.totalEnemyDamage > 0) ||
-                                     isVictorious,
+                    showBloodEffects:
+                        (gameProvider.gameState.health <
+                            gameProvider.gameState.maxHealth * 0.7) ||
+                        (combatResult?.totalEnemyDamage != null &&
+                            combatResult!.totalEnemyDamage > 0) ||
+                        isVictorious,
                   ),
                 ),
 
@@ -95,7 +100,10 @@ class _MudFightScreenState extends State<MudFightScreen> {
                   elevation: 3,
                   color: Colors.brown.shade800.withValues(alpha: 0.8),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0,
+                      vertical: 8.0,
+                    ),
                     child: Column(
                       children: [
                         Text(
@@ -108,17 +116,27 @@ class _MudFightScreenState extends State<MudFightScreen> {
                         ),
                         Text(
                           '${combatData.enemyCount} enemies | Enemy HP: ${combatResult?.remainingEnemyHealth ?? (combatData.initialEnemyHealth / combatData.enemyCount).toInt()}',
-                          style: const TextStyle(fontSize: 14, color: Colors.white),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
                         ),
                         const SizedBox(height: 5),
                         LinearProgressIndicator(
-                          value: gameProvider.gameState.health / gameProvider.gameState.maxHealth,
+                          value:
+                              gameProvider.gameState.health /
+                              gameProvider.gameState.maxHealth,
                           backgroundColor: Colors.grey.shade800,
-                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.red),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Colors.red,
+                          ),
                         ),
                         Text(
                           'Your Health: ${gameProvider.gameState.health}/${gameProvider.gameState.maxHealth}',
-                          style: const TextStyle(fontSize: 14, color: Colors.white70),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.white70,
+                          ),
                         ),
                       ],
                     ),
@@ -141,11 +159,34 @@ class _MudFightScreenState extends State<MudFightScreen> {
                           alignment: WrapAlignment.center,
                           children: [
                             if (gameProvider.gameState.weapons.bullets > 0)
-                              _buildAmmoButton(context, 'STD', 'bullets', gameProvider),
-                            if (gameProvider.gameState.weapons.hollowPointBullets > 0)
-                              _buildAmmoButton(context, 'HP', 'hollow_point', gameProvider),
-                            if (gameProvider.gameState.weapons.explodingBullets > 0)
-                              _buildAmmoButton(context, 'EXPL', 'exploding', gameProvider),
+                              _buildAmmoButton(
+                                context,
+                                'STD',
+                                'bullets',
+                                gameProvider,
+                              ),
+                            if (gameProvider
+                                    .gameState
+                                    .weapons
+                                    .hollowPointBullets >
+                                0)
+                              _buildAmmoButton(
+                                context,
+                                'HP',
+                                'hollow_point',
+                                gameProvider,
+                              ),
+                            if (gameProvider
+                                    .gameState
+                                    .weapons
+                                    .explodingBullets >
+                                0)
+                              _buildAmmoButton(
+                                context,
+                                'EXPL',
+                                'exploding',
+                                gameProvider,
+                              ),
                           ],
                         ),
                       const SizedBox(height: 8),
@@ -155,21 +196,61 @@ class _MudFightScreenState extends State<MudFightScreen> {
                         runSpacing: 6,
                         alignment: WrapAlignment.center,
                         children: [
-                          _buildWeaponButton(context, 'Fists', 'fists', Icons.person),
+                          _buildWeaponButton(
+                            context,
+                            'Fists',
+                            'fists',
+                            Icons.person,
+                          ),
                           if (gameProvider.gameState.weapons.pistols > 0)
-                            _buildWeaponButton(context, 'Pistol', 'pistol', Icons.security),
+                            _buildWeaponButton(
+                              context,
+                              'Pistol',
+                              'pistol',
+                              Icons.security,
+                            ),
                           if (gameProvider.gameState.weapons.barbedWireBat > 0)
-                            _buildWeaponButton(context, 'Bat', 'barbed_wire_bat', Icons.sports_baseball),
+                            _buildWeaponButton(
+                              context,
+                              'Bat',
+                              'barbed_wire_bat',
+                              Icons.sports_baseball,
+                            ),
                           if (gameProvider.gameState.weapons.uzis > 0)
-                            _buildWeaponButton(context, 'Uzi', 'uzi', Icons.toys),
+                            _buildWeaponButton(
+                              context,
+                              'Uzi',
+                              'uzi',
+                              Icons.toys,
+                            ),
                           if (gameProvider.gameState.weapons.ar15 > 0)
-                            _buildWeaponButton(context, 'AR-15', 'ar15', Icons.build),
+                            _buildWeaponButton(
+                              context,
+                              'AR-15',
+                              'ar15',
+                              Icons.build,
+                            ),
                           if (gameProvider.gameState.weapons.grenades > 0)
-                            _buildWeaponButton(context, 'Grenade', 'grenade', Icons.explore),
+                            _buildWeaponButton(
+                              context,
+                              'Grenade',
+                              'grenade',
+                              Icons.explore,
+                            ),
                           if (gameProvider.gameState.weapons.knife > 0)
-                            _buildWeaponButton(context, 'Knife', 'knife', Icons.content_cut),
+                            _buildWeaponButton(
+                              context,
+                              'Knife',
+                              'knife',
+                              Icons.content_cut,
+                            ),
                           if (gameProvider.gameState.weapons.sword > 0)
-                            _buildWeaponButton(context, 'Sword', 'sword', Icons.sports_kabaddi),
+                            _buildWeaponButton(
+                              context,
+                              'Sword',
+                              'sword',
+                              Icons.sports_kabaddi,
+                            ),
                         ],
                       ),
                       const SizedBox(height: 10),
@@ -181,17 +262,47 @@ class _MudFightScreenState extends State<MudFightScreen> {
                           alignment: WrapAlignment.center,
                           children: [
                             if (gameProvider.gameState.drugs.crack > 0)
-                              _buildDrugButton(context, 'Crack', 'crack', gameProvider),
+                              _buildDrugButton(
+                                context,
+                                'Crack',
+                                'crack',
+                                gameProvider,
+                              ),
                             if (gameProvider.gameState.drugs.coke > 0)
-                              _buildDrugButton(context, 'Coke', 'coke', gameProvider),
+                              _buildDrugButton(
+                                context,
+                                'Coke',
+                                'coke',
+                                gameProvider,
+                              ),
                             if (gameProvider.gameState.drugs.weed > 0)
-                              _buildDrugButton(context, 'Weed', 'weed', gameProvider),
+                              _buildDrugButton(
+                                context,
+                                'Weed',
+                                'weed',
+                                gameProvider,
+                              ),
                             if (gameProvider.gameState.drugs.ice > 0)
-                              _buildDrugButton(context, 'Ice', 'ice', gameProvider),
+                              _buildDrugButton(
+                                context,
+                                'Ice',
+                                'ice',
+                                gameProvider,
+                              ),
                             if (gameProvider.gameState.drugs.percs > 0)
-                              _buildDrugButton(context, 'Percs', 'percs', gameProvider),
+                              _buildDrugButton(
+                                context,
+                                'Percs',
+                                'percs',
+                                gameProvider,
+                              ),
                             if (gameProvider.gameState.drugs.pixieDust > 0)
-                              _buildDrugButton(context, 'Pixie', 'pixie_dust', gameProvider),
+                              _buildDrugButton(
+                                context,
+                                'Pixie',
+                                'pixie_dust',
+                                gameProvider,
+                              ),
                           ],
                         ),
                       const SizedBox(height: 10),
@@ -205,24 +316,45 @@ class _MudFightScreenState extends State<MudFightScreen> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.amber.shade700,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
                             ),
                             child: const Text('FLEE'),
                           ),
                           if (gameProvider.gameState.pistolUpgraded) ...[
-                             const SizedBox(width: 15),
-                             const Text('🔫 AUTO', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                            const SizedBox(width: 15),
+                            const Text(
+                              '🔫 AUTO',
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ],
                       ),
                     ],
                   )
                 else if (isVictorious)
-                  _buildCombatResultCard(context, 'VICTORY', Colors.green,
-                      Icons.emoji_events, combatResult!.finalMessage)
+                  _buildCombatResultCard(
+                    context,
+                    'VICTORY',
+                    Colors.green,
+                    Icons.emoji_events,
+                    combatResult!.finalMessage,
+                  )
                 else if (isDefeated)
-                  _buildCombatResultCard(context, 'DEFEAT', Colors.red,
-                      Icons.dangerous, combatResult?.defeat == true ? combatResult!.finalMessage : "You sustained fatal injuries."),
+                  _buildCombatResultCard(
+                    context,
+                    'DEFEAT',
+                    Colors.red,
+                    Icons.dangerous,
+                    combatResult?.defeat == true
+                        ? combatResult!.finalMessage
+                        : "You sustained fatal injuries.",
+                  ),
 
                 const SizedBox(height: 20),
 
@@ -238,19 +370,29 @@ class _MudFightScreenState extends State<MudFightScreen> {
                         children: [
                           const Text(
                             'Log:',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                           Expanded(
                             child: ListView.builder(
                               shrinkWrap: true,
                               itemCount: combatResult?.fightLog.length ?? 0,
                               itemBuilder: (context, index) {
-                                final logEntry = combatResult?.fightLog[index] ?? '';
+                                final logEntry =
+                                    combatResult?.fightLog[index] ?? '';
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 2.0,
+                                  ),
                                   child: Text(
                                     logEntry,
-                                    style: const TextStyle(fontSize: 12, color: Colors.white70),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.white70,
+                                    ),
                                   ),
                                 );
                               },
@@ -269,7 +411,7 @@ class _MudFightScreenState extends State<MudFightScreen> {
     );
   }
 
-  String? _extractLastWeapon(String log) {
+  String _extractLastWeapon(String log) {
     if (log.contains('pistol')) return 'pistol';
     if (log.contains('uzi')) return 'uzi';
     if (log.contains('ar15')) return 'ar15';
@@ -280,8 +422,12 @@ class _MudFightScreenState extends State<MudFightScreen> {
     return 'fists';
   }
 
-  Widget _buildWeaponButton(BuildContext context, String weaponName,
-      String weaponType, IconData icon) {
+  Widget _buildWeaponButton(
+    BuildContext context,
+    String weaponName,
+    String weaponType,
+    IconData icon,
+  ) {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     return ElevatedButton.icon(
       onPressed: () {
@@ -303,12 +449,17 @@ class _MudFightScreenState extends State<MudFightScreen> {
     );
   }
 
-  Widget _buildAmmoButton(BuildContext context, String ammoName,
-      String ammoType, GameProvider gameProvider) {
+  Widget _buildAmmoButton(
+    BuildContext context,
+    String ammoName,
+    String ammoType,
+    GameProvider gameProvider,
+  ) {
     final gameState = gameProvider.gameState;
     final isSelected = switch (ammoType) {
-      'bullets' => !gameState.weapons.useExplodingBullets &&
-                   !gameState.weapons.useHollowPointBullets,
+      'bullets' =>
+        !gameState.weapons.useExplodingBullets &&
+            !gameState.weapons.useHollowPointBullets,
       'hollow_point' => gameState.weapons.useHollowPointBullets,
       'exploding' => gameState.weapons.useExplodingBullets,
       _ => false,
@@ -338,8 +489,12 @@ class _MudFightScreenState extends State<MudFightScreen> {
     );
   }
 
-  Widget _buildDrugButton(BuildContext context, String drugName,
-      String drugType, GameProvider gameProvider) {
+  Widget _buildDrugButton(
+    BuildContext context,
+    String drugName,
+    String drugType,
+    GameProvider gameProvider,
+  ) {
     return ElevatedButton(
       onPressed: () {
         gameProvider.useDrug(drugType);
@@ -349,17 +504,20 @@ class _MudFightScreenState extends State<MudFightScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         minimumSize: const Size(40, 24),
       ),
-      child: Text('$drugName (${_getDrugCount(gameProvider.gameState, drugType)})', style: const TextStyle(fontSize: 10)),
+      child: Text(
+        '$drugName (${_getDrugCount(gameProvider.gameState, drugType)})',
+        style: const TextStyle(fontSize: 10),
+      ),
     );
   }
 
   bool _hasAnyDrugs(dynamic gameState) {
     return gameState.drugs.crack > 0 ||
-           gameState.drugs.coke > 0 ||
-           gameState.drugs.weed > 0 ||
-           gameState.drugs.ice > 0 ||
-           gameState.drugs.percs > 0 ||
-           gameState.drugs.pixieDust > 0;
+        gameState.drugs.coke > 0 ||
+        gameState.drugs.weed > 0 ||
+        gameState.drugs.ice > 0 ||
+        gameState.drugs.percs > 0 ||
+        gameState.drugs.pixieDust > 0;
   }
 
   int _getDrugCount(dynamic gameState, String drugType) {
@@ -374,8 +532,13 @@ class _MudFightScreenState extends State<MudFightScreen> {
     };
   }
 
-  Widget _buildCombatResultCard(BuildContext context, String title, Color color,
-      IconData icon, String message) {
+  Widget _buildCombatResultCard(
+    BuildContext context,
+    String title,
+    Color color,
+    IconData icon,
+    String message,
+  ) {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     return Card(
       elevation: 5,
@@ -409,8 +572,7 @@ class _MudFightScreenState extends State<MudFightScreen> {
                       gameProvider.restartGame(keepPersistentData: false);
                     },
               icon: title == 'VICTORY' ? Icons.check : Icons.restart_alt,
-              backgroundColor:
-                  title == 'VICTORY' ? Colors.green : Colors.red,
+              backgroundColor: title == 'VICTORY' ? Colors.green : Colors.red,
             ),
           ],
         ),

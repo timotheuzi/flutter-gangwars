@@ -1,0 +1,10 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pixelated street thug sprite -->
+  <rect x="12" y="4" width="8" height="8" fill="#A52A2A" /> <!-- Head -->
+  <rect x="8" y="12" width="16" height="12" fill="#556B2F" /> <!-- Body -->
+  <rect x="8" y="24" width="4" height="8" fill="#556B2F" /> <!-- Left leg -->
+  <rect x="20" y="24" width="4" height="8" fill="#556B2F" /> <!-- Right leg -->
+  <rect x="4" y="12" width="4" height="8" fill="#556B2F" /> <!-- Left arm -->
+  <rect x="24" y="12" width="4" height="8" fill="#556B2F" /> <!-- Right arm -->
+  <rect x="24" y="14" width="4" height="4" fill="#808080" /> <!-- Knife -->
+</svg>

@@ -12,7 +12,7 @@ class CreditsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Credits - Droid Gangwar'),
+        title: const Text('Credits - Gangwars'),
         actions: [
           IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -67,7 +67,7 @@ class CreditsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Droid Gangwar - Flutter Edition',
+                        'Gangwars - Flutter Edition',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

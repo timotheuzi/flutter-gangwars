@@ -60,7 +60,8 @@ class CombatSystem {
 
       final playerDmg = _getWeaponDamage(weapon, gameState);
       final isAuto = _isAutomatic(weapon, gameState);
-      final isMeleeMultiSwing = weapon == 'sword' ||
+      final isMeleeMultiSwing =
+          weapon == 'sword' ||
           weapon == 'barbed_wire_bat' ||
           weapon == 'axe' ||
           weapon == 'vampire_bat' ||
@@ -452,7 +453,8 @@ class CombatSystem {
       ],
     };
 
-    final list = descriptions[weapon] ??
+    final list =
+        descriptions[weapon] ??
         ["You unleash a torrent of savage violence for $damage damage!"];
     return list[random.nextInt(list.length)];
   }
@@ -518,8 +520,9 @@ class CombatSystem {
     }
 
     base = (base * ammoMult).toInt();
-    if (weapon == 'pistol' && gameState.pistolUpgraded)
+    if (weapon == 'pistol' && gameState.pistolUpgraded) {
       base = (base * 2.2).toInt();
+    }
 
     return base;
   }
@@ -555,11 +558,12 @@ class CombatSystem {
       _ => 0,
     };
 
-    if (drugCount <= 0)
+    if (drugCount <= 0) {
       return DrugUseResult(
         success: false,
         message: 'You don\'t have any $drug!',
       );
+    }
 
     switch (drug) {
       case 'crack':
@@ -578,23 +582,23 @@ class CombatSystem {
 
     return switch (drug) {
       'crack' => DrugUseResult(
-          success: true,
-          message:
-              'You consume crack with desperate hunger, your body surging with unholy power! (+30 HP)',
-          healthChange: 30,
-        ),
+        success: true,
+        message:
+            'You consume crack with desperate hunger, your body surging with unholy power! (+30 HP)',
+        healthChange: 30,
+      ),
       'percs' => DrugUseResult(
-          success: true,
-          message:
-              'You swallow painkillers, dulling the agony and healing wounds through chemical oblivion! (+15 HP)',
-          healthChange: 15,
-        ),
+        success: true,
+        message:
+            'You swallow painkillers, dulling the agony and healing wounds through chemical oblivion! (+15 HP)',
+        healthChange: 15,
+      ),
       _ => DrugUseResult(
-          success: true,
-          message:
-              'You ingest $drug, feeling its dark influence course through your veins!',
-          healthChange: 10,
-        ),
+        success: true,
+        message:
+            'You ingest $drug, feeling its dark influence course through your veins!',
+        healthChange: 10,
+      ),
     };
   }
 
@@ -612,18 +616,4 @@ class CombatSystem {
       );
     }
   }
-}
-
-class DrugUseResult {
-  final bool success;
-  final String message;
-  final int healthChange;
-  final String temporaryEffect;
-
-  DrugUseResult({
-    required this.success,
-    required this.message,
-    this.healthChange = 0,
-    this.temporaryEffect = '',
-  });
 }

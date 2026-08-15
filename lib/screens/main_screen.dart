@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import '../widgets/building_entry_animation.dart';
 import '../widgets/wandering_animation.dart';
+import '../widgets/city_navigation.dart';
+import '../screens/procedural_demo_screen.dart';
+import '../screens/procedural_open_world_screen.dart';
 import 'main_menu_screen.dart';
 import 'city_screen.dart';
 import 'crackhouse_screen.dart';
@@ -42,6 +45,9 @@ class MainScreen extends StatelessWidget {
     return switch (gameProvider.currentScreen) {
       'main_menu' => const MainMenuScreen(),
       'city' => const CityScreen(),
+      'city_navigation' => const CityNavigation(),
+      'procedural_demo' => const ProceduralDemoScreen(),
+      'procedural_open_world' => const ProceduralOpenWorldScreen(),
       'crackhouse' => const CrackhouseScreen(),
       'gunshack' => const GunshackScreen(),
       'bank' => const BankScreen(),

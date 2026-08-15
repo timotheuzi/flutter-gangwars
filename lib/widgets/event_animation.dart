@@ -170,7 +170,8 @@ class _EventAnimationState extends State<EventAnimation>
   }
 
   Widget _buildNpcAnimation() {
-    final isFighting = widget.selectedOption == 'Fight' ||
+    final isFighting =
+        widget.selectedOption == 'Fight' ||
         widget.selectedOption == 'Challenge';
     final isRecruiting = widget.selectedOption == 'Recruit';
 

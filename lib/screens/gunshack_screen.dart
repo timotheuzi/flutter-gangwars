@@ -13,7 +13,7 @@ class GunshackScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gun Shack - Droid Gangwar'),
+        title: const Text('Gun Shack - Gangwars'),
         actions: [
           IconButton(
             icon: const Icon(Icons.arrow_back),

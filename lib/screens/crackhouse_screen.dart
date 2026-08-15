@@ -14,7 +14,7 @@ class CrackhouseScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('The Ossuary - Droid Gangwar'),
+        title: const Text('The Ossuary - Gangwars'),
         backgroundColor: Colors.purple.shade900,
         actions: [
           IconButton(

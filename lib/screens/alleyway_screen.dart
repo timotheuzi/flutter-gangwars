@@ -168,7 +168,7 @@ class _AlleywayScreenState extends State<AlleywayScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alleyway - Droid Gangwar'),
+        title: const Text('Alleyway - Gangwars'),
         actions: [
           IconButton(
             icon: const Icon(Icons.arrow_back),

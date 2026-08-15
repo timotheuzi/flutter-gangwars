@@ -1,48 +1,48 @@
 import 'package:flutter/material.dart';
 
-class BloodDropIcon extends StatelessWidget {
+class TeardropIcon extends StatelessWidget {
   final double size;
 
-  const BloodDropIcon({super.key, this.size = 512});
+  const TeardropIcon({super.key, this.size = 512});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(painter: BloodDropPainter()),
+      child: CustomPaint(painter: TeardropPainter()),
     );
   }
 }
 
-class BloodDropPainter extends CustomPainter {
+class TeardropPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.red.shade900
+      ..color = Colors.blue.shade900
       ..style = PaintingStyle.fill;
 
     final path = Path();
-    // Start at the top point
-    path.moveTo(size.width / 2, size.height * 0.1);
+    // Start at the bottom rounded part
+    path.moveTo(size.width / 2, size.height * 0.9);
 
-    // Draw the drop shape
+    // Draw the teardrop shape
     path.cubicTo(
       size.width * 0.2,
-      size.height * 0.4, // Control point 1
+      size.height * 0.6, // Control point 1
       0,
-      size.height * 0.7, // Control point 2
+      size.height * 0.3, // Control point 2
       size.width / 2,
-      size.height * 0.95, // Bottom point
+      size.height * 0.05, // Top point
     );
 
     path.cubicTo(
       size.width,
-      size.height * 0.7, // Control point 3
+      size.height * 0.3, // Control point 3
       size.width * 0.8,
-      size.height * 0.4, // Control point 4
+      size.height * 0.6, // Control point 4
       size.width / 2,
-      size.height * 0.1, // Back to top
+      size.height * 0.9, // Back to bottom
     );
 
     canvas.drawPath(path, paint);
@@ -55,7 +55,7 @@ class BloodDropPainter extends CustomPainter {
     canvas.drawOval(
       Rect.fromLTWH(
         size.width * 0.35,
-        size.height * 0.4,
+        size.height * 0.6,
         size.width * 0.15,
         size.height * 0.2,
       ),

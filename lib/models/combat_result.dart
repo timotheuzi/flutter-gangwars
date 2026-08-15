@@ -12,6 +12,12 @@ class CombatResult {
   int remainingEnemyHealth = 0;
   int initialEnemyHealth = 0;
   int initialPlayerHealth = 0;
+
+  // Additional properties needed by the UI
+  String enemyType = '';
+  int enemyCount = 0;
+  String combatId = '';
+  String initialMessage = '';
 }
 
 class DrugUseResult {

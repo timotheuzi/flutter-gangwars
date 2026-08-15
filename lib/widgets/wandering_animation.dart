@@ -4,20 +4,19 @@ import 'dart:math';
 import '../providers/game_provider.dart';
 import '../widgets/event_animation.dart';
 import 'pixel_art_member.dart';
+import 'pixel_art_icon.dart';
 
 class WanderingAnimation extends StatefulWidget {
   final VoidCallback onAnimationComplete;
 
-  const WanderingAnimation({
-    super.key,
-    required this.onAnimationComplete,
-  });
+  const WanderingAnimation({super.key, required this.onAnimationComplete});
 
   @override
   WanderingAnimationState createState() => WanderingAnimationState();
 }
 
-class WanderingAnimationState extends State<WanderingAnimation> {
+class WanderingAnimationState extends State<WanderingAnimation>
+    with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _playerPosition;
   late Animation<double> _playerBob;
@@ -33,18 +32,12 @@ class WanderingAnimationState extends State<WanderingAnimation> {
     _playerPosition = Tween<double>(
       begin: -100.0,
       end: MediaQuery.of(context).size.width + 100,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.linear,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
 
     _playerBob = Tween<double>(
       begin: 0.0,
       end: 4 * pi,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.linear,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
 
     _controller.repeat();
 
@@ -87,9 +80,7 @@ class WanderingAnimationState extends State<WanderingAnimation> {
             left: 0,
             right: 0,
             height: 120,
-            child: Container(
-              color: Colors.grey.shade800,
-            ),
+            child: Container(color: Colors.grey.shade800),
           ),
 
           // Sidewalk
@@ -98,9 +89,7 @@ class WanderingAnimationState extends State<WanderingAnimation> {
             left: 0,
             right: 0,
             height: 80,
-            child: Container(
-              color: Colors.grey.shade600,
-            ),
+            child: Container(color: Colors.grey.shade600),
           ),
 
           // Street lamps
@@ -155,6 +144,12 @@ class WanderingAnimationState extends State<WanderingAnimation> {
 
           // Some floating particles (dust, leaves, etc.)
           ..._buildFloatingParticles(),
+
+          // Floating danger indicators
+          ..._buildDangerIndicators(),
+
+          // Floating opportunity indicators
+          ..._buildOpportunityIndicators(),
         ],
       ),
     );
@@ -165,11 +160,7 @@ class WanderingAnimationState extends State<WanderingAnimation> {
       Positioned(
         left: 200,
         bottom: 80,
-        child: Container(
-          width: 4,
-          height: 60,
-          color: Colors.grey.shade700,
-        ),
+        child: Container(width: 4, height: 60, color: Colors.grey.shade700),
       ),
       Positioned(
         left: 198,
@@ -186,11 +177,7 @@ class WanderingAnimationState extends State<WanderingAnimation> {
       Positioned(
         left: 500,
         bottom: 80,
-        child: Container(
-          width: 4,
-          height: 60,
-          color: Colors.grey.shade700,
-        ),
+        child: Container(width: 4, height: 60, color: Colors.grey.shade700),
       ),
       Positioned(
         left: 498,
@@ -222,10 +209,7 @@ class WanderingAnimationState extends State<WanderingAnimation> {
           ),
           child: Column(
             children: [
-              Container(
-                height: 20,
-                color: Colors.red.shade900,
-              ),
+              Container(height: 20, color: Colors.red.shade900),
               Row(
                 children: [
                   Container(width: 15, height: 60, color: Colors.blue.shade400),
@@ -253,17 +237,34 @@ class WanderingAnimationState extends State<WanderingAnimation> {
           ),
           child: Column(
             children: [
-              Container(
-                height: 15,
-                color: Colors.grey.shade800,
-              ),
+              Container(height: 15, color: Colors.grey.shade800),
               Row(
                 children: [
-                  Container(width: 12, height: 75, color: Colors.amber.shade300),
-                  Container(width: 12, height: 75, color: Colors.brown.shade800),
-                  Container(width: 12, height: 75, color: Colors.amber.shade300),
-                  Container(width: 12, height: 75, color: Colors.brown.shade800),
-                  Container(width: 12, height: 75, color: Colors.amber.shade300),
+                  Container(
+                    width: 12,
+                    height: 75,
+                    color: Colors.amber.shade300,
+                  ),
+                  Container(
+                    width: 12,
+                    height: 75,
+                    color: Colors.brown.shade800,
+                  ),
+                  Container(
+                    width: 12,
+                    height: 75,
+                    color: Colors.amber.shade300,
+                  ),
+                  Container(
+                    width: 12,
+                    height: 75,
+                    color: Colors.brown.shade800,
+                  ),
+                  Container(
+                    width: 12,
+                    height: 75,
+                    color: Colors.amber.shade300,
+                  ),
                 ],
               ),
             ],
@@ -284,10 +285,7 @@ class WanderingAnimationState extends State<WanderingAnimation> {
           ),
           child: Column(
             children: [
-              Container(
-                height: 10,
-                color: Colors.red.shade900,
-              ),
+              Container(height: 10, color: Colors.red.shade900),
               Row(
                 children: [
                   Container(width: 18, height: 50, color: Colors.white),
@@ -314,17 +312,20 @@ class WanderingAnimationState extends State<WanderingAnimation> {
       final endX = startX + 200 + random.nextDouble() * 200;
       final endY = startY - 20 - random.nextDouble() * 40;
 
-      final animation = Tween<Offset>(
-        begin: Offset(startX, startY),
-        end: Offset(endX, endY),
-      ).animate(CurvedAnimation(
-        parent: _controller,
-        curve: Interval(
-          random.nextDouble() * 0.5,
-          min(1.0, random.nextDouble() * 0.5 + 0.5),
-          curve: Curves.linear,
-        ),
-      ));
+      final animation =
+          Tween<Offset>(
+            begin: Offset(startX, startY),
+            end: Offset(endX, endY),
+          ).animate(
+            CurvedAnimation(
+              parent: _controller,
+              curve: Interval(
+                random.nextDouble() * 0.5,
+                min(1.0, random.nextDouble() * 0.5 + 0.5),
+                curve: Curves.linear,
+              ),
+            ),
+          );
 
       particles.add(
         AnimatedBuilder(
@@ -350,6 +351,96 @@ class WanderingAnimationState extends State<WanderingAnimation> {
     return particles;
   }
 
+  List<Widget> _buildDangerIndicators() {
+    final random = Random(123);
+    final indicators = <Widget>[];
+    final dangerTypes = ['knife', 'gun', 'grenade'];
+
+    for (int i = 0; i < 3; i++) {
+      final x = 100 + random.nextDouble() * 400;
+      final y = 50 + random.nextDouble() * 100;
+      final dangerType = dangerTypes[i];
+
+      final animation =
+          Tween<Offset>(begin: Offset(x, y), end: Offset(x, y - 20)).animate(
+            CurvedAnimation(
+              parent: _controller,
+              curve: Interval(
+                i * 0.2,
+                i * 0.2 + 0.5,
+                curve: Curves.bounceInOut,
+              ),
+            ),
+          );
+
+      indicators.add(
+        AnimatedBuilder(
+          animation: animation,
+          builder: (context, child) {
+            return Positioned(
+              left: animation.value.dx,
+              top: animation.value.dy,
+              child: Opacity(
+                opacity: 0.8,
+                child: Transform.rotate(
+                  angle: sin(_controller.value * 6 * pi + i) * 0.2,
+                  child: PixelArtIcon(name: dangerType, size: 24),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    }
+
+    return indicators;
+  }
+
+  List<Widget> _buildOpportunityIndicators() {
+    final random = Random(456);
+    final indicators = <Widget>[];
+    final opportunityTypes = ['crack', 'weed', 'coke', 'money'];
+
+    for (int i = 0; i < 4; i++) {
+      final x = 50 + random.nextDouble() * 500;
+      final y = 200 + random.nextDouble() * 100;
+      final opportunityType = opportunityTypes[i];
+
+      final animation = Tween<double>(begin: 1.0, end: 1.5).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Interval(i * 0.15, i * 0.15 + 0.5, curve: Curves.easeInOut),
+        ),
+      );
+
+      indicators.add(
+        AnimatedBuilder(
+          animation: animation,
+          builder: (context, child) {
+            return Positioned(
+              left: x,
+              top: y,
+              child: Opacity(
+                opacity: 0.9,
+                child: Transform.scale(
+                  scale: animation.value,
+                  child: opportunityType == 'money'
+                      ? const Text(
+                          '\$',
+                          style: TextStyle(fontSize: 24, color: Colors.yellow),
+                        )
+                      : PixelArtIcon(name: opportunityType, size: 20),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    }
+
+    return indicators;
+  }
+
   void _onEventChanged() {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     final event = gameProvider.currentWanderingEvent.value;
@@ -363,24 +454,32 @@ class WanderingAnimationState extends State<WanderingAnimation> {
             String? selectedOption;
             return AlertDialog(
               backgroundColor: Colors.grey.shade900,
-              title: Text(event.title, style: const TextStyle(color: Colors.white)),
+              title: Text(
+                event.title,
+                style: const TextStyle(color: Colors.white),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   EventAnimation(event: event, selectedOption: selectedOption),
                   const SizedBox(height: 15),
-                  Text(event.description, style: const TextStyle(color: Colors.white70)),
+                  Text(
+                    event.description,
+                    style: const TextStyle(color: Colors.white70),
+                  ),
                 ],
               ),
               actions: event.options.isNotEmpty
-                ? event.options.map((option) {
-                    return TextButton(
-                      onPressed: () {
-                        setState(() => selectedOption = option);
-                        Future.delayed(const Duration(milliseconds: 500), () {
-                          if (mounted) {
-                            final resultMessage = gameProvider.handleNpcInteraction(event, option);
+                  ? event.options.map((option) {
+                      return TextButton(
+                        onPressed: () {
+                          setState(() => selectedOption = option);
+                          Future.delayed(const Duration(milliseconds: 500), () {
+                            if (!mounted) return;
+                            final resultMessage = gameProvider
+                                .handleNpcInteraction(event, option);
                             if (gameProvider.currentScreen != 'mud_fight') {
+                              // ignore: use_build_context_synchronously
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(resultMessage),
@@ -390,23 +489,25 @@ class WanderingAnimationState extends State<WanderingAnimation> {
                             }
                             gameProvider.completeWanderingAnimation();
                             gameProvider.currentWanderingEvent.value = null;
+                            // ignore: use_build_context_synchronously
                             Navigator.pop(context);
-                          }
-                        });
-                      },
-                      child: Text(option),
-                    );
-                  }).toList()
-                : [TextButton(
-                    onPressed: () {
-                      gameProvider.completeWanderingAnimation();
-                      gameProvider.currentWanderingEvent.value = null;
-                      Navigator.pop(context);
-                    },
-                    child: const Text('OK'),
-                  )],
+                          });
+                        },
+                        child: Text(option),
+                      );
+                    }).toList()
+                  : [
+                      TextButton(
+                        onPressed: () {
+                          gameProvider.completeWanderingAnimation();
+                          gameProvider.currentWanderingEvent.value = null;
+                          Navigator.pop(context);
+                        },
+                        child: const Text('OK'),
+                      ),
+                    ],
             );
-          }
+          },
         ),
       );
     }

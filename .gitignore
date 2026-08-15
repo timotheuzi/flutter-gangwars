@@ -9,6 +9,7 @@
 .history
 .svn/
 gangwar_ref
+*.zip
 
 # IntelliJ related
 *.iml
@@ -56,5 +57,4 @@ build/
 # /gangwar_ref/
 
 # Other artifacts
-*.zip
 *.tar.gz

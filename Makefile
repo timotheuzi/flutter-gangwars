@@ -1,11 +1,11 @@
-# Droid Gangwar Flutter - Build System
+# Gangwars Flutter - Build System
 # Makefile for cross-platform builds and development tasks
 
 # Configuration
-APP_NAME := droid_gangwar_flutter
-FLUTTER := /home/maestro/flutter/bin/flutter
-DART := /home/maestro/flutter/bin/cache/dart-sdk/bin/dart
-PUB := /home/maestro/flutter/bin/cache/dart-sdk/bin/pub
+APP_NAME := gangwars_flutter
+FLUTTER := /home/bimo/flutter/bin/flutter
+DART := /home/bimo/flutter/bin/dart
+PUB := /home/bimo/flutter/bin/pub
 
 # Platform targets
 PLATFORMS := linux android ios
@@ -22,7 +22,7 @@ all: help
 
 # Help menu
 help:
-	@echo -e "${BLUE}Droid Gangwar Flutter Build System${NC}"
+	@echo -e "${BLUE}Gangwars Flutter Build System${NC}"
 	@echo -e "${YELLOW}Usage: make [target]${NC}"
 	@echo ""
 	@echo -e "${GREEN}Build Targets:${NC}"
@@ -41,6 +41,7 @@ help:
 	@echo "  run-web          - Run web version"
 	@echo "  test             - Run all tests"
 	@echo "  analyze          - Run static code analysis"
+	@echo "  lint             - Run strict lint checks"
 	@echo "  format           - Format code"
 	@echo ""
 	@echo -e "${GREEN}Dependency Targets:${NC}"
@@ -52,7 +53,7 @@ help:
 	@echo -e "${GREEN}Cleanup Targets:${NC}"
 	@echo "  clean            - Clean build artifacts"
 	@echo "  clean-all        - Deep clean all build files"
-	@echo "  kill             - Kill all Flutter processes"
+	@echo "  kill             - Kill all Flutter, Dart, and Gradle processes"
 	@echo ""
 	@echo -e "${GREEN}Utility Targets:${NC}"
 	@echo "  doctor           - Check Flutter installation"
@@ -63,12 +64,12 @@ help:
 # Flutter doctor - check installation
 doctor:
 	@echo -e "${BLUE}Checking Flutter installation...${NC}"
-	$(FLUTTER) doctor
+	$(FLUTTER) doctor -v
 
 # Install Flutter dependencies
 install-deps:
 	@echo -e "${BLUE}Installing dependencies...${NC}"
-	$(FLUTTER) pub get
+	$(FLUTTER) pub get -v
 	@echo -e "${GREEN}Dependencies installed successfully!${NC}"
 
 # Install Linux system dependencies (Ubuntu/Debian/Kali)
@@ -85,7 +86,7 @@ install-linux-deps:
 # Upgrade dependencies
 upgrade-deps:
 	@echo -e "${BLUE}Upgrading dependencies...${NC}"
-	$(FLUTTER) pub upgrade
+	$(FLUTTER) pub upgrade -v
 	@echo -e "${GREEN}Dependencies upgraded successfully!${NC}"
 
 # Clean dependencies
@@ -113,6 +114,12 @@ analyze:
 	$(DART) analyze || echo -e "${YELLOW}Analysis complete with issues found. See output above.${NC}"
 	@echo -e "${GREEN}Analysis complete!${NC}"
 
+# Lint code for warnings and errors
+lint:
+	@echo -e "${BLUE}Running lint checks...${NC}"
+	$(DART) analyze
+	@echo -e "${GREEN}Lint checks passed!${NC}"
+
 # Format code
 format:
 	@echo -e "${BLUE}Formatting code...${NC}"
@@ -122,7 +129,7 @@ format:
 # Run tests
 test:
 	@echo -e "${BLUE}Running tests...${NC}"
-	$(FLUTTER) test
+	$(FLUTTER) test -v
 	@echo -e "${GREEN}Tests complete!${NC}"
 
 # Run app in debug mode (platform-specific)
@@ -135,14 +142,14 @@ run:
 	# Try to run on available platform with fallbacks
 	# First try web (most likely to work), then Android, then Linux
 	echo "Attempting to run on web (Chrome)..."
-	if $(FLUTTER) run -d chrome; then \
+	if $(FLUTTER) run -v -d chrome; then \
 		echo "Successfully running on web!"; \
 	elif $(FLUTTER) devices | grep -q "Android"; then \
 		echo "Web failed, trying Android..."; \
-		$(FLUTTER) run -d android; \
+		$(FLUTTER) run -v -d android; \
 	elif $(FLUTTER) devices | grep -q "Linux"; then \
 		echo "Android failed, trying Linux..."; \
-		$(FLUTTER) run -d linux; \
+		$(FLUTTER) run -v -d linux; \
 	else \
 		echo ""; \
 		echo -e "${RED}No suitable device found. Please install missing dependencies:${NC}"; \
@@ -156,8 +163,8 @@ run:
 		echo "  - Or run: sudo apt-get install libgtk-3-dev mesa-utils"; \
 		echo ""; \
 		echo -e "${YELLOW}For Android Development:${NC}"; \
-		echo "  - Connect an Android device or start an emulator"; \
-		echo "  - Accept Android licenses: flutter doctor --android-licenses"; \
+		echo "  Connect an Android device or start an emulator"; \
+		echo "  Accept Android licenses: flutter doctor --android-licenses"; \
 		echo ""; \
 		echo "After installing dependencies, run 'flutter doctor' to verify setup."; \
 		exit 1; \
@@ -166,74 +173,82 @@ run:
 
 run-linux:
 	@echo -e "${BLUE}Running Linux version...${NC}"
-	$(FLUTTER) run -d linux
+	$(FLUTTER) run -v -d linux
 	@echo -e "${GREEN}Linux app running!${NC}"
 
 run-android:
 	@echo -e "${BLUE}Running Android version...${NC}"
-	$(FLUTTER) run -d android
+	$(FLUTTER) run -v -d android
 	@echo -e "${GREEN}Android app running!${NC}"
 
 run-ios:
 	@echo -e "${BLUE}Running iOS version...${NC}"
-	$(FLUTTER) run -d ios
+	$(FLUTTER) run -v -d ios
 	@echo -e "${GREEN}iOS app running!${NC}"
 
 run-web:
 	@echo -e "${BLUE}Running web version...${NC}"
-	$(FLUTTER) run -d web-server
+	$(FLUTTER) run -v -d web-server
 	@echo -e "${GREEN}Web app running! Access at http://localhost:8080${NC}"
 
 # Build targets
-build-linux:
+build-linux: clean
 	@echo -e "${BLUE}Building Linux desktop version...${NC}"
-	$(FLUTTER) build linux --release
+	$(FLUTTER) build linux --release -v
 	@echo -e "${GREEN}Linux build complete! Output: build/linux/x64/release/bundle/${NC}"
 
-build-windows:
+build-windows: clean
 	@echo -e "${BLUE}Building Windows desktop version...${NC}"
-	$(FLUTTER) build windows --release
+	$(FLUTTER) build windows --release -v
 	@echo -e "${GREEN}Windows build complete! Output: build/windows/runner/Release/${NC}"
 
-build-android:
+build-android: clean
 	@echo -e "${BLUE}Building Android APK...${NC}"
-	$(FLUTTER) build apk --release
-	@echo -e "${GREEN}Android APK build complete! Output: build/app/outputs/flutter-apk/app-release.apk${NC}"
+	ANDROID_HOME=/home/bimo/Android/Sdk ANDROID_SDK_ROOT=/home/bimo/Android/Sdk $(FLUTTER) build apk --debug --android-skip-build-dependency-validation -v
+	@echo -e "${GREEN}Android APK build complete! Output: build/app/outputs/flutter-apk/app-debug.apk${NC}"
 
-build-android-bundle:
+build-android-bundle: clean
 	@echo -e "${BLUE}Building Android App Bundle...${NC}"
-	$(FLUTTER) build appbundle --release
+	$(FLUTTER) build appbundle --release -v
 	@echo -e "${GREEN}Android App Bundle build complete! Output: build/app/outputs/bundle/release/app-release.aab${NC}"
 
-build-ios:
+build-ios: clean
 	@echo -e "${BLUE}Building iOS app...${NC}"
 	@echo -e "${YELLOW}Note: iOS builds require macOS. Skipping on Linux.${NC}"
 	@echo -e "${YELLOW}To build iOS app, run this on a macOS system: flutter build ios --release${NC}"
 	@echo -e "${GREEN}iOS platform support is ready!${NC}"
 
-build-web:
+build-web: clean
 	@echo -e "${BLUE}Building web version...${NC}"
-	$(FLUTTER) build web --release
+	$(FLUTTER) build web --release -v
 	@echo -e "${GREEN}Web build complete! Output: build/web/${NC}"
 
 # Build all platforms
-build-all: build-linux build-windows build-android build-ios build-web
+build-all: clean build-linux build-windows build-android build-ios build-web
 	@echo -e "${GREEN}All platform builds complete!${NC}"
 
 # Clean build artifacts
-clean:
+clean: kill-gradle
 	@echo -e "${BLUE}Cleaning build artifacts...${NC}"
-	$(FLUTTER) clean
+	$(FLUTTER) clean -v
 	rm -rf build/
 	rm -rf .dart_tool/
+	rm -rf android/.gradle
+	rm -rf android/app/build
 	@echo -e "${GREEN}Build artifacts cleaned!${NC}"
 
 # Deep clean
 clean-all: clean clean-deps
 	@echo -e "${GREEN}Deep clean complete!${NC}"
 
+# Kill Gradle processes
+kill-gradle:
+	@echo -e "${BLUE}Stopping Gradle daemons...${NC}"
+	./android/gradlew --stop || echo "No Gradle daemons to stop"
+	@echo -e "${GREEN}Gradle daemons stopped!${NC}"
+
 # Kill Flutter processes
-kill:
+kill: kill-gradle
 	@echo -e "${BLUE}Killing Flutter processes...${NC}"
 	pkill -f flutter || echo "No Flutter processes found"
 	pkill -f dart || echo "No Dart processes found"
@@ -260,6 +275,6 @@ install-tools:
 	@echo -e "${GREEN}Tools installed!${NC}"
 
 .PHONY: all help doctor install-deps install-linux-deps upgrade-deps clean-deps pubspec version \
-        analyze format test run run-linux run-android run-ios run-web \
+        analyze lint format test run run-linux run-android run-ios run-web \
         build-linux build-windows build-android build-android-bundle build-ios build-web build-all \
-        clean clean-all kill release install-tools
+        clean clean-all kill-gradle kill release install-tools
