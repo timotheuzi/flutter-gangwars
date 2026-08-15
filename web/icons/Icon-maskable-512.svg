@@ -1,0 +1,123 @@
+<svg width="512" height="512" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background - extended for maskable -->
+  <rect width="1024" height="1024" fill="#1a1a1a"/>
+  
+  <!-- Safe zone padding - content centered in 80% area -->
+  <!-- Zombie Head Base Shape - centered and slightly smaller for safe zone -->
+  <ellipse cx="512" cy="520" rx="280" ry="340" fill="#4a5d4a"/>
+  
+  <!-- Skull/Cranium -->
+  <path d="M512 200 
+           C 380 200, 280 310, 280 450
+           C 280 510, 300 560, 340 590
+           L 340 660
+           C 340 700, 380 740, 440 760
+           L 580 760
+           C 640 740, 680 700, 680 660
+           L 680 590
+           C 720 560, 740 510, 740 450
+           C 740 310, 640 200, 512 200 Z" 
+        fill="#3d4f3d"/>
+  
+  <!-- Exposed Brain/Skull Top -->
+  <path d="M512 200
+           C 460 200, 400 230, 380 290
+           C 360 350, 370 400, 400 430
+           C 430 460, 470 475, 512 475
+           C 554 475, 590 460, 620 430
+           C 650 400, 660 350, 640 290
+           C 620 230, 564 200, 512 200 Z"
+        fill="#2d3d2d"/>
+  
+  <!-- Brain Texture Lines -->
+  <path d="M420 310 Q 460 340, 500 310 Q 540 280, 580 310" 
+        stroke="#1d2d1d" stroke-width="6" fill="none"/>
+  <path d="M410 370 Q 450 400, 490 370 Q 530 340, 570 370" 
+        stroke="#1d2d1d" stroke-width="5" fill="none"/>
+  <path d="M440 430 Q 480 460, 520 430 Q 560 400, 600 430" 
+        stroke="#1d2d1d" stroke-width="4" fill="none"/>
+  
+  <!-- Left Eye Socket -->
+  <ellipse cx="400" cy="480" rx="55" ry="40" fill="#0d0d0d"/>
+  <ellipse cx="400" cy="480" rx="40" ry="28" fill="#1a0d0d"/>
+  <!-- Left Eye -->
+  <ellipse cx="400" cy="480" rx="20" ry="16" fill="#8b0000"/>
+  <ellipse cx="400" cy="480" rx="10" ry="8" fill="#ff0000"/>
+  <ellipse cx="396" cy="476" rx="4" ry="3" fill="#ff6666"/>
+  
+  <!-- Right Eye Socket -->
+  <ellipse cx="624" cy="480" rx="55" ry="40" fill="#0d0d0d"/>
+  <ellipse cx="624" cy="480" rx="40" ry="28" fill="#1a0d0d"/>
+  <!-- Right Eye -->
+  <ellipse cx="624" cy="480" rx="20" ry="16" fill="#8b0000"/>
+  <ellipse cx="624" cy="480" rx="10" ry="8" fill="#ff0000"/>
+  <ellipse cx="628" cy="476" rx="4" ry="3" fill="#ff6666"/>
+  
+  <!-- Nose Cavity -->
+  <path d="M512 550 
+           L 495 580 
+           L 512 595 
+           L 529 580 Z" 
+        fill="#0d0d0d"/>
+  
+  <!-- Mouth/Jaw -->
+  <path d="M380 680 
+           Q 420 720, 512 720 
+           Q 604 720, 644 680
+           L 628 695
+           Q 590 730, 512 730
+           Q 434 730, 396 695 Z" 
+        fill="#1a0d0d"/>
+  
+  <!-- Teeth -->
+  <rect x="405" y="690" width="16" height="24" fill="#ffffcc" rx="2"/>
+  <rect x="430" y="694" width="14" height="20" fill="#ffffcc" rx="2"/>
+  <rect x="454" y="690" width="16" height="24" fill="#ffffcc" rx="2"/>
+  <rect x="478" y="694" width="14" height="20" fill="#ffffcc" rx="2"/>
+  <rect x="502" y="690" width="16" height="24" fill="#ffffcc" rx="2"/>
+  <rect x="526" y="694" width="14" height="20" fill="#ffffcc" rx="2"/>
+  <rect x="550" y="690" width="16" height="24" fill="#ffffcc" rx="2"/>
+  <rect x="574" y="694" width="14" height="20" fill="#ffffcc" rx="2"/>
+  <rect x="598" y="690" width="16" height="24" fill="#ffffcc" rx="2"/>
+  
+  <!-- Jaw Line -->
+  <path d="M350 630 
+           Q 380 670, 420 690
+           Q 512 720, 604 690
+           Q 644 670, 674 630" 
+        stroke="#2d3d2d" stroke-width="12" fill="none"/>
+  
+  <!-- Wounds/Scars -->
+  <path d="M330 420 L 370 460" stroke="#8b0000" stroke-width="6" stroke-linecap="round"/>
+  <path d="M694 405 L 654 445" stroke="#8b0000" stroke-width="5" stroke-linecap="round"/>
+  <path d="M460 330 L 485 370" stroke="#8b0000" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Decayed Skin Patches -->
+  <ellipse cx="350" cy="540" rx="24" ry="16" fill="#2d3d2d" opacity="0.7"/>
+  <ellipse cx="674" cy="515" rx="20" ry="14" fill="#2d3d2d" opacity="0.7"/>
+  <ellipse cx="420" cy="630" rx="16" ry="12" fill="#2d3d2d" opacity="0.7"/>
+  
+  <!-- Dripping Blood -->
+  <path d="M400 520 Q 404 545, 400 580 Q 396 615, 400 650" 
+        stroke="#8b0000" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <path d="M624 520 Q 620 550, 624 585 Q 628 620, 624 655" 
+        stroke="#8b0000" stroke-width="8" fill="none" stroke-linecap="round"/>
+  
+  <!-- Forehead Wrinkles -->
+  <path d="M420 370 Q 512 355, 604 370" stroke="#2d3d2d" stroke-width="5" fill="none"/>
+  <path d="M435 395 Q 512 380, 589 395" stroke="#2d3d2d" stroke-width="4" fill="none"/>
+  
+  <!-- Cheekbones -->
+  <path d="M310 490 Q 340 475, 370 490" stroke="#2d3d2d" stroke-width="6" fill="none"/>
+  <path d="M654 490 Q 684 475, 714 490" stroke="#2d3d2d" stroke-width="6" fill="none"/>
+  
+  <!-- Glow Effect for Eyes -->
+  <defs>
+    <radialGradient id="eyeGlowMaskable" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ff0000;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#8b0000;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="400" cy="480" rx="32" ry="24" fill="url(#eyeGlowMaskable)"/>
+  <ellipse cx="624" cy="480" rx="32" ry="24" fill="url(#eyeGlowMaskable)"/>
+</svg>

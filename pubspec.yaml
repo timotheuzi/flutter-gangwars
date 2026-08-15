@@ -1,0 +1,43 @@
+name: gangwar
+description: A cross-platform Flutter adaptation of the classic Gangwar game
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.0.5
+  shared_preferences: ^2.2.2
+  flame: ^1.12.0
+  flame_tiled: ^3.0.9
+  flutter_svg: ^2.0.9
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+dependency_overrides:
+  meta: ^1.18.2
+  vector_math: ^2.3.0
+  test_api: ^0.7.11
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/app_icon.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/app_icon.png"
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: PixelArt
+      fonts:
+        - asset: assets/fonts/pixel_art.ttf
+  assets:
+    - assets/images/

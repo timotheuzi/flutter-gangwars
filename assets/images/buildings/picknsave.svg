@@ -1,0 +1,11 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pixelated picknsave store sprite -->
+  <rect x="8" y="8" width="48" height="48" fill="#D3D3D3" /> <!-- Store body -->
+  <rect x="16" y="0" width="32" height="8" fill="#A9A9A9" /> <!-- Roof -->
+  <rect x="24" y="48" width="16" height="16" fill="#C0C0C0" /> <!-- Door -->
+  <rect x="12" y="16" width="8" height="8" fill="#FFFFE0" /> <!-- Window 1 -->
+  <rect x="44" y="16" width="8" height="8" fill="#FFFFE0" /> <!-- Window 2 -->
+  <rect x="12" y="32" width="8" height="8" fill="#FFFFE0" /> <!-- Window 3 -->
+  <rect x="44" y="32" width="8" height="8" fill="#FFFFE0" /> <!-- Window 4 -->
+  <rect x="28" y="0" width="8" height="8" fill="#00FF00" /> <!-- Sign -->
+</svg>

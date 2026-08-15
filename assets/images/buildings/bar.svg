@@ -1,0 +1,9 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pixelated bar building sprite -->
+  <rect x="8" y="16" width="48" height="40" fill="#8B4513" /> <!-- Wooden body -->
+  <rect x="16" y="8" width="32" height="8" fill="#A52A2A" /> <!-- Roof -->
+  <rect x="24" y="48" width="16" height="16" fill="#D2691E" /> <!-- Door -->
+  <rect x="12" y="24" width="8" height="8" fill="#FFFF00" /> <!-- Window 1 -->
+  <rect x="44" y="24" width="8" height="8" fill="#FFFF00" /> <!-- Window 2 -->
+  <rect x="28" y="0" width="8" height="8" fill="#FFD700" /> <!-- Sign -->
+</svg>
