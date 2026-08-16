@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.gangwar.gangwars"
-    compileSdk = 36
+    compileSdk = 35
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -19,8 +19,13 @@ android {
 
     defaultConfig {
         applicationId = "com.gangwar.gangwars"
+<<<<<<< HEAD
         minSdk = 24
         targetSdk = 36
+=======
+        minSdk = 21
+        targetSdk = 35
+>>>>>>> origin/wipsy
         versionCode = 1
         versionName = "1.0.1"
     }
@@ -30,10 +35,19 @@ android {
         }
     }
 
+    signingConfigs {
+        getByName("debug") {
+        }
+    }
+
     buildTypes {
+<<<<<<< HEAD
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
+=======
+        release {
+>>>>>>> origin/wipsy
             signingConfig = signingConfigs.getByName("debug")
         }
         getByName("debug") {
@@ -48,6 +62,9 @@ android {
             // Workaround for 'stripDebugDebugSymbols' failure with NDK 28+
             // NDK 28 has toolchain changes that can cause 'llvm-strip' process start failures in some AGP versions.
             keepDebugSymbols.add("**/*.so")
+        }
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 }

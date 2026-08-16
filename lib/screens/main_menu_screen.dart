@@ -31,18 +31,18 @@ class MainMenuScreen extends StatelessWidget {
                 ),
                 margin: const EdgeInsets.symmetric(
                   horizontal: 20,
-                ), // Reduced margin slightly
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
                       'GANGWAR',
                       style: TextStyle(
-                        fontSize: 48, // Reduced from 64 to prevent overflow
+                        fontSize: 48,
                         fontWeight: FontWeight.bold,
                         color: Colors.redAccent,
                         fontFamily: 'Courier',
-                        letterSpacing: 2, // Reduced from 4 to fit better
+                        letterSpacing: 2,
                         shadows: [
                           Shadow(
                             blurRadius: 15.0,
@@ -56,38 +56,31 @@ class MainMenuScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      softWrap: false, // Ensure it stays on one line
+                      softWrap: false,
                       overflow: TextOverflow.visible,
                     ),
                     const Text(
                       'FLUTTER EDITION',
                       style: TextStyle(
-                        fontSize: 16, // Reduced from 20 to fit better
+                        fontSize: 16,
                         color: Colors.white,
                         fontWeight: FontWeight.w300,
-                        letterSpacing: 4.0, // Reduced from 8.0
+                        letterSpacing: 4.0,
                       ),
                     ),
                     const SizedBox(height: 50),
                     _buildMenuButton(
                       context,
-                      'NEW GAME',
+                      'START GAME',
                       () => _startNewGame(context),
-                      Icons.add,
+                      Icons.play_arrow,
                     ),
                     const SizedBox(height: 15),
                     _buildMenuButton(
                       context,
                       'CONTINUE',
                       () => _continueGame(context),
-                      Icons.play_arrow,
-                    ),
-                    const SizedBox(height: 15),
-                    _buildMenuButton(
-                      context,
-                      '3D OPEN WORLD',
-                      () => _enter3DWorld(context),
-                      Icons.terrain,
+                      Icons.history,
                     ),
                     const SizedBox(height: 15),
                     _buildMenuButton(
@@ -221,7 +214,7 @@ class MainMenuScreen extends StatelessWidget {
   void _continueGame(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     if (gameProvider.gameState.playerName.isNotEmpty) {
-      gameProvider.navigateToScreen('city');
+      gameProvider.navigateToScreen('procedural_open_world');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No saved data on these streets.')),
@@ -232,11 +225,6 @@ class MainMenuScreen extends StatelessWidget {
   void _showCredits(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     gameProvider.navigateToScreen('credits');
-  }
-
-  void _enter3DWorld(BuildContext context) {
-    final gameProvider = Provider.of<GameProvider>(context, listen: false);
-    gameProvider.navigateToScreen('procedural_open_world');
   }
 
   void _quitGame(BuildContext context) {
