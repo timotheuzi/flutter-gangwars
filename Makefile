@@ -6,6 +6,8 @@ APP_NAME := gangwars_flutter
 FLUTTER := /home/bimo/flutter/bin/flutter
 DART := /home/bimo/flutter/bin/dart
 PUB := /home/bimo/flutter/bin/pub
+ANDROID_SDK_DIR := /home/bimo/android-sdk
+JAVA_HOME_DIR := /home/bimo/.sdkman/candidates/java/current
 
 # Platform targets
 PLATFORMS := linux android ios
@@ -204,7 +206,7 @@ build-windows: clean
 
 build-android: clean
 	@echo -e "${BLUE}Building Android APK...${NC}"
-	ANDROID_HOME=/home/bimo/Android/Sdk ANDROID_SDK_ROOT=/home/bimo/Android/Sdk $(FLUTTER) build apk --debug --android-skip-build-dependency-validation -v
+	JAVA_HOME=$(JAVA_HOME_DIR) ANDROID_HOME=$(ANDROID_SDK_DIR) ANDROID_SDK_ROOT=$(ANDROID_SDK_DIR) $(FLUTTER) build apk --debug --android-skip-build-dependency-validation -v
 	@echo -e "${GREEN}Android APK build complete! Output: build/app/outputs/flutter-apk/app-debug.apk${NC}"
 
 build-android-bundle: clean

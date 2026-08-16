@@ -1,12 +1,20 @@
-// Root build.gradle.kts
-rootProject.layout.buildDirectory.value(rootProject.layout.projectDirectory.dir("../build"))
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.layout.buildDirectory.set(layout.projectDirectory.dir("../build"))
 
 subprojects {
-    project.layout.buildDirectory.value(rootProject.layout.buildDirectory.dir(project.name))
+    project.layout.buildDirectory.set(rootProject.layout.buildDirectory.dir(project.name))
 }
 
 subprojects {
-    project.evaluationDependsOn(":app")
+    if (project.name != "app") {
+        project.evaluationDependsOn(":app")
+    }
 }
 
 tasks.register<Delete>("clean") {
