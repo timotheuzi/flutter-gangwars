@@ -52,8 +52,8 @@ class IsometricOpenWorld extends FlameGame {
     await add(_isoCamera);
 
     // Joystick for movement
-    final knobPaint = Paint()..color = BasicPalette.blue.color.withOpacity(0.78);
-    final backgroundPaint = Paint()..color = BasicPalette.blue.color.withOpacity(0.39);
+    final knobPaint = Paint()..color = BasicPalette.blue.color.withValues(alpha: 0.78);
+    final backgroundPaint = Paint()..color = BasicPalette.blue.color.withValues(alpha: 0.39);
     _joystick = IsometricJoystickComponent(
       isometricCamera: _isoCamera,
       knob: CircleComponent(radius: 25, paint: knobPaint),
@@ -212,7 +212,7 @@ class IsometricWorldPainterComponent extends PositionComponent {
   void _drawProps(Canvas canvas) {
     for (final prop in worldData.props) {
       // Shadow
-      _shadowPaint.color = Colors.black.withOpacity(0.15);
+      _shadowPaint.color = Colors.black.withValues(alpha: 0.15);
       canvas.drawOval(
         Rect.fromCenter(
           center: Offset(prop.screenX + 2, prop.screenY + 2),
@@ -296,7 +296,7 @@ class IsometricWorldPainterComponent extends PositionComponent {
       final ny = npc.screenY;
 
       // Shadow
-      _shadowPaint.color = Colors.black.withOpacity(0.12);
+      _shadowPaint.color = Colors.black.withValues(alpha: 0.12);
       canvas.drawOval(
         Rect.fromCenter(center: Offset(nx + 1, ny + 1), width: 10, height: 4),
         _shadowPaint,
@@ -460,7 +460,7 @@ class IsometricNPCComponent extends PositionComponent {
     final ny = _drawY;
 
     // Shadow
-    _shadowPaint.color = Colors.black.withOpacity(0.12);
+    _shadowPaint.color = Colors.black.withValues(alpha: 0.12);
     canvas.drawOval(
       Rect.fromCenter(center: Offset(nx + 1, ny + 1), width: 10, height: 4),
       _shadowPaint,

@@ -96,10 +96,10 @@ class ProceduralOpenWorldScreenState extends State<ProceduralOpenWorldScreen>
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              'Do you want to enter the ${buildingType}?',
-              style: const TextStyle(color: Colors.white70),
-            ),
+  Text(
+    'Do you want to enter the $buildingType?',
+    style: const TextStyle(color: Colors.white70),
+  ),
           ],
         ),
         actions: [

@@ -1,4 +1,4 @@
-# Gangwar
+# Gangwars
 
 ![Gangwar Logo](assets/images/logo.png)
 
@@ -130,7 +130,7 @@ Contributions are welcome! Please follow the existing code style and include scr
 
 ## 🏆 License
 
-This project is licensed under the **MaggotCorp Proprietary License**. See [LICENSE](LICENSE) for details.
+This project is licensed under the **autarky labs Proprietary License**. See [LICENSE](LICENSE) for details.
 
-**© 2025 MaggotCorp. All rights reserved.**
+**© 2025 autarky labs. All rights reserved.**
 **Original Game: timotheuzi@hotmail.com**

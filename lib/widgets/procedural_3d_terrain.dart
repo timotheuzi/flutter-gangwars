@@ -204,9 +204,9 @@ class Procedural3DTerrain {
   Color _getEdgeColor(Color surface) {
     return Color.fromARGB(
       255,
-      (surface.red * 0.7).round().clamp(0, 255),
-      (surface.green * 0.7).round().clamp(0, 255),
-      (surface.blue * 0.7).round().clamp(0, 255),
+      (surface.r * 255 * 0.7).round().clamp(0, 255),
+      (surface.g * 255 * 0.7).round().clamp(0, 255),
+      (surface.b * 255 * 0.7).round().clamp(0, 255),
     );
   }
 
@@ -607,9 +607,9 @@ class IsometricWorldPainter extends CustomPainter {
         final sidePaint = Paint()
           ..color = Color.fromARGB(
             255,
-            (tile.edgeColor.red * 0.6).round().clamp(0, 255),
-            (tile.edgeColor.green * 0.6).round().clamp(0, 255),
-            (tile.edgeColor.blue * 0.6).round().clamp(0, 255),
+            (tile.edgeColor.r * 255 * 0.6).round().clamp(0, 255),
+            (tile.edgeColor.g * 255 * 0.6).round().clamp(0, 255),
+            (tile.edgeColor.b * 255 * 0.6).round().clamp(0, 255),
           );
 
         // Right side face
@@ -631,9 +631,9 @@ class IsometricWorldPainter extends CustomPainter {
         final leftPaint = Paint()
           ..color = Color.fromARGB(
             255,
-            (sidePaint.color.red * 0.8).round().clamp(0, 255),
-            (sidePaint.color.green * 0.8).round().clamp(0, 255),
-            (sidePaint.color.blue * 0.8).round().clamp(0, 255),
+            (sidePaint.color.r * 255 * 0.8).round().clamp(0, 255),
+            (sidePaint.color.g * 255 * 0.8).round().clamp(0, 255),
+            (sidePaint.color.b * 255 * 0.8).round().clamp(0, 255),
           );
         canvas.drawPath(leftPath, leftPaint);
       }
@@ -682,9 +682,9 @@ class IsometricWorldPainter extends CustomPainter {
       final frontPaint = Paint()
         ..color = Color.fromARGB(
           255,
-          (building.color.red * 1.2).round().clamp(0, 255),
-          (building.color.green * 1.2).round().clamp(0, 255),
-          (building.color.blue * 1.2).round().clamp(0, 255),
+          (building.color.r * 255 * 1.2).round().clamp(0, 255),
+          (building.color.g * 255 * 1.2).round().clamp(0, 255),
+          (building.color.b * 255 * 1.2).round().clamp(0, 255),
         );
       final frontPath = Path();
       frontPath.moveTo(building.screenX, building.screenY + bh / 2 - bh * 0.3);
@@ -696,9 +696,9 @@ class IsometricWorldPainter extends CustomPainter {
       // Roof
       paint.color = Color.fromARGB(
         255,
-        (building.color.red * 0.8).round().clamp(0, 255),
-        (building.color.green * 0.8).round().clamp(0, 255),
-        (building.color.blue * 0.8).round().clamp(0, 255),
+        (building.color.r * 255 * 0.8).round().clamp(0, 255),
+        (building.color.g * 255 * 0.8).round().clamp(0, 255),
+        (building.color.b * 255 * 0.8).round().clamp(0, 255),
       );
       final roofPath = Path();
       roofPath.moveTo(
@@ -769,9 +769,9 @@ class IsometricWorldPainter extends CustomPainter {
       // Legs
       paint.color = Color.fromARGB(
         255,
-        (npc.color.red * 0.7).round().clamp(0, 255),
-        (npc.color.green * 0.7).round().clamp(0, 255),
-        (npc.color.blue * 0.7).round().clamp(0, 255),
+        (npc.color.r * 255 * 0.7).round().clamp(0, 255),
+        (npc.color.g * 255 * 0.7).round().clamp(0, 255),
+        (npc.color.b * 255 * 0.7).round().clamp(0, 255),
       );
       canvas.drawRect(
         Rect.fromCenter(

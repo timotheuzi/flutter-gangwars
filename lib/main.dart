@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:gangwar/screens/main_screen.dart';
-import 'package:gangwar/providers/game_provider.dart';
+import 'screens/main_screen.dart';
+import 'providers/game_provider.dart';
 
 void main() {
   runApp(
@@ -22,7 +22,7 @@ class GangWars extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        fontFamily: 'GameFont',
+        fontFamily: 'PixelArt',
       ),
       home: const MainScreen(),
       debugShowCheckedModeBanner: false,

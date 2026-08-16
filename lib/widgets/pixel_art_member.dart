@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class PixelArtMember extends StatelessWidget {
   final bool isPlayer;
@@ -20,14 +21,60 @@ class PixelArtMember extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!isAlive) {
+      return SizedBox(
+        width: size,
+        height: size,
+        child: CustomPaint(
+          painter: MemberPainter(isPlayer, isAlive, isCheering, enemyType, isPimp),
+          size: Size(size, size),
+        ),
+      );
+    }
+
+    final String assetPath = _getAssetPath();
+    
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(
-        painter: MemberPainter(isPlayer, isAlive, isCheering, enemyType, isPimp),
-        size: Size(size, size),
+      child: SvgPicture.asset(
+        assetPath,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        placeholderBuilder: (BuildContext context) => CustomPaint(
+          painter: MemberPainter(isPlayer, isAlive, isCheering, enemyType, isPimp),
+          size: Size(size, size),
+        ),
       ),
     );
+  }
+
+  String _getAssetPath() {
+    if (isPlayer) {
+      return isCheering ? 'assets/images/player/player_cheer.svg' : 'assets/images/player/player_idle.svg';
+    }
+    
+    if (isPimp) {
+      return 'assets/images/npc/shady_dealer.svg'; // Closest match
+    }
+
+    switch (enemyType) {
+      case 'Police Officers':
+        return 'assets/images/enemy/police_officer.svg';
+      case 'Squidie Hit Squad':
+        return 'assets/images/enemy/squidie_hit_squad.svg';
+      case 'Rival Gang Members':
+        return 'assets/images/enemy/rival_gang.svg';
+      case 'Bouncer':
+        return 'assets/images/npc/bouncer.svg';
+      case 'Street Thug':
+        return 'assets/images/npc/street_thug.svg';
+      case 'Street Punk':
+        return 'assets/images/npc/street_punk.svg';
+      default:
+        return 'assets/images/npc/street_thug.svg';
+    }
   }
 }
 
@@ -94,8 +141,12 @@ class MemberPainter extends CustomPainter {
     d(9, 5, hair);
 
     // Hat
-    for (int x = 5; x < 11; x++) d(x, 1, purple);
-    for (int x = 3; x < 13; x++) d(x, 2, purple);
+    for (int x = 5; x < 11; x++) {
+      d(x, 1, purple);
+    }
+    for (int x = 3; x < 13; x++) {
+      d(x, 2, purple);
+    }
     
     // Suit
     for (int x = 5; x < 11; x++) {
@@ -129,7 +180,9 @@ class MemberPainter extends CustomPainter {
 
     // Cane (Right hand)
     d(12, 10, yellow);
-    for (int y = 11; y < 16; y++) d(12, y, Colors.brown);
+    for (int y = 11; y < 16; y++) {
+      d(12, y, Colors.brown);
+    }
 
     // Legs
     for (int x = 5; x < 7; x++) {
@@ -245,11 +298,19 @@ class MemberPainter extends CustomPainter {
     }
 
     if (isCheering) {
-      for (int x = 2; x < 6; x++) d(x, 4, skin);
-      for (int x = 11; x < 15; x++) d(x, 4, skin);
+      for (int x = 2; x < 6; x++) {
+        d(x, 4, skin);
+      }
+      for (int x = 11; x < 15; x++) {
+        d(x, 4, skin);
+      }
     } else {
-      for (int x = 2; x < 6; x++) d(x, 8, skin);
-      for (int x = 11; x < 15; x++) d(x, 8, skin);
+      for (int x = 2; x < 6; x++) {
+        d(x, 8, skin);
+      }
+      for (int x = 11; x < 15; x++) {
+        d(x, 8, skin);
+      }
     }
 
     // Legs
