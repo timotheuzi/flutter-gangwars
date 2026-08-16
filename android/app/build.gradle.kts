@@ -9,20 +9,25 @@ android {
     compileSdk = 37
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = "21"
     }
 
     defaultConfig {
         applicationId = "com.gangwar.gangwars"
-        minSdk = flutter.minSdkVersion
-        targetSdk = 37
+        minSdk = 24
+        targetSdk = 36
         versionCode = 1
-        versionName = "1.0.0"
+        versionName = "1.0.1"
+    }
+
+    signingConfigs {
+        getByName("debug") {
+        }
     }
 
     signingConfigs {
@@ -31,10 +36,23 @@ android {
     }
 
     buildTypes {
-        release {
+        getByName("release") {
+            isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug")
-            isMinifyEnabled = false
-            isShrinkResources = false
+        }
+        getByName("debug") {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+
+    packaging {
+        jniLibs {
+            // Workaround for 'stripDebugDebugSymbols' failure with NDK 28+
+            // NDK 28 has toolchain changes that can cause 'llvm-strip' process start failures in some AGP versions.
+            keepDebugSymbols.add("**/*.so")
         }
         debug {
             signingConfig = signingConfigs.getByName("debug")

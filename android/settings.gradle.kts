@@ -23,6 +23,11 @@ pluginManagement {
 
 plugins {
     id("dev.flutter.flutter-plugin-loader")
+<<<<<<< HEAD
+    id("com.android.application") version "9.0.1" apply false
+    id("com.android.library") version "9.0.1" apply false
+    id("org.jetbrains.kotlin.android") version "2.2.21" apply false
+=======
     id("com.android.application") version "8.13.0" apply false
     id("com.android.library") version "8.13.0" apply false
     id("org.jetbrains.kotlin.android") version "2.2.21" apply false
@@ -34,6 +39,8 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+>>>>>>> origin/wipsy
 }
+
 
 include(":app")

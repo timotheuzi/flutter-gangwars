@@ -66,7 +66,7 @@ class GameProvider with ChangeNotifier {
 
   void startNewGame(String playerName, String gangName) {
     _gameState = GameState(playerName: playerName, gangName: gangName);
-    _currentScreen = 'city';
+    _currentScreen = 'procedural_open_world';
     saveGameState();
     notifyListeners();
   }

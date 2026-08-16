@@ -19,7 +19,7 @@ class GameState with ChangeNotifier {
   int lives = 3;
   int damage = 0;
   int currentScore = 0;
-  String currentLocation = 'city';
+  String currentLocation = 'procedural_open_world';
   double accuracy = 0.85; // Base accuracy rating
 
   Map<String, int> drugPrices = {
@@ -75,7 +75,7 @@ class GameState with ChangeNotifier {
     this.lives = 3,
     this.damage = 0,
     this.currentScore = 0,
-    this.currentLocation = 'city',
+    this.currentLocation = 'procedural_open_world',
     this.accuracy = 0.85,
   });
 
@@ -283,7 +283,7 @@ class GameState with ChangeNotifier {
       lives: json['lives'] ?? 3,
       damage: json['damage'] ?? 0,
       currentScore: json['currentScore'] ?? 0,
-      currentLocation: json['currentLocation'] ?? 'city',
+      currentLocation: json['currentLocation'] ?? 'procedural_open_world',
       accuracy: (json['accuracy'] ?? 0.85).toDouble(),
     );
 

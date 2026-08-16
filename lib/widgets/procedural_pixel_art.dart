@@ -397,7 +397,6 @@ class ProceduralPixelArt {
 
   void _drawPimp(List<List<Color>> pixels, int variant) {
     final purple = Colors.purple.shade700;
-    final darkPurple = Colors.purple.shade900;
     final yellow = Colors.yellow.shade600;
     final skin = Colors.brown.shade700;
     final hair = Colors.black87;

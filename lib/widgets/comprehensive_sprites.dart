@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'pixel_art_member.dart';
+import 'pixel_art_icon.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 /// Comprehensive Sprite System for Gang Wars
-/// Provides pixelated sprites for all game situations
+/// Provides pixelated sprites for all game situations, now using SVG assets where available.
 
 class ComprehensiveSprites {
   /// Create a police officer sprite
@@ -11,7 +14,13 @@ class ComprehensiveSprites {
     required PoliceState state,
     bool isAnimated = true,
   }) {
-    return _PoliceSprite(size: size, state: state, isAnimated: isAnimated);
+    return PixelArtMember(
+      isPlayer: false,
+      isAlive: state != PoliceState.dead,
+      size: size,
+      enemyType: 'Police Officers',
+      isCheering: state == PoliceState.shooting, // Using as action state
+    );
   }
 
   /// Create a civilian sprite
@@ -21,11 +30,24 @@ class ComprehensiveSprites {
     required CivilianType type,
     bool isAnimated = true,
   }) {
-    return _CivilianSprite(
+    // Map civilian types to available NPC assets
+    String npcType = 'Street Thug';
+    switch (type) {
+      case CivilianType.homeless:
+        npcType = 'Homeless Person';
+        break;
+      case CivilianType.man:
+        npcType = 'Street Punk';
+        break;
+      default:
+        npcType = 'Street Thug';
+    }
+
+    return PixelArtMember(
+      isPlayer: false,
+      isAlive: state != CivilianState.dead,
       size: size,
-      state: state,
-      type: type,
-      isAnimated: isAnimated,
+      enemyType: npcType,
     );
   }
 
@@ -36,11 +58,9 @@ class ComprehensiveSprites {
     required DrugState state,
     bool isAnimated = true,
   }) {
-    return _DrugSprite(
+    return PixelArtIcon(
+      name: type.name,
       size: size,
-      type: type,
-      state: state,
-      isAnimated: isAnimated,
     );
   }
 
@@ -96,11 +116,9 @@ class ComprehensiveSprites {
     required WeaponState state,
     bool isAnimated = true,
   }) {
-    return _WeaponSprite(
+    return PixelArtIcon(
+      name: type.name,
       size: size,
-      type: type,
-      state: state,
-      isAnimated: isAnimated,
     );
   }
 
@@ -208,599 +226,6 @@ enum UIType { button, icon, bar, frame, cursor, menu }
 enum HealthState { idle, active, damaged, healed }
 
 enum HealthType { heart, shield, pill, bandage, firstAid }
-
-// Police Sprite Implementation
-class _PoliceSprite extends StatefulWidget {
-  final double size;
-  final PoliceState state;
-  final bool isAnimated;
-
-  const _PoliceSprite({
-    required this.size,
-    required this.state,
-    required this.isAnimated,
-  });
-
-  @override
-  _PoliceSpriteState createState() => _PoliceSpriteState();
-}
-
-class _PoliceSpriteState extends State<_PoliceSprite>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _bobAnimation;
-  late Animation<double> _alertAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
-
-    _bobAnimation = Tween<double>(
-      begin: 0.0,
-      end: 2 * pi,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
-
-    _alertAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-
-    if (widget.isAnimated) {
-      _controller.repeat();
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, sin(_bobAnimation.value) * 2),
-          child: CustomPaint(
-            painter: _PolicePainter(
-              state: widget.state,
-              alertValue: _alertAnimation.value,
-            ),
-            size: Size(widget.size, widget.size),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _PolicePainter extends CustomPainter {
-  final PoliceState state;
-  final double alertValue;
-
-  _PolicePainter({required this.state, required this.alertValue});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-    final pixelSize = size.width / 16;
-
-    void drawPixel(int x, int y, Color color) {
-      canvas.drawRect(
-        Rect.fromLTWH(x * pixelSize, y * pixelSize, pixelSize, pixelSize),
-        paint..color = color,
-      );
-    }
-
-    // Head
-    final skinColor = Colors.brown.shade300;
-    for (int x = 6; x < 11; x++) {
-      for (int y = 2; y < 7; y++) {
-        drawPixel(x, y, skinColor);
-      }
-    }
-
-    // Police hat
-    final hatColor = Colors.blue.shade900;
-    for (int x = 5; x < 12; x++) {
-      drawPixel(x, 2, hatColor);
-    }
-    for (int x = 6; x < 11; x++) {
-      drawPixel(x, 1, hatColor);
-    }
-
-    // Badge
-    drawPixel(8, 3, Colors.yellow);
-
-    // Eyes
-    drawPixel(7, 4, Colors.black);
-    drawPixel(9, 4, Colors.black);
-
-    // Body (police uniform)
-    final uniformColor = Colors.blue.shade800;
-    for (int x = 5; x < 12; x++) {
-      for (int y = 7; y < 13; y++) {
-        drawPixel(x, y, uniformColor);
-      }
-    }
-
-    // Badge on chest
-    drawPixel(8, 8, Colors.yellow);
-
-    // Arms
-    final armColor = skinColor;
-    if (state == PoliceState.shooting) {
-      // Shooting pose
-      for (int x = 2; x < 6; x++) {
-        drawPixel(x, 8, armColor);
-      }
-      // Gun
-      for (int x = 1; x < 4; x++) {
-        drawPixel(x, 7, Colors.grey.shade800);
-      }
-    } else if (state == PoliceState.arresting) {
-      // Arresting pose
-      for (int x = 2; x < 6; x++) {
-        drawPixel(x, 7, armColor);
-      }
-      for (int x = 11; x < 15; x++) {
-        drawPixel(x, 7, armColor);
-      }
-    } else {
-      // Normal pose
-      for (int y = 8; y < 11; y++) {
-        drawPixel(4, y, armColor);
-        drawPixel(12, y, armColor);
-      }
-    }
-
-    // Legs
-    final legColor = Colors.blue.shade900;
-    for (int x = 5; x < 8; x++) {
-      for (int y = 13; y < 16; y++) {
-        drawPixel(x, y, legColor);
-      }
-    }
-    for (int x = 9; x < 12; x++) {
-      for (int y = 13; y < 16; y++) {
-        drawPixel(x, y, legColor);
-      }
-    }
-
-    // State-specific effects
-    if (state == PoliceState.alert) {
-      // Alert indicator
-      final alertColor = Colors.red.withValues(alpha: alertValue);
-      drawPixel(13, 1, alertColor);
-      drawPixel(14, 1, alertColor);
-      drawPixel(13, 2, alertColor);
-      drawPixel(14, 2, alertColor);
-    } else if (state == PoliceState.hurt) {
-      // Hurt effect
-      final hurtColor = Colors.red;
-      drawPixel(6, 3, hurtColor);
-      drawPixel(10, 3, hurtColor);
-    } else if (state == PoliceState.dead) {
-      // Dead pose
-      for (int x = 3; x < 14; x++) {
-        for (int y = 13; y < 16; y++) {
-          drawPixel(x, y, Colors.grey.shade600);
-        }
-      }
-      // Blood
-      drawPixel(2, 15, Colors.red.shade900);
-      drawPixel(14, 15, Colors.red.shade900);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _PolicePainter oldDelegate) => true;
-}
-
-// Civilian Sprite Implementation
-class _CivilianSprite extends StatefulWidget {
-  final double size;
-  final CivilianState state;
-  final CivilianType type;
-  final bool isAnimated;
-
-  const _CivilianSprite({
-    required this.size,
-    required this.state,
-    required this.type,
-    required this.isAnimated,
-  });
-
-  @override
-  _CivilianSpriteState createState() => _CivilianSpriteState();
-}
-
-class _CivilianSpriteState extends State<_CivilianSprite>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _bobAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-
-    _bobAnimation = Tween<double>(
-      begin: 0.0,
-      end: 2 * pi,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
-
-    if (widget.isAnimated) {
-      _controller.repeat();
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, sin(_bobAnimation.value) * 1),
-          child: CustomPaint(
-            painter: _CivilianPainter(state: widget.state, type: widget.type),
-            size: Size(widget.size, widget.size),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _CivilianPainter extends CustomPainter {
-  final CivilianState state;
-  final CivilianType type;
-
-  _CivilianPainter({required this.state, required this.type});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-    final pixelSize = size.width / 16;
-
-    void drawPixel(int x, int y, Color color) {
-      canvas.drawRect(
-        Rect.fromLTWH(x * pixelSize, y * pixelSize, pixelSize, pixelSize),
-        paint..color = color,
-      );
-    }
-
-    // Get colors based on type
-    Color skinColor;
-    Color clothesColor;
-    Color hairColor;
-
-    switch (type) {
-      case CivilianType.man:
-        skinColor = Colors.brown.shade300;
-        clothesColor = Colors.grey.shade700;
-        hairColor = Colors.brown.shade800;
-        break;
-      case CivilianType.woman:
-        skinColor = Colors.brown.shade200;
-        clothesColor = Colors.pink.shade300;
-        hairColor = Colors.yellow.shade600;
-        break;
-      case CivilianType.child:
-        skinColor = Colors.brown.shade100;
-        clothesColor = Colors.blue.shade300;
-        hairColor = Colors.brown.shade400;
-        break;
-      case CivilianType.elderly:
-        skinColor = Colors.brown.shade200;
-        clothesColor = Colors.grey.shade500;
-        hairColor = Colors.grey.shade300;
-        break;
-      case CivilianType.homeless:
-        skinColor = Colors.brown.shade400;
-        clothesColor = Colors.brown.shade600;
-        hairColor = Colors.grey.shade400;
-        break;
-    }
-
-    // Head
-    for (int x = 6; x < 11; x++) {
-      for (int y = 2; y < 7; y++) {
-        drawPixel(x, y, skinColor);
-      }
-    }
-
-    // Hair
-    for (int x = 6; x < 11; x++) {
-      drawPixel(x, 2, hairColor);
-    }
-    if (type == CivilianType.woman) {
-      drawPixel(6, 3, hairColor);
-      drawPixel(10, 3, hairColor);
-    }
-
-    // Eyes
-    drawPixel(7, 4, Colors.black);
-    drawPixel(9, 4, Colors.black);
-
-    // Body
-    for (int x = 5; x < 12; x++) {
-      for (int y = 7; y < 13; y++) {
-        drawPixel(x, y, clothesColor);
-      }
-    }
-
-    // Arms
-    for (int y = 8; y < 11; y++) {
-      drawPixel(4, y, skinColor);
-      drawPixel(12, y, skinColor);
-    }
-
-    // Legs
-    final legColor = Colors.blue.shade800;
-    for (int x = 5; x < 8; x++) {
-      for (int y = 13; y < 16; y++) {
-        drawPixel(x, y, legColor);
-      }
-    }
-    for (int x = 9; x < 12; x++) {
-      for (int y = 13; y < 16; y++) {
-        drawPixel(x, y, legColor);
-      }
-    }
-
-    // State-specific effects
-    if (state == CivilianState.scared) {
-      // Scared expression
-      drawPixel(6, 3, Colors.white);
-      drawPixel(10, 3, Colors.white);
-    } else if (state == CivilianState.dead) {
-      // Dead pose
-      for (int x = 3; x < 14; x++) {
-        for (int y = 13; y < 16; y++) {
-          drawPixel(x, y, Colors.grey.shade600);
-        }
-      }
-      // Blood
-      drawPixel(2, 15, Colors.red.shade900);
-      drawPixel(14, 15, Colors.red.shade900);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _CivilianPainter oldDelegate) => true;
-}
-
-// Drug Sprite Implementation
-class _DrugSprite extends StatefulWidget {
-  final double size;
-  final DrugType type;
-  final DrugState state;
-  final bool isAnimated;
-
-  const _DrugSprite({
-    required this.size,
-    required this.type,
-    required this.state,
-    required this.isAnimated,
-  });
-
-  @override
-  _DrugSpriteState createState() => _DrugSpriteState();
-}
-
-class _DrugSpriteState extends State<_DrugSprite>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _floatAnimation;
-  late Animation<double> _glowAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    );
-
-    _floatAnimation = Tween<double>(
-      begin: 0.0,
-      end: 2 * pi,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
-
-    _glowAnimation = Tween<double>(
-      begin: 0.5,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-
-    if (widget.isAnimated) {
-      _controller.repeat();
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, sin(_floatAnimation.value) * 3),
-          child: CustomPaint(
-            painter: _DrugPainter(
-              type: widget.type,
-              state: widget.state,
-              glowValue: _glowAnimation.value,
-            ),
-            size: Size(widget.size, widget.size),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _DrugPainter extends CustomPainter {
-  final DrugType type;
-  final DrugState state;
-  final double glowValue;
-
-  _DrugPainter({
-    required this.type,
-    required this.state,
-    required this.glowValue,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-    final pixelSize = size.width / 16;
-
-    void drawPixel(int x, int y, Color color) {
-      canvas.drawRect(
-        Rect.fromLTWH(x * pixelSize, y * pixelSize, pixelSize, pixelSize),
-        paint..color = color,
-      );
-    }
-
-    // Get drug-specific colors and shapes
-    Color drugColor;
-    Color accentColor;
-
-    switch (type) {
-      case DrugType.weed:
-        drugColor = Colors.green.shade700;
-        accentColor = Colors.green.shade900;
-        // Draw weed leaf shape
-        for (int x = 7; x < 10; x++) {
-          for (int y = 4; y < 12; y++) {
-            drawPixel(x, y, drugColor);
-          }
-        }
-        for (int x = 4; x < 13; x++) {
-          for (int y = 7; y < 9; y++) {
-            drawPixel(x, y, drugColor);
-          }
-        }
-        drawPixel(8, 3, accentColor);
-        drawPixel(8, 12, accentColor);
-        break;
-
-      case DrugType.crack:
-        drugColor = Colors.yellow.shade100;
-        // Draw crack rock shape
-        for (int x = 5; x < 11; x++) {
-          for (int y = 5; y < 11; y++) {
-            drawPixel(x, y, drugColor);
-          }
-        }
-        drawPixel(4, 7, drugColor);
-        drawPixel(4, 8, drugColor);
-        drawPixel(11, 7, drugColor);
-        drawPixel(11, 8, drugColor);
-        drawPixel(7, 4, drugColor);
-        drawPixel(8, 4, drugColor);
-        drawPixel(7, 11, drugColor);
-        drawPixel(8, 11, drugColor);
-        break;
-
-      case DrugType.coke:
-        drugColor = Colors.white;
-        // Draw cocaine lines
-        for (int x = 4; x < 12; x++) {
-          drawPixel(x, 8, drugColor);
-        }
-        for (int x = 5; x < 11; x++) {
-          drawPixel(x, 9, drugColor);
-        }
-        for (int x = 4; x < 12; x++) {
-          drawPixel(x, 6, drugColor);
-        }
-        break;
-
-      case DrugType.ice:
-        drugColor = Colors.lightBlue.shade100;
-        // Draw ice crystal shape
-        for (int x = 6; x < 10; x++) {
-          for (int y = 4; y < 8; y++) {
-            drawPixel(x, y, drugColor);
-          }
-        }
-        for (int x = 4; x < 12; x++) {
-          for (int y = 8; y < 12; y++) {
-            drawPixel(x, y, drugColor);
-          }
-        }
-        break;
-
-      case DrugType.percs:
-        drugColor = Colors.pink.shade200;
-        // Draw pill shape
-        for (int x = 5; x < 11; x++) {
-          for (int y = 7; y < 10; y++) {
-            drawPixel(x, y, drugColor);
-          }
-        }
-        drawPixel(4, 8, drugColor);
-        drawPixel(11, 8, drugColor);
-        // Pill divider
-        for (int x = 7; x < 9; x++) {
-          drawPixel(x, 8, Colors.white);
-        }
-        break;
-
-      case DrugType.pixie:
-        drugColor = Colors.purple.shade300;
-        // Draw pixie dust pattern
-        for (int x = 4; x < 12; x++) {
-          for (int y = 4; y < 12; y++) {
-            if ((x + y) % 2 == 0) {
-              drawPixel(x, y, drugColor);
-            } else {
-              drawPixel(x, y, Colors.white70);
-            }
-          }
-        }
-        break;
-    }
-
-    // Add glow effect when collected
-    if (state == DrugState.collected) {
-      final glowPaint = Paint()
-        ..color = Colors.yellow.withValues(alpha: glowValue * 0.5)
-        ..style = PaintingStyle.fill;
-
-      canvas.drawCircle(
-        Offset(size.width / 2, size.height / 2),
-        size.width / 2,
-        glowPaint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DrugPainter oldDelegate) => true;
-}
 
 // Money Sprite Implementation
 class _MoneySprite extends StatefulWidget {
@@ -1316,18 +741,29 @@ class _BuildingSpriteState extends State<_BuildingSprite>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return CustomPaint(
-          painter: _BuildingPainter(
-            type: widget.type,
-            state: widget.state,
-            flickerValue: _flickerAnimation.value,
-          ),
-          size: Size(widget.size, widget.size * 1.5),
-        );
-      },
+    // Try to find an SVG for the building
+    String assetName = widget.type.name;
+    String assetPath = 'assets/images/buildings/$assetName.svg';
+
+    return SizedBox(
+      width: widget.size,
+      height: widget.size * 1.5,
+      child: SvgPicture.asset(
+        assetPath,
+        placeholderBuilder: (context) => AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return CustomPaint(
+              painter: _BuildingPainter(
+                type: widget.type,
+                state: widget.state,
+                flickerValue: _flickerAnimation.value,
+              ),
+              size: Size(widget.size, widget.size * 1.5),
+            );
+          },
+        ),
+      ),
     );
   }
 }
@@ -1503,306 +939,6 @@ class _BuildingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _BuildingPainter oldDelegate) => true;
-}
-
-// Weapon Sprite Implementation
-class _WeaponSprite extends StatefulWidget {
-  final double size;
-  final WeaponType type;
-  final WeaponState state;
-  final bool isAnimated;
-
-  const _WeaponSprite({
-    required this.size,
-    required this.type,
-    required this.state,
-    required this.isAnimated,
-  });
-
-  @override
-  _WeaponSpriteState createState() => _WeaponSpriteState();
-}
-
-class _WeaponSpriteState extends State<_WeaponSprite>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _recoilAnimation;
-  late Animation<double> _flashAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 150),
-    );
-
-    _recoilAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
-
-    _flashAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
-
-    if (widget.isAnimated && widget.state == WeaponState.firing) {
-      _controller.forward();
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(-_recoilAnimation.value * 3, 0),
-          child: CustomPaint(
-            painter: _WeaponPainter(
-              type: widget.type,
-              state: widget.state,
-              flashValue: _flashAnimation.value,
-            ),
-            size: Size(widget.size, widget.size),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _WeaponPainter extends CustomPainter {
-  final WeaponType type;
-  final WeaponState state;
-  final double flashValue;
-
-  _WeaponPainter({
-    required this.type,
-    required this.state,
-    required this.flashValue,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-    final pixelSize = size.width / 16;
-
-    void drawPixel(int x, int y, Color color) {
-      canvas.drawRect(
-        Rect.fromLTWH(x * pixelSize, y * pixelSize, pixelSize, pixelSize),
-        paint..color = color,
-      );
-    }
-
-    // Get weapon-specific colors
-    Color metalColor;
-    Color woodColor;
-    Color accentColor;
-
-    switch (type) {
-      case WeaponType.pistol:
-        metalColor = Colors.blueGrey.shade700;
-        woodColor = Colors.brown.shade600;
-        accentColor = Colors.black;
-        // Pistol grip
-        for (int x = 4; x < 8; x++) {
-          for (int y = 8; y < 14; y++) {
-            drawPixel(x, y, woodColor);
-          }
-        }
-        // Pistol barrel
-        for (int x = 7; x < 14; x++) {
-          for (int y = 6; y < 9; y++) {
-            drawPixel(x, y, metalColor);
-          }
-        }
-        // Trigger guard
-        drawPixel(6, 9, metalColor);
-        drawPixel(7, 9, metalColor);
-        drawPixel(8, 9, metalColor);
-        // Sight
-        drawPixel(12, 6, accentColor);
-        break;
-
-      case WeaponType.uzi:
-        metalColor = Colors.grey.shade800;
-        woodColor = Colors.brown.shade600;
-        // Uzi body
-        for (int x = 2; x < 13; x++) {
-          for (int y = 7; y < 11; y++) {
-            drawPixel(x, y, metalColor);
-          }
-        }
-        // Uzi stock
-        for (int x = 12; x < 15; x++) {
-          for (int y = 5; y < 11; y++) {
-            drawPixel(x, y, woodColor);
-          }
-        }
-        // Uzi magazine
-        for (int x = 4; x < 7; x++) {
-          for (int y = 11; y < 15; y++) {
-            drawPixel(x, y, metalColor);
-          }
-        }
-        break;
-
-      case WeaponType.ar15:
-        metalColor = Colors.black87;
-        woodColor = Colors.brown.shade600;
-        // AR15 body
-        for (int x = 2; x < 15; x++) {
-          for (int y = 7; y < 10; y++) {
-            drawPixel(x, y, metalColor);
-          }
-        }
-        // AR15 stock
-        for (int x = 12; x < 15; x++) {
-          for (int y = 5; y < 11; y++) {
-            drawPixel(x, y, woodColor);
-          }
-        }
-        // AR15 magazine
-        for (int x = 6; x < 9; x++) {
-          for (int y = 10; y < 14; y++) {
-            drawPixel(x, y, metalColor);
-          }
-        }
-        // AR15 grip
-        for (int x = 2; x < 5; x++) {
-          for (int y = 10; y < 13; y++) {
-            drawPixel(x, y, woodColor);
-          }
-        }
-        break;
-
-      case WeaponType.shotgun:
-        metalColor = Colors.grey.shade700;
-        woodColor = Colors.brown.shade500;
-        // Shotgun body
-        for (int x = 2; x < 14; x++) {
-          for (int y = 7; y < 10; y++) {
-            drawPixel(x, y, metalColor);
-          }
-        }
-        // Shotgun stock
-        for (int x = 11; x < 15; x++) {
-          for (int y = 5; y < 12; y++) {
-            drawPixel(x, y, woodColor);
-          }
-        }
-        // Shotgun pump
-        for (int x = 4; x < 8; x++) {
-          for (int y = 10; y < 12; y++) {
-            drawPixel(x, y, woodColor);
-          }
-        }
-        break;
-
-      case WeaponType.knife:
-        metalColor = Colors.grey.shade400;
-        woodColor = Colors.brown.shade600;
-        // Knife handle
-        for (int x = 2; x < 6; x++) {
-          for (int y = 8; y < 12; y++) {
-            drawPixel(x, y, woodColor);
-          }
-        }
-        // Knife blade
-        for (int x = 6; x < 13; x++) {
-          for (int y = 7; y < 10; y++) {
-            drawPixel(x, y, metalColor);
-          }
-        }
-        // Knife tip
-        drawPixel(13, 8, metalColor);
-        drawPixel(13, 9, metalColor);
-        break;
-
-      case WeaponType.bat:
-        woodColor = Colors.brown.shade400;
-        metalColor = Colors.grey.shade600;
-        // Bat handle
-        for (int x = 2; x < 5; x++) {
-          for (int y = 6; y < 14; y++) {
-            drawPixel(x, y, woodColor);
-          }
-        }
-        // Bat head
-        for (int x = 5; x < 11; x++) {
-          for (int y = 4; y < 8; y++) {
-            drawPixel(x, y, woodColor);
-          }
-        }
-        // Bat grip
-        drawPixel(4, 10, metalColor);
-        drawPixel(4, 11, metalColor);
-        break;
-
-      case WeaponType.grenade:
-        metalColor = Colors.green.shade900;
-        accentColor = Colors.grey;
-        // Grenade body
-        for (int x = 6; x < 11; x++) {
-          for (int y = 6; y < 13; y++) {
-            drawPixel(x, y, metalColor);
-          }
-        }
-        for (int x = 5; x < 12; x++) {
-          for (int y = 8; y < 11; y++) {
-            drawPixel(x, y, metalColor);
-          }
-        }
-        // Grenade pin
-        drawPixel(8, 5, accentColor);
-        break;
-
-      case WeaponType.vest:
-        metalColor = Colors.blueGrey.shade900;
-        accentColor = Colors.grey;
-        // Vest body
-        for (int x = 5; x < 12; x++) {
-          for (int y = 5; y < 13; y++) {
-            drawPixel(x, y, metalColor);
-          }
-        }
-        for (int x = 4; x < 13; x++) {
-          for (int y = 7; y < 11; y++) {
-            drawPixel(x, y, metalColor);
-          }
-        }
-        // Vest straps
-        drawPixel(6, 4, accentColor);
-        drawPixel(10, 4, accentColor);
-        drawPixel(6, 14, accentColor);
-        drawPixel(10, 14, accentColor);
-        break;
-    }
-
-    // Add muzzle flash when firing
-    if (state == WeaponState.firing && flashValue > 0.5) {
-      final flashPaint = Paint()
-        ..color = Colors.yellow.withValues(alpha: 1 - flashValue)
-        ..style = PaintingStyle.fill;
-
-      canvas.drawCircle(
-        Offset(size.width * 0.9, size.height * 0.4),
-        size.width * 0.15,
-        flashPaint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _WeaponPainter oldDelegate) => true;
 }
 
 // Effect Sprite Implementation

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class PixelArtIcon extends StatelessWidget {
   final String name;
@@ -8,11 +9,39 @@ class PixelArtIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String assetPath = _getAssetPath(name);
+    
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(painter: IconPainter(name)),
+      child: SvgPicture.asset(
+        assetPath,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        placeholderBuilder: (BuildContext context) => CustomPaint(
+          painter: IconPainter(name),
+          size: Size(size, size),
+        ),
+      ),
     );
+  }
+
+  String _getAssetPath(String name) {
+    final String lowerName = name.toLowerCase().replaceAll(' ', '_');
+    
+    // Check drugs
+    if (['weed', 'crack', 'coke', 'ice', 'percs', 'pixie_dust'].contains(lowerName)) {
+      return 'assets/images/drugs/$lowerName.svg';
+    }
+    
+    // Check weapons
+    if (['pistol', 'uzi', 'ar15', 'grenade', 'ghost_gun', 'vampire_bat', 'barbed_wire_bat'].contains(lowerName)) {
+      return 'assets/images/weapons/$lowerName.svg';
+    }
+    
+    // Default fallback (though SvgPicture might fail if not found)
+    return 'assets/images/app_icon.svg';
   }
 }
 
@@ -34,39 +63,51 @@ class IconPainter extends CustomPainter {
     }
 
     switch (name.toLowerCase()) {
-      // Drugs
       case 'weed':
         _drawWeed(drawPixel);
+        break;
       case 'crack':
         _drawCrack(drawPixel);
+        break;
       case 'coke':
         _drawCoke(drawPixel);
+        break;
       case 'ice':
         _drawIce(drawPixel);
+        break;
       case 'percs':
         _drawPercs(drawPixel);
+        break;
       case 'pixie dust':
+      case 'pixie_dust':
         _drawPixie(drawPixel);
-
-      // Weapons
+        break;
       case 'pistol':
         _drawPistol(drawPixel);
+        break;
       case 'uzi':
         _drawUzi(drawPixel);
+        break;
       case 'ar15':
         _drawAR15(drawPixel);
+        break;
       case 'grenade':
         _drawGrenade(drawPixel);
+        break;
       case 'bat':
+      case 'vampire_bat':
+      case 'barbed_wire_bat':
         _drawBat(drawPixel);
+        break;
       case 'bullets':
         _drawBullets(drawPixel);
+        break;
       case 'vest':
         _drawVest(drawPixel);
-
-      // Other
+        break;
       case 'prostitute':
         _drawProstitute(drawPixel);
+        break;
       default:
         _drawDefault(drawPixel);
     }

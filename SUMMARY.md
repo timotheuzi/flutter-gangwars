@@ -83,7 +83,7 @@ gangwars_flutter/
 2. **GameProvider**: State management with Provider pattern
 3. **CombatSystem**: Turn-based combat logic
 4. **RandomEventData**: Dynamic event generation
-5. **CityScreen**: Main game interface
+5. **ProceduralOpenWorld**: Main game interface
 6. **MainMenuScreen**: Game entry point
 
 ### UI Components
@@ -108,6 +108,7 @@ gangwars_flutter/
 - Smooth animations and transitions
 - Consistent Material Design
 - Responsive design for all platforms
+- 3D Procedural Open World integration
 
 ### User Experience
 - Faster navigation and transitions
@@ -155,7 +156,7 @@ gangwars_flutter/
 
 ### UI Components
 - [x] Main menu
-- [x] City screen
+- [x] 3D Open World screen
 - [x] Location cards
 - [x] Game buttons
 - [x] Stats display
@@ -220,44 +221,8 @@ The Gangwars Flutter migration represents a successful transformation from a sin
 3. **Reduced code complexity** through Flutter's reactive paradigm
 4. **Improved development productivity** with hot reload and faster builds
 5. **Future-proofed the application** with cross-platform capabilities
+6. **Integrated 3D world as the core experience**
 
 This migration demonstrates the power of Flutter for game development and provides a solid foundation for future enhancements and cross-platform distribution.
 
 **The streets are now open on all platforms!** 💰🔫🏙️
-
-
-uploading to google play
-
-Based on an analysis of your project, here is an assessment of your game's readiness for Google Play regarding its mature content.
-1. Is it allowed on Google Play?
-   Yes, mature games are allowed on the Google Play Store, provided they:
-   •
-   Do not promote illegal acts: While your game features drug dealing (e.g., "crack", "coke") and violence, it must be presented as a fictional gameplay element rather than an endorsement of real-world illegal activity.
-   •
-   Avoid "Gratuitous Violence": Google Play prohibits "extremely violent" or "gratuitous" content. Your game uses pixel-art style and text-based descriptions (e.g., "blood-stained suit", "corpse loot"), which typically fall within the Mature (17+) or Teen range rather than being prohibited.
-   •
-   Accurate Rating: You must complete the IARC content rating questionnaire in the Google Play Console honestly. Given the drug references and violence, your game will likely receive an ESRB M (Mature 17+) or PEGI 18 rating.
-2. Identified "Mature" Elements in your project
-   Your code contains several elements that trigger high-age ratings:
-   •
-   Drugs: lib/models/random_event_data.dart references "crack", "coke", "weed", "ice", and "percs".
-   •
-   Violence/Gore: Descriptions like "blood-stained suit", "throne of spent casings", "corpse loot", and "blood-soaked cash".
-   •
-   Weapons: Detailed lists including "uzi", "machine gun", "grenades", and "brass knuckles".
-3. Deployment Checklist for Mature Games
-   Before you upload your App Bundle (.aab), ensure these steps are completed:
-   •
-   Privacy Policy (Mandatory): Because your game features mature content (and likely uses shared_preferences), Google requires a Privacy Policy URL. You must host this on a website and link it in the Play Console.
-   •
-   IARC Questionnaire: Be very explicit about "Drug Reference" and "Violence" when filling this out. If Google finds unmapped mature content, your app may be suspended.
-   •
-   Target Audience: Ensure you set your target age to 18 and over in the Play Console to avoid the more restrictive "Designed for Families" policies.
-   •
-   Play Policy Insights: In Android Studio, you can sometimes see policy warnings. Go to View > Tool Windows > App Quality Insights to check for any flagged issues.
-4. Technical Readiness
-   •
-   App Icon: Your pubspec.yaml points to assets/images/app_icon.png. Ensure this icon doesn't contain graphic violence or drug paraphernalia, as the store listing itself has stricter "all ages" visibility rules.
-   •
-   Package Name: Your package is gangwar. This is fine.
-   Recommendation: Proceed with deployment, but ensure your Store Listing (screenshots and descriptions) is slightly more "tame" than the game itself to pass the initial automated metadata review, while being 100% honest in the Content Rating section.
