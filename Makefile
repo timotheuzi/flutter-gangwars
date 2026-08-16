@@ -204,6 +204,7 @@ build-windows: clean
 
 build-android: clean
 	@echo -e "${BLUE}Building Android APK...${NC}"
+	JAVA_HOME=$(JAVA_HOME_DIR) ANDROID_HOME=$(ANDROID_SDK_DIR) ANDROID_SDK_ROOT=$(ANDROID_SDK_DIR) $(FLUTTER) build apk --debug --android-skip-build-dependency-validation -v
 	ANDROID_HOME=/home/bim/Android/Sdk ANDROID_SDK_ROOT=/home/bim/Android/Sdk $(FLUTTER) build apk --debug --android-skip-build-dependency-validation -v
 	@echo -e "${GREEN}Android APK build complete! Output: build/app/outputs/flutter-apk/app-debug.apk${NC}"
 
