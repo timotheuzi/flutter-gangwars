@@ -19,13 +19,8 @@ android {
 
     defaultConfig {
         applicationId = "com.gangwar.gangwars"
-<<<<<<< HEAD
         minSdk = 24
         targetSdk = 36
-=======
-        minSdk = 21
-        targetSdk = 35
->>>>>>> origin/wipsy
         versionCode = 1
         versionName = "1.0.1"
     }
@@ -41,13 +36,9 @@ android {
     }
 
     buildTypes {
-<<<<<<< HEAD
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-=======
-        release {
->>>>>>> origin/wipsy
             signingConfig = signingConfigs.getByName("debug")
         }
         getByName("debug") {

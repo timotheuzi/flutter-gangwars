@@ -14,7 +14,6 @@ class _MainMenuBackgroundState extends State<MainMenuBackground>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   final List<Car> _cars = [];
-  final List<Prostitute> _prostitutes = [];
   final List<DrugDealer> _dealers = [];
   final List<PixelGangMember> _gangMembers = [];
   final Random _random = Random();
@@ -29,9 +28,6 @@ class _MainMenuBackgroundState extends State<MainMenuBackground>
 
     // Initialize background elements
     for (int i = 0; i < 3; i++) {
-      _prostitutes.add(
-        Prostitute(x: 50.0 + (i * 100), y: 450.0 + _random.nextDouble() * 50),
-      );
       _dealers.add(
         DrugDealer(x: 200.0 + (i * 120), y: 480.0 + _random.nextDouble() * 30),
       );
@@ -113,21 +109,6 @@ class _MainMenuBackgroundState extends State<MainMenuBackground>
               left: 0,
               right: 0,
               child: Container(height: 300, color: Colors.grey.shade900),
-            ),
-
-            // Prostitutes waving
-            ..._prostitutes.map(
-              (p) => Positioned(
-                left: p.x,
-                top: p.y,
-                child: PixelArtMember(
-                  isPlayer: false,
-                  isAlive: true,
-                  isCheering:
-                      (sin(_controller.value * 20 + p.x) > 0), // Waving logic
-                  size: 40,
-                ),
-              ),
             ),
 
             // Drug dealers with product
@@ -306,12 +287,6 @@ class Car {
     required this.speed,
     required this.isDriveBy,
   });
-}
-
-class Prostitute {
-  double x;
-  double y;
-  Prostitute({required this.x, required this.y});
 }
 
 class DrugDealer {

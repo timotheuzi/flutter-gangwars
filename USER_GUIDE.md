@@ -9,8 +9,8 @@ The goal is simple: **Survive and Dominate**. Accumulate wealth, grow your gang,
 
 ## 📍 Key Locations
 
-### 🏙️ City (Main Hub)
-This is your primary navigation screen. From here, you can access all other locations in the city. Keep an eye on the top bar for your current status (Health, Cash, and Day).
+### 🏙️ 3D Open World
+This is your primary navigation environment. Explore the city in a fully realized 3D isometric view. Walk to buildings to interact with them.
 
 ### 🏚️ Crackhouse
 The heart of your economy.
@@ -64,9 +64,10 @@ Randomly, or when provoked, you will enter combat with rival gangs.
 ---
 
 ## 🛠️ Controls
+- **Joystick/D-pad**: Move your character in the 3D world.
 - **Tap**: Select locations, buy items, or confirm actions.
 - **Scroll**: Navigate through long lists of inventory or drug types.
-- **Back Button**: Returns you to the City Hub from any location.
+- **Back Button**: Returns you to the previous screen.
 
 ---
 

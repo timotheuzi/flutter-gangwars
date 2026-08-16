@@ -37,6 +37,7 @@ class GameState with ChangeNotifier {
   Flags flags = Flags();
   Weapons weapons = Weapons();
   Drugs drugs = Drugs();
+  Prostitutes prostitutes = Prostitutes();
 
   // Squidies gang enhancements
   int squidiesGainedToday = 0;
@@ -137,6 +138,14 @@ class GameState with ChangeNotifier {
       members += newRecruits;
       if (members > 100) members = 100;
     }
+
+    // Prostitutes generate income: $3500 - $4800 per day
+    final random = Random();
+    int totalIncome = 0;
+    for (int i = 0; i < prostitutes.count; i++) {
+      totalIncome += 3500 + random.nextInt(1301); // 4800 - 3500 + 1
+    }
+    money += totalIncome;
 
     // Increase squidies critical hit chance
     squidiesCriticalHitChance = min(0.25, squidiesCriticalHitChance + 0.005);
@@ -241,6 +250,7 @@ class GameState with ChangeNotifier {
     'flags': flags.toJson(),
     'weapons': weapons.toJson(),
     'drugs': drugs.toJson(),
+    'prostitutes': prostitutes.toJson(),
     'squidiesGainedToday': squidiesGainedToday,
     'squidiesCriticalHitChance': squidiesCriticalHitChance,
     'gangMembers': gangMembers.map((m) => m.toJson()).toList(),
@@ -282,6 +292,7 @@ class GameState with ChangeNotifier {
     state.flags = Flags.fromJson(json['flags'] ?? {});
     state.weapons = Weapons.fromJson(json['weapons'] ?? {});
     state.drugs = Drugs.fromJson(json['drugs'] ?? {});
+    state.prostitutes = Prostitutes.fromJson(json['prostitutes'] ?? {});
     state.squidiesGainedToday = json['squidiesGainedToday'] ?? 0;
     state.squidiesCriticalHitChance = (json['squidiesCriticalHitChance'] ?? 0.1)
         .toDouble();
@@ -509,5 +520,20 @@ class Drugs {
       ..ice = json['ice'] ?? 0
       ..percs = json['percs'] ?? 0
       ..pixieDust = json['pixie_dust'] ?? 0;
+  }
+}
+
+class Prostitutes {
+  int count = 0;
+  int price = 5000;
+
+  Prostitutes();
+
+  Map<String, dynamic> toJson() => {'count': count, 'price': price};
+
+  factory Prostitutes.fromJson(Map<String, dynamic> json) {
+    return Prostitutes()
+      ..count = json['count'] ?? 0
+      ..price = json['price'] ?? 5000;
   }
 }
