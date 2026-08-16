@@ -22,7 +22,7 @@ class GangWars extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        fontFamily: 'GameFont',
+        fontFamily: 'PixelArt',
       ),
       home: const MainScreen(),
       debugShowCheckedModeBanner: false,

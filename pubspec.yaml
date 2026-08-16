@@ -29,9 +29,9 @@ dependency_overrides:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/app_icon.png"
+  image_path: "assets/images/app_icon.svg"
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/images/app_icon.png"
+  adaptive_icon_foreground: "assets/images/app_icon.svg"
 
 flutter:
   uses-material-design: true
@@ -41,3 +41,10 @@ flutter:
         - asset: assets/fonts/pixel_art.ttf
   assets:
     - assets/images/
+    - assets/images/alleyway/
+    - assets/images/buildings/
+    - assets/images/drugs/
+    - assets/images/enemy/
+    - assets/images/npc/
+    - assets/images/player/
+    - assets/images/weapons/
