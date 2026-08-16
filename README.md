@@ -1,4 +1,4 @@
-# Gangwar
+# Gangwars
 
 ![Gangwar Logo](assets/images/logo.png)
 

@@ -59,3 +59,5 @@ build/
 
 # Other artifacts
 *.tar.gz
+# Widget Preview related
+.widget_preview/

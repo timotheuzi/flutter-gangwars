@@ -1,14 +1,12 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
     namespace = "com.gangwar.gangwars"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = "28.0.12077973"
+    compileSdk = 35
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -16,45 +14,38 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
-
-    sourceSets {
-        named("main") {
-            java.srcDir(file("src/main/kotlin"))
-        }
+        jvmTarget = "17"
     }
 
     defaultConfig {
         applicationId = "com.gangwar.gangwars"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        minSdk = 21
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0.0"
     }
 
     signingConfigs {
-        create("release") {
-            storeFile = file("my-release-key.jks")
-            storePassword = "android"
-            keyAlias = "upload"
-            keyPassword = "kjjkgh765"
+        getByName("debug") {
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = true
-            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+            isShrinkResources = false
+        }
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 }
 
-dependencies {
-    implementation("androidx.appcompat:appcompat:1.7.0")
-}
-
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation("androidx.appcompat:appcompat:1.7.0")
 }
