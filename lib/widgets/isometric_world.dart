@@ -62,12 +62,29 @@ class IsometricOpenWorld extends FlameGame {
     );
     await add(_joystick);
 
+    _addWorldEntities();
+  }
+
+  void _addWorldEntities() {
+    if (worldData == null) return;
+
     // Add animated NPCs
     for (final npc in worldData!.npcs) {
-      await add(
+      add(
         IsometricNPCComponent(
           npc: npc,
           worldData: worldData!,
+          tileWidth: 48.0,
+          tileHeight: 28.0,
+        ),
+      );
+    }
+    
+    // Add Items
+    for (final item in worldData!.items) {
+       add(
+        IsometricItemComponent(
+          item: item,
           tileWidth: 48.0,
           tileHeight: 28.0,
         ),
@@ -81,9 +98,6 @@ class IsometricOpenWorld extends FlameGame {
 
     // Update camera
     _isoCamera.update(dt);
-
-    // Update NPC animations
-    // (handled in individual components)
   }
 
   /// Regenerate the world with a new seed
@@ -97,13 +111,18 @@ class IsometricOpenWorld extends FlameGame {
       baseHeight: 40.0,
     );
 
-    // Remove old components and re-add
+    // Remove old components
+    children.whereType<IsometricNPCComponent>().forEach((c) => c.removeFromParent());
+    children.whereType<IsometricItemComponent>().forEach((c) => c.removeFromParent());
     _worldPainter.removeFromParent();
+
+    // Re-add components
     _worldPainter = IsometricWorldPainterComponent(
       worldData: worldData!,
       size: size,
     );
     add(_worldPainter);
+    _addWorldEntities();
   }
 }
 
@@ -127,7 +146,6 @@ class IsometricWorldPainterComponent extends PositionComponent {
     _drawTiles(canvas);
     _drawProps(canvas);
     _drawBuildings(canvas);
-    _drawNPCs(canvas);
   }
 
   void _drawTiles(Canvas canvas) {
@@ -289,50 +307,6 @@ class IsometricWorldPainterComponent extends PositionComponent {
       }
     }
   }
-
-  void _drawNPCs(Canvas canvas) {
-    for (final npc in worldData.npcs) {
-      final nx = npc.screenX;
-      final ny = npc.screenY;
-
-      // Shadow
-      _shadowPaint.color = Colors.black.withValues(alpha: 0.12);
-      canvas.drawOval(
-        Rect.fromCenter(center: Offset(nx + 1, ny + 1), width: 10, height: 4),
-        _shadowPaint,
-      );
-
-      // Legs
-      _paint.color = Color.fromARGB(
-        255,
-        (npc.color.r * 255 * 0.7).round().clamp(0, 255),
-        (npc.color.g * 255 * 0.7).round().clamp(0, 255),
-        (npc.color.b * 255 * 0.7).round().clamp(0, 255),
-      );
-      canvas.drawRect(
-        Rect.fromCenter(center: Offset(nx - 2, ny), width: 3, height: 4),
-        _paint,
-      );
-      canvas.drawRect(
-        Rect.fromCenter(center: Offset(nx + 2, ny), width: 3, height: 4),
-        _paint,
-      );
-
-      // Body
-      _paint.color = npc.color;
-      canvas.drawRect(
-        Rect.fromCenter(center: Offset(nx, ny - 5), width: 6, height: 7),
-        _paint,
-      );
-
-      // Head
-      _paint.color = const Color(0xFFDCB48C); // Skin color
-      canvas.drawRect(
-        Rect.fromCenter(center: Offset(nx, ny - 11), width: 5, height: 5),
-        _paint,
-      );
-    }
-  }
 }
 
 /// Isometric Camera component for pan and zoom
@@ -371,12 +345,12 @@ class IsometricCamera extends Component {
   void update(double dt) {
     // Smooth lerp for offset
     _offset = Offset(
-      _offset.dx + (_targetOffset.dx - _offset.dx) * 5.0 * dt,
-      _offset.dy + (_targetOffset.dy - _offset.dy) * 5.0 * dt,
+      _offset.dx + (_targetOffset.dx - _offset.dx) * 8.0 * dt,
+      _offset.dy + (_targetOffset.dy - _offset.dy) * 8.0 * dt,
     );
 
     // Smooth lerp for zoom
-    _zoom += (_targetZoom - _zoom) * 4.0 * dt;
+    _zoom += (_targetZoom - _zoom) * 6.0 * dt;
   }
 }
 
@@ -395,10 +369,11 @@ class IsometricJoystickComponent extends JoystickComponent {
   void update(double dt) {
     super.update(dt);
 
-    if (!delta.isZero()) {
-      const panSpeed = 200.0;
+    if (!relativeDelta.isZero()) {
+      // Increased sensitivity and using relativeDelta for smoother response
+      const panSpeed = 600.0;
       isometricCamera.panBy(
-        Offset(-delta.x * panSpeed * dt, -delta.y * panSpeed * dt),
+        Offset(-relativeDelta.x * panSpeed * dt, -relativeDelta.y * panSpeed * dt),
       );
     }
   }
@@ -514,6 +489,50 @@ class IsometricNPCComponent extends PositionComponent {
       ),
       _skinPaint,
     );
+  }
+}
+
+/// Item component for the isometric world
+class IsometricItemComponent extends PositionComponent {
+  final IsometricItem item;
+  final double tileWidth;
+  final double tileHeight;
+  double _hoverTimer = 0;
+  final Paint _paint = Paint()..style = PaintingStyle.fill;
+
+  IsometricItemComponent({
+    required this.item,
+    required this.tileWidth,
+    required this.tileHeight,
+  });
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    _hoverTimer += dt;
+  }
+
+  @override
+  void render(Canvas canvas) {
+    final ix = item.screenX;
+    final iy = item.screenY + math.sin(_hoverTimer * 4) * 3;
+
+    _paint.color = item.color;
+    // Draw a small diamond for items
+    final path = Path();
+    const double s = 6.0;
+    path.moveTo(ix, iy - s);
+    path.lineTo(ix + s, iy);
+    path.lineTo(ix, iy + s);
+    path.lineTo(ix - s, iy);
+    path.close();
+    canvas.drawPath(path, _paint);
+
+    // Add a glow
+    final glowPaint = Paint()
+      ..color = item.color.withValues(alpha: 0.3)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
+    canvas.drawCircle(Offset(ix, iy), s * 1.5, glowPaint);
   }
 }
 

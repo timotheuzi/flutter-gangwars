@@ -8,8 +8,8 @@ class Procedural3DTerrain {
   final int seed;
 
   Procedural3DTerrain({int? seed})
-    : seed = seed ?? DateTime.now().millisecondsSinceEpoch,
-      _random = Random(seed ?? DateTime.now().millisecondsSinceEpoch);
+      : seed = seed ?? DateTime.now().millisecondsSinceEpoch,
+        _random = Random(seed ?? DateTime.now().millisecondsSinceEpoch);
 
   /// Generate a height map using simplex-like noise
   ProceduralHeightMap generateHeightMap({
@@ -121,12 +121,14 @@ class Procedural3DTerrain {
     final buildings = _generateBuildings(tiles, tileWidth, tileHeight);
     final npcs = _generateNPCs(tiles, tileWidth, tileHeight);
     final props = _generateProps(tiles, tileWidth, tileHeight);
+    final items = _generateItems(tiles, tileWidth, tileHeight);
 
     return IsometricWorldData(
       tiles: tiles,
       buildings: buildings,
       npcs: npcs,
       props: props,
+      items: items,
       mapWidth: mapWidth,
       mapHeight: mapHeight,
     );
@@ -189,15 +191,15 @@ class Procedural3DTerrain {
   Color _getTerrainColor(double elevation, int x, int y) {
     // Color based on elevation
     if (elevation < 0.3) {
-      return Color.fromARGB(255, 50, 120, 50); // Grass
+      return const Color.fromARGB(255, 50, 120, 50); // Grass
     } else if (elevation < 0.8) {
-      return Color.fromARGB(255, 40, 100, 40); // Dark grass
+      return const Color.fromARGB(255, 40, 100, 40); // Dark grass
     } else if (elevation < 1.5) {
-      return Color.fromARGB(255, 80, 70, 50); // Dirt/hill
+      return const Color.fromARGB(255, 80, 70, 50); // Dirt/hill
     } else if (elevation < 2.2) {
-      return Color.fromARGB(255, 100, 90, 70); // Rock
+      return const Color.fromARGB(255, 100, 90, 70); // Rock
     } else {
-      return Color.fromARGB(255, 70, 70, 70); // Stone/mountain
+      return const Color.fromARGB(255, 70, 70, 70); // Stone/mountain
     }
   }
 
@@ -224,7 +226,17 @@ class Procedural3DTerrain {
     double tileH,
   ) {
     final buildings = <IsometricBuilding>[];
-    final buildingTypes = ['bank', 'bar', 'crackhouse', 'gunshack', 'house'];
+    final buildingTypes = [
+      'bank',
+      'bar',
+      'crackhouse',
+      'gunshack',
+      'house',
+      'alleyway',
+      'hospital',
+      'police',
+      'store'
+    ];
 
     // Place buildings on relatively flat terrain
     final suitableTiles = tiles
@@ -242,7 +254,7 @@ class Procedural3DTerrain {
     suitableTiles.shuffle(_random);
 
     final count = min(
-      buildingTypes.length + _random.nextInt(3),
+      buildingTypes.length + _random.nextInt(5),
       suitableTiles.length,
     );
     for (int i = 0; i < count; i++) {
@@ -276,6 +288,14 @@ class Procedural3DTerrain {
         return const Color(0xFF4A4A4A); // Dark grey
       case 'gunshack':
         return const Color(0xFF6B4226); // Dark brown
+      case 'alleyway':
+        return const Color(0xFF2C3E50); // Midnight blue/grey
+      case 'hospital':
+        return Colors.white;
+      case 'police':
+        return Colors.blue.shade900;
+      case 'store':
+        return Colors.grey.shade600;
       default:
         return const Color(0xFF808080); // Grey
     }
@@ -287,13 +307,12 @@ class Procedural3DTerrain {
     double tileH,
   ) {
     final npcs = <IsometricNPC>[];
-    final walkableTiles = tiles
-        .where((t) => t.elevation > 0.1 && t.elevation < 1.2)
-        .toList();
+    final walkableTiles =
+        tiles.where((t) => t.elevation > 0.1 && t.elevation < 1.2).toList();
 
     walkableTiles.shuffle(_random);
 
-    final count = min(15 + _random.nextInt(10), walkableTiles.length);
+    final count = min(20 + _random.nextInt(15), walkableTiles.length);
     for (int i = 0; i < count; i++) {
       final tile = walkableTiles[i];
       final npcType = _random.nextInt(5);
@@ -332,19 +351,61 @@ class Procedural3DTerrain {
     }
   }
 
+  List<IsometricItem> _generateItems(
+    List<IsometricTile> tiles,
+    double tileW,
+    double tileH,
+  ) {
+    final items = <IsometricItem>[];
+    final suitableTiles =
+        tiles.where((t) => t.elevation > 0.1 && t.elevation < 1.0).toList();
+
+    suitableTiles.shuffle(_random);
+
+    final count = min(15 + _random.nextInt(10), suitableTiles.length);
+    for (int i = 0; i < count; i++) {
+      final tile = suitableTiles[i];
+      final itemType = _random.nextInt(3);
+
+      items.add(
+        IsometricItem(
+          gridX: tile.gridX,
+          gridY: tile.gridY,
+          screenX: tile.screenX,
+          screenY: tile.screenY - tile.elevation * tile.baseHeight,
+          type: itemType,
+          color: _getItemColor(itemType),
+        ),
+      );
+    }
+    return items;
+  }
+
+  Color _getItemColor(int type) {
+    switch (type) {
+      case 0:
+        return Colors.greenAccent; // Medkit
+      case 1:
+        return Colors.yellowAccent; // Briefcase/Money
+      case 2:
+        return Colors.blueAccent; // Ammo
+      default:
+        return Colors.white;
+    }
+  }
+
   List<IsometricProp> _generateProps(
     List<IsometricTile> tiles,
     double tileW,
     double tileH,
   ) {
     final props = <IsometricProp>[];
-    final suitableTiles = tiles
-        .where((t) => t.elevation > 0.1 && t.elevation < 1.0)
-        .toList();
+    final suitableTiles =
+        tiles.where((t) => t.elevation > 0.1 && t.elevation < 1.0).toList();
 
     suitableTiles.shuffle(_random);
 
-    final count = min(20 + _random.nextInt(15), suitableTiles.length);
+    final count = min(30 + _random.nextInt(20), suitableTiles.length);
     for (int i = 0; i < count; i++) {
       final tile = suitableTiles[i];
       final propType = _random.nextInt(4);
@@ -495,6 +556,24 @@ class IsometricNPC {
   });
 }
 
+class IsometricItem {
+  final int gridX;
+  final int gridY;
+  final double screenX;
+  final double screenY;
+  final int type;
+  final Color color;
+
+  IsometricItem({
+    required this.gridX,
+    required this.gridY,
+    required this.screenX,
+    required this.screenY,
+    required this.type,
+    required this.color,
+  });
+}
+
 class IsometricProp {
   final int gridX;
   final int gridY;
@@ -520,6 +599,7 @@ class IsometricWorldData {
   final List<IsometricBuilding> buildings;
   final List<IsometricNPC> npcs;
   final List<IsometricProp> props;
+  final List<IsometricItem> items;
   final int mapWidth;
   final int mapHeight;
 
@@ -528,6 +608,7 @@ class IsometricWorldData {
     required this.buildings,
     required this.npcs,
     required this.props,
+    required this.items,
     required this.mapWidth,
     required this.mapHeight,
   });
@@ -557,6 +638,7 @@ class IsometricWorldPainter extends CustomPainter {
     _drawProps(canvas);
     _drawBuildings(canvas);
     _drawNPCs(canvas);
+    _drawItems(canvas);
 
     canvas.restore();
   }
@@ -570,14 +652,13 @@ class IsometricWorldPainter extends CustomPainter {
     // Sort tiles by depth (painter's algorithm)
     final sortedTiles = List<IsometricTile>.from(worldData.tiles)
       ..sort(
-        (a, b) =>
-            Procedural3DTerrain.depthSortKey(
-              a.gridX,
-              a.gridY,
-              a.elevation,
-            ).compareTo(
-              Procedural3DTerrain.depthSortKey(b.gridX, b.gridY, b.elevation),
-            ),
+        (a, b) => Procedural3DTerrain.depthSortKey(
+          a.gridX,
+          a.gridY,
+          a.elevation,
+        ).compareTo(
+          Procedural3DTerrain.depthSortKey(b.gridX, b.gridY, b.elevation),
+        ),
       );
 
     for (final tile in sortedTiles) {
@@ -657,6 +738,28 @@ class IsometricWorldPainter extends CustomPainter {
         ),
         shadowPaint,
       );
+    }
+  }
+
+  void _drawItems(Canvas canvas) {
+    final paint = Paint()..style = PaintingStyle.fill;
+    for (final item in worldData.items) {
+      paint.color = item.color;
+      // Draw a small diamond for items
+      final path = Path();
+      const double s = 6.0;
+      path.moveTo(item.screenX, item.screenY - s);
+      path.lineTo(item.screenX + s, item.screenY);
+      path.lineTo(item.screenX, item.screenY + s);
+      path.lineTo(item.screenX - s, item.screenY);
+      path.close();
+      canvas.drawPath(path, paint);
+
+      // Add a glow
+      final glowPaint = Paint()
+        ..color = item.color.withValues(alpha: 0.3)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
+      canvas.drawCircle(Offset(item.screenX, item.screenY), s * 1.5, glowPaint);
     }
   }
 
@@ -756,7 +859,7 @@ class IsometricWorldPainter extends CustomPainter {
       );
 
       // Head
-      paint.color = Color.fromARGB(255, 220, 180, 140);
+      paint.color = const Color.fromARGB(255, 220, 180, 140);
       canvas.drawRect(
         Rect.fromCenter(
           center: Offset(npc.screenX, npc.screenY - 12),

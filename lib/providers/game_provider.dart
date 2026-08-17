@@ -211,54 +211,79 @@ class GameProvider with ChangeNotifier {
     switch (weaponType) {
       case 'pistol':
         _gameState.weapons.pistols += quantity;
+        break;
       case 'bullets':
         _gameState.weapons.bullets += quantity * 50;
+        break;
       case 'exploding_bullets':
         _gameState.weapons.explodingBullets += quantity * 20;
+        break;
       case 'hollow_point_bullets':
         _gameState.weapons.hollowPointBullets += quantity * 15;
+        break;
       case 'uzi':
         _gameState.weapons.uzis += quantity;
+        break;
       case 'ar15':
         _gameState.weapons.ar15 += quantity;
+        break;
       case 'ghost_gun':
         _gameState.weapons.ghostGuns += quantity;
+        break;
       case 'grenade':
         _gameState.weapons.grenades += quantity;
+        break;
       case 'barbed_wire_bat':
         _gameState.weapons.barbedWireBat += quantity;
+        break;
       case 'vampire_bat':
         _gameState.weapons.vampireBat += quantity;
+        break;
       case 'brass_knuckles':
         _gameState.weapons.brassKnuckles += quantity;
+        break;
       case 'knife':
         _gameState.weapons.knife += quantity;
+        break;
       case 'sword':
         _gameState.weapons.sword += quantity;
+        break;
       case 'axe':
         _gameState.weapons.axe += quantity;
+        break;
       case 'golden_gun':
         _gameState.weapons.goldenGun += quantity;
+        break;
       case 'poison_blowgun':
         _gameState.weapons.poisonBlowgun += quantity;
+        break;
       case 'missile_launcher':
         _gameState.weapons.missileLauncher += quantity;
+        break;
       case 'missile':
         _gameState.weapons.missiles += quantity;
+        break;
       case 'machine_gun':
         _gameState.weapons.machineGun += quantity;
+        break;
       case 'rocket_launcher':
         _gameState.weapons.rocketLauncher += quantity;
+        break;
       case 'submachine_gun':
         _gameState.weapons.submachineGun += quantity;
+        break;
       case 'flamethrower':
         _gameState.weapons.flamethrower += quantity;
+        break;
       case 'vest_light':
         _gameState.weapons.vest = 5;
+        break;
       case 'vest_medium':
         _gameState.weapons.vest = 10;
+        break;
       case 'vest_heavy':
         _gameState.weapons.vest = 15;
+        break;
     }
   }
 
@@ -346,16 +371,22 @@ class GameProvider with ChangeNotifier {
     switch (normalized) {
       case 'weed':
         _gameState.drugs.weed += quantity;
+        break;
       case 'crack':
         _gameState.drugs.crack += quantity;
+        break;
       case 'coke':
         _gameState.drugs.coke += quantity;
+        break;
       case 'ice':
         _gameState.drugs.ice += quantity;
+        break;
       case 'percs':
         _gameState.drugs.percs += quantity;
+        break;
       case 'pixie_dust':
         _gameState.drugs.pixieDust += quantity;
+        break;
     }
   }
 
@@ -364,16 +395,22 @@ class GameProvider with ChangeNotifier {
     switch (normalized) {
       case 'weed':
         _gameState.drugs.weed -= quantity;
+        break;
       case 'crack':
         _gameState.drugs.crack -= quantity;
+        break;
       case 'coke':
         _gameState.drugs.coke -= quantity;
+        break;
       case 'ice':
         _gameState.drugs.ice -= quantity;
+        break;
       case 'percs':
         _gameState.drugs.percs -= quantity;
+        break;
       case 'pixie_dust':
         _gameState.drugs.pixieDust -= quantity;
+        break;
     }
   }
 
