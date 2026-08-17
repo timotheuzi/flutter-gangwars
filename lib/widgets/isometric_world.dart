@@ -14,6 +14,10 @@ class IsometricOpenWorld extends FlameGame {
   final Function(String)? onEnterBuilding;
   IsometricWorldData? worldData;
   Procedural3DTerrain? terrain;
+  
+  // Track the last building we were "near" to avoid spamming dialogs
+  String? _lastNearbyBuilding;
+  double _entryCooldown = 0;
 
   /// Custom isometric camera (separate from Flame's CameraComponent)
   IsometricCamera get isoCamera => _isoCamera;
@@ -98,6 +102,41 @@ class IsometricOpenWorld extends FlameGame {
 
     // Update camera
     _isoCamera.update(dt);
+    
+    if (_entryCooldown > 0) {
+      _entryCooldown -= dt;
+    } else {
+      _checkBuildingInteraction();
+    }
+  }
+  
+  void _checkBuildingInteraction() {
+    if (worldData == null || onEnterBuilding == null) return;
+    
+    // The "player" position is the center of the screen relative to the world offset
+    final playerWorldX = size.x / 2 - _isoCamera.offset.dx;
+    final playerWorldY = size.y / 2 - _isoCamera.offset.dy;
+    
+    String? currentNearby;
+    for (final building in worldData!.buildings) {
+      final dx = playerWorldX - building.screenX;
+      final dy = playerWorldY - building.screenY;
+      final distance = math.sqrt(dx * dx + dy * dy);
+      
+      // If close to a building (approx one tile width)
+      if (distance < 40.0) {
+        currentNearby = building.type;
+        break;
+      }
+    }
+    
+    if (currentNearby != null && currentNearby != _lastNearbyBuilding) {
+      _lastNearbyBuilding = currentNearby;
+      _entryCooldown = 2.0; // 2 second cooldown before another check
+      onEnterBuilding!(currentNearby);
+    } else if (currentNearby == null) {
+      _lastNearbyBuilding = null;
+    }
   }
 
   /// Regenerate the world with a new seed
@@ -123,6 +162,9 @@ class IsometricOpenWorld extends FlameGame {
     );
     add(_worldPainter);
     _addWorldEntities();
+    
+    _lastNearbyBuilding = null;
+    _entryCooldown = 0;
   }
 }
 

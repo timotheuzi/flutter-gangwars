@@ -96,10 +96,10 @@ class ProceduralOpenWorldScreenState extends State<ProceduralOpenWorldScreen>
               ),
             ),
             const SizedBox(height: 16),
-  Text(
-    'Do you want to enter the $buildingType?',
-    style: const TextStyle(color: Colors.white70),
-  ),
+            Text(
+              'Do you want to enter the $buildingType?',
+              style: const TextStyle(color: Colors.white70),
+            ),
           ],
         ),
         actions: [
@@ -120,20 +120,17 @@ class ProceduralOpenWorldScreenState extends State<ProceduralOpenWorldScreen>
   }
 
   BuildingType _mapToBuildingType(String type) {
-    switch (type) {
-      case 'bank':
-        return BuildingType.bank;
-      case 'bar':
-        return BuildingType.bar;
-      case 'crackhouse':
-        return BuildingType.crackhouse;
-      case 'gunshack':
-        return BuildingType.gunshack;
-      case 'house':
-        return BuildingType.house;
-      default:
-        return BuildingType.store;
-    }
+    return switch (type) {
+      'bank' => BuildingType.bank,
+      'bar' => BuildingType.bar,
+      'crackhouse' => BuildingType.crackhouse,
+      'gunshack' => BuildingType.gunshack,
+      'house' => BuildingType.house,
+      'hospital' => BuildingType.hospital,
+      'police' => BuildingType.police,
+      'store' || 'picknsave' => BuildingType.store,
+      _ => BuildingType.store,
+    };
   }
 
   void _navigateToBuilding(String buildingType) {
