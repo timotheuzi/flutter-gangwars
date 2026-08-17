@@ -6,7 +6,8 @@ plugins {
 
 android {
     namespace = "com.gangwar.gangwars"
-    compileSdk = 37
+    compileSdk = 36
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -14,12 +15,12 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "21"
+        jvmTarget = 21
     }
 
     defaultConfig {
         applicationId = "com.gangwar.gangwars"
-        minSdk = 24
+        minSdk = 28
         targetSdk = 36
         versionCode = 1
         versionName = "1.0.1"
@@ -30,32 +31,24 @@ android {
         }
     }
 
-    signingConfigs {
-        getByName("debug") {
-        }
-    }
-
-    buildTypes {
+    /*buildTypes {
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug")
         }
         getByName("debug") {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
             signingConfig = signingConfigs.getByName("debug")
         }
-    }
+    }*/
 
     packaging {
         jniLibs {
             // Workaround for 'stripDebugDebugSymbols' failure with NDK 28+
             // NDK 28 has toolchain changes that can cause 'llvm-strip' process start failures in some AGP versions.
             keepDebugSymbols.add("**/*.so")
-        }
-        debug {
-            signingConfig = signingConfigs.getByName("debug")
         }
     }
 }

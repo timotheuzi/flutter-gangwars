@@ -40,19 +40,22 @@ add_library(runner INTERFACE)
 
 # Source files common to all platforms.
 set(COMMON_SOURCES
-  my_application.cc
+  runner/my_application.cc
+  flutter/generated_plugin_registrant.cc
 )
 
 # Define the application target. To change the name of the binary produced,
 # assign a new value to BINARY_NAME above.
 add_executable(${BINARY_NAME}
-  main.cc
+  runner/main.cc
   ${COMMON_SOURCES}
 )
 
 # Apply the standard set of build settings. This can be removed for applications
 # that need different build settings.
 target_link_libraries(${BINARY_NAME} PRIVATE flutter)
+target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/runner")
+target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/flutter")
 target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_definitions(${BINARY_NAME} PRIVATE
   $<$<BOOL:${FLUTTER_BUILD_NUMBER}>:FLUTTER_BUILD_NUMBER="${FLUTTER_BUILD_NUMBER}">
