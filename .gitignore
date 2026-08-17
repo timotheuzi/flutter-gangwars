@@ -10,6 +10,7 @@
 .svn/
 gangwar_ref
 *.zip
+*.7z
 fgw.zip
 
 # IntelliJ related
