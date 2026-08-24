@@ -33,6 +33,7 @@ fgw.zip
 .pub/
 __pycache__/
 build/
+*.lock
 
 # Android related
 **/android/app/debug/
