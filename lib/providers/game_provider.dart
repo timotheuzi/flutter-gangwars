@@ -179,9 +179,9 @@ class GameProvider with ChangeNotifier {
   int _getWeaponPrice(String weaponType) {
     return switch (weaponType) {
       'pistol' => 800,
-      'bullets' => 400, // Balanced price for 50 bullets
-      'exploding_bullets' => 400, // Balanced price for 20 bullets
-      'hollow_point_bullets' => 300, // Fixed: 100 less than exploding
+      'bullets' => 400,
+      'exploding_bullets' => 400,
+      'hollow_point_bullets' => 300,
       'uzi' => 15000,
       'ar15' => 30000,
       'ghost_gun' => 2000,
@@ -434,7 +434,6 @@ class GameProvider with ChangeNotifier {
       _gameMessage = 'Victory! You defeated the $enemyType in the mud!';
     } else if (result.defeat) {
       _gameMessage = 'Defeat! You died in the gutter.';
-      // We do NOT change _currentScreen here so the user can see the defeat card summary
     }
 
     saveGameState();
@@ -499,7 +498,6 @@ class GameProvider with ChangeNotifier {
 
   bool _buyMedical() {
     if (!_gameState.spendMoney(500)) {
-      // Balanced price
       _gameMessage = 'Not enough money!';
       return false;
     }
@@ -560,7 +558,6 @@ class GameProvider with ChangeNotifier {
   }
 
   void _advanceDayWithIncome() {
-    // Calculate income before advancing day
     final random = Random();
     int totalIncome = 0;
     for (int i = 0; i < _gameState.prostitutes.count; i++) {
@@ -569,7 +566,6 @@ class GameProvider with ChangeNotifier {
 
     _gameState.advanceDay();
 
-    // Day message includes prostitute income
     _gameMessage = 'A new day begins! Day ${_gameState.day}';
     if (_gameState.prostitutes.count > 0) {
       _gameMessage += '\nYour prostitutes earned you \$$totalIncome tonight.';
@@ -579,20 +575,17 @@ class GameProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Legacy method for compatibility if needed, but updated to use new logic
   String wander() {
     final event = wanderWithEvent();
     return event?.description ?? _gameMessage;
   }
 
-  // New method that returns the full event object
   RandomEvent? wanderWithEvent() {
     _gameState.steps++;
 
     if (_gameState.steps >= _gameState.maxSteps) {
       _advanceDayWithIncome();
 
-      // Check for loan sharks at the start of a new day - now 2 days grace
       if (_gameState.loan > 0 &&
           (_gameState.day - _gameState.loanDayTaken) >= 2) {
         _gameState.flags.hasAttractedLoanShark = true;
@@ -601,17 +594,14 @@ class GameProvider with ChangeNotifier {
       return null;
     }
 
-    // Check for loan shark encounter
     if (_gameState.loan > 0 &&
         _gameState.flags.hasAttractedLoanShark &&
         Random().nextDouble() < 0.2) {
-      // Increased chance
       final msg = _handleLoanSharkEncounter();
       _gameMessage = msg;
-      return null; // Combat started or debt paid
+      return null;
     }
 
-    // Generate random event
     final event = RandomEventData.generateRandomEvent(_gameState);
 
     if (!RandomEventData.hasMeetRequirements(event, _gameState)) {
@@ -624,14 +614,12 @@ class GameProvider with ChangeNotifier {
       );
     }
 
-    // Don't apply effects yet for NPC encounters with options
-    if (event.type == EventType.npcEncounter && event.options.isNotEmpty) {
+    if (event.options.isNotEmpty) {
       return event;
     }
 
     RandomEventData.applyEventEffects(event, _gameState);
 
-    // Handle combat events
     switch (event.type) {
       case EventType.gangFight:
         startMudFight(100, 3, 'Rival Gang Members', event.id);
@@ -644,7 +632,6 @@ class GameProvider with ChangeNotifier {
         startMudFight(200, enemyCount, 'Squidie Hit Squad', event.id);
         break;
       default:
-        // Other events handled by applyEventEffects or just informational
         break;
     }
 
@@ -654,17 +641,8 @@ class GameProvider with ChangeNotifier {
 
   String _handleLoanSharkEncounter() {
     final repaymentAmount = (_gameState.loan * 1.5).toInt();
-
-    if (_gameState.money >= repaymentAmount) {
-      // Automatic repayment if money is available? Or force combat?
-      // Requirement says "hunted down", so let's trigger combat.
-      startMudFight(200, 1, 'Loan Shark Enforcer', 'loan_shark_boss_fight');
-      return 'A Loan Shark Enforcer corners you! "You owe us \$$repaymentAmount, punk!"';
-    } else {
-      // Start combat with loan shark enforcer
-      startMudFight(200, 1, 'Loan Shark Enforcer', 'loan_shark_boss_fight');
-      return 'Loan shark enforcer attacks! Fight or die!';
-    }
+    startMudFight(200, 1, 'Loan Shark Enforcer', 'loan_shark_boss_fight');
+    return 'A Loan Shark Enforcer corners you! "You owe us \$$repaymentAmount, punk!"';
   }
 
   String handleNpcInteraction(RandomEvent event, String option) {
@@ -673,14 +651,28 @@ class GameProvider with ChangeNotifier {
     }
 
     final effects = event.optionEffects[option]!;
+    bool interactionSuccess = true;
 
     effects.forEach((key, value) {
       switch (key) {
         case 'damage':
-          if (option == 'Fight' || option == 'Challenge') {
-            final enemyName = event.title.replaceFirst('👤 DARK ENCOUNTER: ', '');
-            startMudFight(100, 1, enemyName, event.id);
-            _gameMessage = 'You attacked the $enemyName!';
+          if (option == 'Fight' || option == 'Challenge' || option == 'YES (FIGHT)') {
+             int enemyHealth = 100;
+             int enemyCount = 1;
+             String enemyName = event.title.replaceFirst('👤 DARK ENCOUNTER: ', '')
+                                         .replaceFirst('🩸 TERRITORY DISPUTE', 'Rival Gang')
+                                         .replaceFirst('🪤 THE SLAUGHTERHOUSE', 'Ambushers');
+             
+             if (event.type == EventType.gangFight) {
+               enemyCount = 3;
+             } else if (event.type == EventType.policeChase) {
+               enemyName = 'Police Officers';
+               enemyCount = 4;
+               enemyHealth = 150;
+             }
+             
+             startMudFight(enemyHealth, enemyCount, enemyName, event.id);
+             _gameMessage = 'You engaged the $enemyName!';
           } else {
             _gameMessage = 'You took $value damage.';
             _gameState.takeDamage(value);
@@ -695,13 +687,36 @@ class GameProvider with ChangeNotifier {
             _gameState.money += value;
             _gameMessage = 'You got \$$value.';
           } else {
-            if (_gameState.spendMoney(-value)) {
-              _gameMessage = 'You spent \$${-value}.';
+            if (!_gameState.spendMoney(-value)) {
+              _gameMessage = 'You didn\'t have enough money!';
+              interactionSuccess = false;
             }
           }
           break;
+        case 'drugs':
+           // Add a default drug if not specified, or just add crack
+           _addDrug('crack', value);
+           _gameMessage = 'You received $value kilos of crack.';
+           break;
+        case 'members':
+           _gameState.members = min(100, _gameState.members + value);
+           _gameMessage = 'You recruited $value new members.';
+           break;
       }
     });
+    
+    // Handle specific event type transitions if needed
+    if (interactionSuccess) {
+       if (event.type == EventType.weaponFound && option == 'YES') {
+          // Grant random weapon
+          final weapons = ['pistol', 'knife', 'brass_knuckles', 'uzi'];
+          final weapon = weapons[Random().nextInt(weapons.length)];
+          _addWeapon(weapon, 1);
+          _gameMessage = 'You found a $weapon!';
+       }
+    }
+    
+    saveGameState();
     notifyListeners();
     return _gameMessage;
   }

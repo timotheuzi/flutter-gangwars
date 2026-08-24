@@ -191,15 +191,15 @@ class Procedural3DTerrain {
   Color _getTerrainColor(double elevation, int x, int y) {
     // Color based on elevation
     if (elevation < 0.3) {
-      return const Color.fromARGB(255, 50, 120, 50); // Grass
+      return const Color.fromARGB(255, 30, 80, 30); // Darker grass for noir feel
     } else if (elevation < 0.8) {
-      return const Color.fromARGB(255, 40, 100, 40); // Dark grass
+      return const Color.fromARGB(255, 20, 60, 20); // Deep green
     } else if (elevation < 1.5) {
-      return const Color.fromARGB(255, 80, 70, 50); // Dirt/hill
+      return const Color.fromARGB(255, 60, 50, 40); // Mud/dirt
     } else if (elevation < 2.2) {
-      return const Color.fromARGB(255, 100, 90, 70); // Rock
+      return const Color.fromARGB(255, 80, 80, 80); // Asphalt/concrete
     } else {
-      return const Color.fromARGB(255, 70, 70, 70); // Stone/mountain
+      return const Color.fromARGB(255, 50, 50, 50); // Stone
     }
   }
 
@@ -237,7 +237,10 @@ class Procedural3DTerrain {
       'picknsave',
       'hospital',
       'police',
-      'store'
+      'store',
+      'gym',
+      'warehouse',
+      'hideout'
     ];
 
     // Place buildings on relatively flat terrain
@@ -245,7 +248,7 @@ class Procedural3DTerrain {
         .where(
           (t) =>
               t.elevation > 0.2 &&
-              t.elevation < 1.0 &&
+              t.elevation < 1.2 &&
               t.gridX > 2 &&
               t.gridX < 29 &&
               t.gridY > 2 &&
@@ -256,7 +259,7 @@ class Procedural3DTerrain {
     suitableTiles.shuffle(_random);
 
     final count = min(
-      buildingTypes.length + _random.nextInt(5),
+      buildingTypes.length + _random.nextInt(10),
       suitableTiles.length,
     );
     for (int i = 0; i < count; i++) {
@@ -270,8 +273,8 @@ class Procedural3DTerrain {
           gridY: tile.gridY,
           screenX: tile.screenX,
           screenY: tile.screenY - tile.elevation * tile.baseHeight,
-          width: tileW * 1.5,
-          height: tileH * 2.0,
+          width: tileW * (1.2 + _random.nextDouble() * 0.8),
+          height: tileH * (1.8 + _random.nextDouble() * 2.0),
           color: _getBuildingColor(type),
         ),
       );
@@ -302,6 +305,12 @@ class Procedural3DTerrain {
         return Colors.blue.shade900;
       case 'store':
         return Colors.grey.shade600;
+      case 'gym':
+        return Colors.orange.shade800;
+      case 'warehouse':
+        return Colors.blueGrey.shade700;
+      case 'hideout':
+        return Colors.red.shade900;
       default:
         return const Color(0xFF808080); // Grey
     }
@@ -314,14 +323,14 @@ class Procedural3DTerrain {
   ) {
     final npcs = <IsometricNPC>[];
     final walkableTiles =
-        tiles.where((t) => t.elevation > 0.1 && t.elevation < 1.2).toList();
+        tiles.where((t) => t.elevation > 0.1 && t.elevation < 1.5).toList();
 
     walkableTiles.shuffle(_random);
 
-    final count = min(25 + _random.nextInt(15), walkableTiles.length);
+    final count = min(40 + _random.nextInt(30), walkableTiles.length);
     for (int i = 0; i < count; i++) {
       final tile = walkableTiles[i];
-      final npcType = _random.nextInt(6); // Added one for Loan Shark or boss type
+      final npcType = _random.nextInt(8); 
 
       npcs.add(
         IsometricNPC(
@@ -354,6 +363,10 @@ class Procedural3DTerrain {
         return Colors.orange.shade700; // Prostitute
       case 5:
         return Colors.black; // Loan Shark / Boss
+      case 6:
+        return Colors.cyan.shade600; // Informant
+      case 7:
+        return Colors.yellow.shade900; // Vendor
       default:
         return Colors.grey;
     }
@@ -370,10 +383,10 @@ class Procedural3DTerrain {
 
     suitableTiles.shuffle(_random);
 
-    final count = min(20 + _random.nextInt(15), suitableTiles.length);
+    final count = min(30 + _random.nextInt(20), suitableTiles.length);
     for (int i = 0; i < count; i++) {
       final tile = suitableTiles[i];
-      final itemType = _random.nextInt(4);
+      final itemType = _random.nextInt(5);
 
       items.add(
         IsometricItem(
@@ -399,6 +412,8 @@ class Procedural3DTerrain {
         return Colors.blueAccent; // Ammo
       case 3:
         return Colors.redAccent; // Weapons / Grenades
+      case 4:
+        return Colors.purpleAccent; // Drugs
       default:
         return Colors.white;
     }
@@ -411,14 +426,14 @@ class Procedural3DTerrain {
   ) {
     final props = <IsometricProp>[];
     final suitableTiles =
-        tiles.where((t) => t.elevation > 0.1 && t.elevation < 1.0).toList();
+        tiles.where((t) => t.elevation > 0.1 && t.elevation < 1.5).toList();
 
     suitableTiles.shuffle(_random);
 
-    final count = min(40 + _random.nextInt(20), suitableTiles.length);
+    final count = min(60 + _random.nextInt(40), suitableTiles.length);
     for (int i = 0; i < count; i++) {
       final tile = suitableTiles[i];
-      final propType = _random.nextInt(5);
+      final propType = _random.nextInt(6);
 
       props.add(
         IsometricProp(
@@ -428,7 +443,7 @@ class Procedural3DTerrain {
           screenY: tile.screenY - tile.elevation * tile.baseHeight,
           type: propType,
           color: _getPropColor(propType),
-          size: 4 + _random.nextDouble() * 8,
+          size: 4 + _random.nextDouble() * 10,
         ),
       );
     }
@@ -439,15 +454,17 @@ class Procedural3DTerrain {
   Color _getPropColor(int type) {
     switch (type) {
       case 0:
-        return Colors.brown; // Tree trunk
+        return Colors.brown.shade700; // Tree trunk
       case 1:
-        return Colors.green.shade400; // Bush
+        return Colors.green.shade900; // Bush
       case 2:
         return Colors.grey.shade600; // Rock
       case 3:
         return Colors.yellow.shade800; // Street light
       case 4:
         return Colors.blueGrey; // Trash can / Crate
+      case 5:
+        return Colors.red.shade800; // Fire hydrant
       default:
         return Colors.grey;
     }

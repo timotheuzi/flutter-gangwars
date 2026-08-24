@@ -12,12 +12,20 @@ class IsometricOpenWorld extends FlameGame {
   late IsometricCamera _isoCamera;
 
   final Function(String)? onEnterBuilding;
+  final Function(IsometricNPC)? onInteractNPC;
+  final VoidCallback? onStep;
+  
   IsometricWorldData? worldData;
   Procedural3DTerrain? terrain;
   
-  // Track the last building we were "near" to avoid spamming dialogs
+  // Track the last building/NPC we were "near" to avoid spamming dialogs
   String? _lastNearbyBuilding;
-  double _entryCooldown = 0;
+  int? _lastNearbyNPCId;
+  double _interactionCooldown = 0;
+  
+  // Track distance for step counting
+  double _distanceTraveled = 0;
+  final double _stepThreshold = 100.0;
 
   /// Custom isometric camera (separate from Flame's CameraComponent)
   IsometricCamera get isoCamera => _isoCamera;
@@ -26,7 +34,11 @@ class IsometricOpenWorld extends FlameGame {
   Offset get cameraOffset => _isoCamera.offset;
   double get cameraZoom => _isoCamera.zoom;
 
-  IsometricOpenWorld({this.onEnterBuilding});
+  IsometricOpenWorld({
+    this.onEnterBuilding,
+    this.onInteractNPC,
+    this.onStep,
+  });
 
   @override
   Future<void> onLoad() async {
@@ -73,13 +85,15 @@ class IsometricOpenWorld extends FlameGame {
     if (worldData == null) return;
 
     // Add animated NPCs
-    for (final npc in worldData!.npcs) {
+    for (int i = 0; i < worldData!.npcs.length; i++) {
+      final npc = worldData!.npcs[i];
       add(
         IsometricNPCComponent(
           npc: npc,
           worldData: worldData!,
           tileWidth: 48.0,
           tileHeight: 28.0,
+          id: i,
         ),
       );
     }
@@ -100,42 +114,81 @@ class IsometricOpenWorld extends FlameGame {
   void update(double dt) {
     super.update(dt);
 
+    // Track movement for steps
+    if (!_joystick.relativeDelta.isZero()) {
+      _distanceTraveled += _joystick.relativeDelta.length * 600.0 * dt;
+      if (_distanceTraveled >= _stepThreshold) {
+        _distanceTraveled = 0;
+        onStep?.call();
+      }
+    }
+
     // Update camera
     _isoCamera.update(dt);
     
-    if (_entryCooldown > 0) {
-      _entryCooldown -= dt;
+    if (_interactionCooldown > 0) {
+      _interactionCooldown -= dt;
     } else {
-      _checkBuildingInteraction();
+      _checkInteractions();
     }
   }
   
-  void _checkBuildingInteraction() {
-    if (worldData == null || onEnterBuilding == null) return;
+  void _checkInteractions() {
+    if (worldData == null) return;
     
     // The "player" position is the center of the screen relative to the world offset
     final playerWorldX = size.x / 2 - _isoCamera.offset.dx;
     final playerWorldY = size.y / 2 - _isoCamera.offset.dy;
     
-    String? currentNearby;
-    for (final building in worldData!.buildings) {
-      final dx = playerWorldX - building.screenX;
-      final dy = playerWorldY - building.screenY;
-      final distance = math.sqrt(dx * dx + dy * dy);
+    // Check Buildings
+    if (onEnterBuilding != null) {
+      String? currentNearbyBuilding;
+      for (final building in worldData!.buildings) {
+        final dx = playerWorldX - building.screenX;
+        final dy = playerWorldY - building.screenY;
+        final distance = math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 40.0) {
+          currentNearbyBuilding = building.type;
+          break;
+        }
+      }
       
-      // If close to a building (approx one tile width)
-      if (distance < 40.0) {
-        currentNearby = building.type;
-        break;
+      if (currentNearbyBuilding != null && currentNearbyBuilding != _lastNearbyBuilding) {
+        _lastNearbyBuilding = currentNearbyBuilding;
+        _interactionCooldown = 2.0;
+        onEnterBuilding!(currentNearbyBuilding);
+        return;
+      } else if (currentNearbyBuilding == null) {
+        _lastNearbyBuilding = null;
       }
     }
-    
-    if (currentNearby != null && currentNearby != _lastNearbyBuilding) {
-      _lastNearbyBuilding = currentNearby;
-      _entryCooldown = 2.0; // 2 second cooldown before another check
-      onEnterBuilding!(currentNearby);
-    } else if (currentNearby == null) {
-      _lastNearbyBuilding = null;
+
+    // Check NPCs
+    if (onInteractNPC != null) {
+      int? currentNearbyNPCIndex;
+      IsometricNPC? nearbyNPC;
+      
+      final npcComponents = children.whereType<IsometricNPCComponent>().toList();
+      for (final comp in npcComponents) {
+        final dx = playerWorldX - comp.drawX;
+        final dy = playerWorldY - comp.drawY;
+        final distance = math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 30.0) {
+          currentNearbyNPCIndex = comp.id;
+          nearbyNPC = comp.npc;
+          break;
+        }
+      }
+
+      if (currentNearbyNPCIndex != null && currentNearbyNPCIndex != _lastNearbyNPCId) {
+        _lastNearbyNPCId = currentNearbyNPCIndex;
+        _interactionCooldown = 3.0;
+        onInteractNPC!(nearbyNPC!);
+      } else if (currentNearbyNPCIndex == null) {
+        _lastNearbyNPCId = null;
+      }
     }
   }
 
@@ -164,7 +217,8 @@ class IsometricOpenWorld extends FlameGame {
     _addWorldEntities();
     
     _lastNearbyBuilding = null;
-    _entryCooldown = 0;
+    _lastNearbyNPCId = null;
+    _interactionCooldown = 0;
   }
 }
 
@@ -427,6 +481,7 @@ class IsometricNPCComponent extends PositionComponent {
   final IsometricWorldData worldData;
   final double tileWidth;
   final double tileHeight;
+  final int id;
   final math.Random _random = math.Random();
   double _moveTimer = 0;
   Offset _moveDirection = Offset.zero;
@@ -434,6 +489,10 @@ class IsometricNPCComponent extends PositionComponent {
   bool _isMoving = false;
   double _drawX;
   double _drawY;
+  
+  double get drawX => _drawX;
+  double get drawY => _drawY;
+
   final Paint _bodyPaint = Paint()..style = PaintingStyle.fill;
   final Paint _skinPaint = Paint()..style = PaintingStyle.fill;
   final Paint _shadowPaint = Paint();
@@ -444,6 +503,7 @@ class IsometricNPCComponent extends PositionComponent {
     required this.worldData,
     required this.tileWidth,
     required this.tileHeight,
+    required this.id,
   }) : _drawX = npc.screenX,
        _drawY = npc.screenY;
 
@@ -581,11 +641,15 @@ class IsometricItemComponent extends PositionComponent {
 /// Widget wrapper for the isometric open world Flame game
 class IsometricOpenWorldWidget extends StatelessWidget {
   final Function(String)? onEnterBuilding;
+  final Function(IsometricNPC)? onInteractNPC;
+  final VoidCallback? onStep;
   final VoidCallback? onExit;
 
   const IsometricOpenWorldWidget({
     super.key,
     this.onEnterBuilding,
+    this.onInteractNPC,
+    this.onStep,
     this.onExit,
   });
 
@@ -597,6 +661,12 @@ class IsometricOpenWorldWidget extends StatelessWidget {
           game: IsometricOpenWorld(
             onEnterBuilding: (buildingType) {
               onEnterBuilding?.call(buildingType);
+            },
+            onInteractNPC: (npc) {
+              onInteractNPC?.call(npc);
+            },
+            onStep: () {
+              onStep?.call();
             },
           ),
         ),
