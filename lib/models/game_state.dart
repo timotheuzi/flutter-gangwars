@@ -115,7 +115,7 @@ class GameState with ChangeNotifier {
     notifyListeners();
   }
 
-  void advanceDay() {
+  int advanceDay() {
     day++;
     steps = 0;
     squidiesGainedToday = 0;
@@ -135,8 +135,7 @@ class GameState with ChangeNotifier {
         >= 50 => Random().nextInt(1) + 1,
         _ => 1,
       };
-      members += newRecruits;
-      if (members > 100) members = 100;
+      members = min(100, members + newRecruits);
     }
 
     // Prostitutes generate income: $3500 - $4800 per day
@@ -167,6 +166,7 @@ class GameState with ChangeNotifier {
     generateDrugTrends();
 
     notifyListeners();
+    return totalIncome;
   }
 
   void updateDrugPrices() {

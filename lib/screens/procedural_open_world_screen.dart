@@ -6,6 +6,7 @@ import '../widgets/advanced_animations.dart';
 import '../widgets/comprehensive_sprites.dart';
 import '../widgets/cut_scene_system.dart';
 import '../models/random_event.dart';
+import '../widgets/procedural_3d_terrain.dart';
 
 /// 3D Procedural Open World Screen
 /// Displays a fully generated isometric world with terrain, buildings, NPCs,
@@ -81,7 +82,7 @@ class ProceduralOpenWorldScreenState extends State<ProceduralOpenWorldScreen>
   void _onStep() {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     final event = gameProvider.wanderWithEvent();
-    
+
     if (event != null && event.type != EventType.nothing) {
       _showRandomEventDialog(event);
     }
@@ -98,7 +99,7 @@ class ProceduralOpenWorldScreenState extends State<ProceduralOpenWorldScreen>
       'Loan Shark'
     ];
     final name = npcNames[npc.type.clamp(0, 5)];
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

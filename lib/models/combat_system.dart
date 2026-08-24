@@ -53,7 +53,29 @@ class CombatSystem {
         }
       } else if (availableWeapons.containsKey(weapon) &&
           availableWeapons[weapon]! > 0) {
-        availableWeapons[weapon] = availableWeapons[weapon]! - 1;
+        
+        // Consume ammo for firearms
+        if (_isFirearm(weapon)) {
+           if (gameState.weapons.bullets > 0) {
+             gameState.weapons.bullets--;
+           } else if (gameState.weapons.explodingBullets > 0) {
+             gameState.weapons.explodingBullets--;
+           } else if (gameState.weapons.hollowPointBullets > 0) {
+             gameState.weapons.hollowPointBullets--;
+           } else {
+             weapon = 'fists';
+           }
+        } else if (weapon == 'missile_launcher' || weapon == 'rocket_launcher') {
+           if (gameState.weapons.missiles > 0) {
+             gameState.weapons.missiles--;
+           } else {
+             weapon = 'fists';
+           }
+        }
+
+        if (weapon != 'fists') {
+          availableWeapons[weapon] = availableWeapons[weapon]! - 1;
+        }
       } else if (weapon != 'fists') {
         weapon = 'fists';
       }
@@ -153,28 +175,53 @@ class CombatSystem {
 
           final memberWeapon = _getStrongestFromMap(availableWeapons);
           if (memberWeapon != 'fists') {
-            availableWeapons[memberWeapon] =
-                availableWeapons[memberWeapon]! - 1;
-            if (memberWeapon == 'grenade') {
-              gameState.weapons.grenades--;
+            
+            // Check ammo for gang members too
+            bool hasAmmo = true;
+            if (_isFirearm(memberWeapon)) {
+               if (gameState.weapons.bullets > 0) {
+                 gameState.weapons.bullets--;
+               } else if (gameState.weapons.explodingBullets > 0) {
+                 gameState.weapons.explodingBullets--;
+               } else if (gameState.weapons.hollowPointBullets > 0) {
+                 gameState.weapons.hollowPointBullets--;
+               } else {
+                 hasAmmo = false;
+               }
+            } else if (memberWeapon == 'grenade') {
+               if (gameState.weapons.grenades > 0) {
+                 gameState.weapons.grenades--;
+               } else {
+                 hasAmmo = false;
+               }
+            } else if (memberWeapon == 'missile_launcher' || memberWeapon == 'rocket_launcher') {
+               if (gameState.weapons.missiles > 0) {
+                 gameState.weapons.missiles--;
+               } else {
+                 hasAmmo = false;
+               }
+            }
+
+            if (hasAmmo) {
+              availableWeapons[memberWeapon] = availableWeapons[memberWeapon]! - 1;
+              
+              if (random.nextDouble() > (gameState.accuracy - 0.1)) {
+                continue;
+              }
+
+              final memberDmg = _getWeaponDamage(memberWeapon, gameState);
+              final actualDmg = max(
+                2,
+                memberDmg + random.nextInt(max(1, memberDmg ~/ 3)),
+              );
+              remainingEnemyHealth -= actualDmg;
+              result.gangDamageDealt += actualDmg;
+
+              fightLog.add(
+                '[GANG MEMBER] Attacks with ${memberWeapon.toUpperCase()} for $actualDmg damage!',
+              );
             }
           }
-
-          if (random.nextDouble() > (gameState.accuracy - 0.1)) {
-            continue;
-          }
-
-          final memberDmg = _getWeaponDamage(memberWeapon, gameState);
-          final actualDmg = max(
-            2,
-            memberDmg + random.nextInt(max(1, memberDmg ~/ 3)),
-          );
-          remainingEnemyHealth -= actualDmg;
-          result.gangDamageDealt += actualDmg;
-
-          fightLog.add(
-            '[GANG MEMBER] Attacks with ${memberWeapon.toUpperCase()} for $actualDmg damage!',
-          );
         }
 
         result.remainingEnemyHealth = max(0, remainingEnemyHealth);
@@ -568,16 +615,22 @@ class CombatSystem {
     switch (drug) {
       case 'crack':
         gameState.drugs.crack--;
+        break;
       case 'coke':
         gameState.drugs.coke--;
+        break;
       case 'weed':
         gameState.drugs.weed--;
+        break;
       case 'ice':
         gameState.drugs.ice--;
+        break;
       case 'percs':
         gameState.drugs.percs--;
+        break;
       case 'pixie_dust':
         gameState.drugs.pixieDust--;
+        break;
     }
 
     return switch (drug) {

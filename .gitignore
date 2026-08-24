@@ -38,7 +38,7 @@ build/
 # Android related
 **/android/app/debug/
 **/android/app/profile/
-**/android/app/release/
+**/anroid/app/release/
 /android/local.properties
 /android/key.properties
 /android/app/src/main/res/values/google-services.json
