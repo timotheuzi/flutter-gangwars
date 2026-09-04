@@ -5,14 +5,6 @@ plugins {
 
 android {
     namespace = "com.gangwar.gangwars"
-<<<<<<< HEAD
-    compileSdk = 37
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-=======
     compileSdk = 36
     ndkVersion = "30.0.15729638"
 
@@ -24,7 +16,6 @@ android {
     //kotlinOptions {
     //    jvmTarget = 21
     //}
->>>>>>> 46e2088 (latest)
 
     defaultConfig {
         applicationId = "com.gangwar.gangwars"
