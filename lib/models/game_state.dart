@@ -19,7 +19,7 @@ class GameState with ChangeNotifier {
   int lives = 3;
   int damage = 0;
   int currentScore = 0;
-  String currentLocation = 'procedural_open_world';
+  String currentLocation = 'city';
   double accuracy = 0.85; // Base accuracy rating
 
   Map<String, int> drugPrices = {
@@ -75,7 +75,7 @@ class GameState with ChangeNotifier {
     this.lives = 3,
     this.damage = 0,
     this.currentScore = 0,
-    this.currentLocation = 'procedural_open_world',
+    this.currentLocation = 'city',
     this.accuracy = 0.85,
   });
 
@@ -115,7 +115,7 @@ class GameState with ChangeNotifier {
     notifyListeners();
   }
 
-  int advanceDay() {
+  void advanceDay() {
     day++;
     steps = 0;
     squidiesGainedToday = 0;
@@ -135,7 +135,8 @@ class GameState with ChangeNotifier {
         >= 50 => Random().nextInt(1) + 1,
         _ => 1,
       };
-      members = min(100, members + newRecruits);
+      members += newRecruits;
+      if (members > 100) members = 100;
     }
 
     // Prostitutes generate income: $3500 - $4800 per day
@@ -166,7 +167,6 @@ class GameState with ChangeNotifier {
     generateDrugTrends();
 
     notifyListeners();
-    return totalIncome;
   }
 
   void updateDrugPrices() {
@@ -283,7 +283,7 @@ class GameState with ChangeNotifier {
       lives: json['lives'] ?? 3,
       damage: json['damage'] ?? 0,
       currentScore: json['currentScore'] ?? 0,
-      currentLocation: json['currentLocation'] ?? 'procedural_open_world',
+      currentLocation: json['currentLocation'] ?? 'city',
       accuracy: (json['accuracy'] ?? 0.85).toDouble(),
     );
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class PixelArtIcon extends StatelessWidget {
   final String name;
@@ -9,39 +8,11 @@ class PixelArtIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String assetPath = _getAssetPath(name);
-    
     return SizedBox(
       width: size,
       height: size,
-      child: SvgPicture.asset(
-        assetPath,
-        width: size,
-        height: size,
-        fit: BoxFit.contain,
-        placeholderBuilder: (BuildContext context) => CustomPaint(
-          painter: IconPainter(name),
-          size: Size(size, size),
-        ),
-      ),
+      child: CustomPaint(painter: IconPainter(name)),
     );
-  }
-
-  String _getAssetPath(String name) {
-    final String lowerName = name.toLowerCase().replaceAll(' ', '_');
-    
-    // Check drugs
-    if (['weed', 'crack', 'coke', 'ice', 'percs', 'pixie_dust'].contains(lowerName)) {
-      return 'assets/images/drugs/$lowerName.svg';
-    }
-    
-    // Check weapons
-    if (['pistol', 'uzi', 'ar15', 'grenade', 'ghost_gun', 'vampire_bat', 'barbed_wire_bat'].contains(lowerName)) {
-      return 'assets/images/weapons/$lowerName.svg';
-    }
-    
-    // Default fallback (though SvgPicture might fail if not found)
-    return 'assets/images/app_icon.svg';
   }
 }
 
@@ -63,51 +34,85 @@ class IconPainter extends CustomPainter {
     }
 
     switch (name.toLowerCase()) {
+      // Drugs
       case 'weed':
         _drawWeed(drawPixel);
-        break;
       case 'crack':
         _drawCrack(drawPixel);
-        break;
       case 'coke':
         _drawCoke(drawPixel);
-        break;
       case 'ice':
         _drawIce(drawPixel);
-        break;
       case 'percs':
         _drawPercs(drawPixel);
-        break;
-      case 'pixie dust':
       case 'pixie_dust':
+      case 'pixie dust':
         _drawPixie(drawPixel);
-        break;
+
+      // Weapons - Firearms
       case 'pistol':
         _drawPistol(drawPixel);
-        break;
       case 'uzi':
         _drawUzi(drawPixel);
-        break;
       case 'ar15':
         _drawAR15(drawPixel);
-        break;
+      case 'machine_gun':
+      case 'machine gun':
+        _drawMachineGun(drawPixel);
+      case 'submachine_gun':
+      case 'submachine gun':
+        _drawSubmachineGun(drawPixel);
+      case 'flamethrower':
+        _drawFlamethrower(drawPixel);
+      case 'missile_launcher':
+      case 'missile launcher':
+        _drawMissileLauncher(drawPixel);
+      case 'rocket_launcher':
+      case 'rocket launcher':
+        _drawRocketLauncher(drawPixel);
+      case 'golden_gun':
+      case 'golden gun':
+        _drawGoldenGun(drawPixel);
+      case 'ghost_gun':
+      case 'ghost gun':
+        _drawGhostGun(drawPixel);
+
+      // Weapons - Melee
+      case 'knife':
+        _drawKnife(drawPixel);
+      case 'sword':
+        _drawSword(drawPixel);
+      case 'axe':
+        _drawAxe(drawPixel);
+      case 'bat':
+      case 'barbed_wire_bat':
+      case 'vampire_bat':
+        _drawBat(drawPixel);
+      case 'brass_knuckles':
+      case 'brass knuckles':
+        _drawBrassKnuckles(drawPixel);
+      case 'poison_blowgun':
+      case 'poison blowgun':
+        _drawPoisonBlowgun(drawPixel);
+
+      // Weapons - Throwables & Ammo
       case 'grenade':
         _drawGrenade(drawPixel);
-        break;
-      case 'bat':
-      case 'vampire_bat':
-      case 'barbed_wire_bat':
-        _drawBat(drawPixel);
-        break;
       case 'bullets':
         _drawBullets(drawPixel);
-        break;
+      case 'missile':
+        _drawMissile(drawPixel);
+
+      // Armor
       case 'vest':
+      case 'vest_light':
+      case 'vest_medium':
+      case 'vest_heavy':
         _drawVest(drawPixel);
-        break;
+
+      // Other
       case 'prostitute':
         _drawProstitute(drawPixel);
-        break;
       default:
         _drawDefault(drawPixel);
     }
@@ -250,6 +255,177 @@ class IconPainter extends CustomPainter {
     }
   }
 
+  void _drawMachineGun(Function(int, int, Color) d) {
+    final metal = Colors.grey.shade700;
+    // Barrel
+    for (int x = 2; x < 15; x++) {
+      d(x, 8, metal);
+      d(x, 9, metal);
+    }
+    // Ammo belt
+    for (int x = 6; x < 10; x++) {
+      d(x, 10, Colors.yellow.shade700);
+    }
+    // Tripod
+    d(4, 10, metal);
+    d(3, 11, metal);
+    d(12, 10, metal);
+    d(13, 11, metal);
+  }
+
+  void _drawSubmachineGun(Function(int, int, Color) d) {
+    final metal = Colors.grey.shade800;
+    for (int x = 4; x < 14; x++) {
+      for (int y = 7; y < 10; y++) {
+        d(x, y, metal);
+      }
+    }
+    // Mag
+    for (int x = 8; x < 10; x++) {
+      for (int y = 10; y < 14; y++) {
+        d(x, y, metal);
+      }
+    }
+  }
+
+  void _drawFlamethrower(Function(int, int, Color) d) {
+    final tank = Colors.red.shade900;
+    final nozzle = Colors.grey.shade700;
+    // Tank
+    for (int x = 4; x < 9; x++) {
+      for (int y = 5; y < 11; y++) {
+        d(x, y, tank);
+      }
+    }
+    // Nozzle
+    for (int x = 9; x < 15; x++) {
+      d(x, 8, nozzle);
+    }
+    // Flame hint
+    d(14, 7, Colors.orange);
+    d(15, 8, Colors.orange);
+    d(14, 9, Colors.orange);
+  }
+
+  void _drawMissileLauncher(Function(int, int, Color) d) {
+    final body = Colors.green.shade800;
+    for (int x = 2; x < 15; x++) {
+      for (int y = 6; y < 10; y++) {
+        d(x, y, body);
+      }
+    }
+    // Scope
+    d(8, 5, Colors.black);
+    d(9, 5, Colors.black);
+  }
+
+  void _drawRocketLauncher(Function(int, int, Color) d) {
+    final body = Colors.grey.shade600;
+    for (int x = 1; x < 16; x++) {
+      for (int y = 7; y < 11; y++) {
+        d(x, y, body);
+      }
+    }
+    // Handles
+    d(4, 11, Colors.black);
+    d(10, 11, Colors.black);
+  }
+
+  void _drawGoldenGun(Function(int, int, Color) d) {
+    final gold = Colors.yellow.shade700;
+    for (int x = 5; x < 13; x++) {
+      for (int y = 6; y < 9; y++) {
+        d(x, y, gold);
+      }
+    }
+    for (int x = 5; x < 8; x++) {
+      for (int y = 9; y < 13; y++) {
+        d(x, y, gold);
+      }
+    }
+    d(12, 9, Colors.amber);
+  }
+
+  void _drawGhostGun(Function(int, int, Color) d) {
+    final ghost = Colors.white.withValues(alpha: 0.4);
+    for (int x = 5; x < 13; x++) {
+      for (int y = 6; y < 9; y++) {
+        d(x, y, ghost);
+      }
+    }
+    for (int x = 5; x < 8; x++) {
+      for (int y = 9; y < 13; y++) {
+        d(x, y, ghost);
+      }
+    }
+  }
+
+  void _drawKnife(Function(int, int, Color) d) {
+    final metal = Colors.grey.shade300;
+    final handle = Colors.brown.shade800;
+    // Handle
+    for (int x = 3; x < 7; x++) {
+      d(x, 10, handle);
+    }
+    // Blade
+    for (int x = 7; x < 14; x++) {
+      d(x, 9, metal);
+      d(x, 10, metal);
+    }
+    d(14, 10, metal);
+  }
+
+  void _drawSword(Function(int, int, Color) d) {
+    final metal = Colors.grey.shade200;
+    final handle = Colors.brown.shade700;
+    // Handle
+    for (int x = 2; x < 5; x++) {
+      d(x, 13, handle);
+    }
+    // Guard
+    d(5, 12, Colors.amber);
+    d(5, 13, Colors.amber);
+    d(5, 14, Colors.amber);
+    // Blade
+    for (int i = 0; i < 10; i++) {
+      d(6 + i, 12 - i, metal);
+    }
+  }
+
+  void _drawAxe(Function(int, int, Color) d) {
+    final wood = Colors.brown.shade600;
+    final head = Colors.grey.shade400;
+    // Handle
+    for (int y = 4; y < 14; y++) {
+      d(8, y, wood);
+    }
+    // Head
+    for (int x = 4; x < 8; x++) {
+      for (int y = 4; y < 8; y++) {
+        d(x, y, head);
+      }
+    }
+  }
+
+  void _drawBrassKnuckles(Function(int, int, Color) d) {
+    final metal = Colors.grey.shade400;
+    for (int i = 0; i < 4; i++) {
+      d(6 + i * 2, 7, metal);
+      d(6 + i * 2, 8, metal);
+    }
+    for (int x = 6; x < 13; x++) {
+      d(x, 10, metal);
+    }
+  }
+
+  void _drawPoisonBlowgun(Function(int, int, Color) d) {
+    final tube = Colors.brown.shade400;
+    for (int x = 2; x < 15; x++) {
+      d(x, 8, tube);
+    }
+    d(14, 8, Colors.green); // Poison tip
+  }
+
   void _drawGrenade(Function(int, int, Color) d) {
     final green = Colors.green.shade900;
     for (int x = 6; x < 10; x++) {
@@ -283,6 +459,16 @@ class IconPainter extends CustomPainter {
       }
       d(ox, 5, Colors.grey);
     }
+  }
+
+  void _drawMissile(Function(int, int, Color) d) {
+    final body = Colors.grey.shade400;
+    for (int x = 4; x < 12; x++) {
+      d(x, 8, body);
+    }
+    d(12, 8, Colors.red); // Warhead
+    d(3, 7, Colors.grey); // Fin
+    d(3, 9, Colors.grey); // Fin
   }
 
   void _drawVest(Function(int, int, Color) d) {

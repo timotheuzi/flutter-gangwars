@@ -3,7 +3,11 @@ import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import '../widgets/building_entry_animation.dart';
 import '../widgets/wandering_animation.dart';
+import '../widgets/city_navigation.dart';
+import '../screens/procedural_demo_screen.dart';
+import '../screens/procedural_open_world_screen.dart';
 import 'main_menu_screen.dart';
+import 'city_screen.dart';
 import 'crackhouse_screen.dart';
 import 'gunshack_screen.dart';
 import 'bank_screen.dart';
@@ -13,9 +17,6 @@ import 'alleyway_screen.dart';
 import 'picknsave_screen.dart';
 import 'credits_screen.dart';
 import 'mud_fight_screen.dart';
-import 'procedural_open_world_screen.dart';
-import 'procedural_demo_screen.dart';
-import 'generic_location_screen.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -41,12 +42,12 @@ class MainScreen extends StatelessWidget {
       );
     }
 
-    final screen = gameProvider.currentScreen;
-
-    return switch (screen) {
+    return switch (gameProvider.currentScreen) {
       'main_menu' => const MainMenuScreen(),
+      'city' => const CityScreen(),
+      'city_navigation' => const CityNavigation(),
       'procedural_demo' => const ProceduralDemoScreen(),
-      'procedural_open_world' || 'city' => const ProceduralOpenWorldScreen(),
+      'procedural_open_world' => const ProceduralOpenWorldScreen(),
       'crackhouse' => const CrackhouseScreen(),
       'gunshack' => const GunshackScreen(),
       'bank' => const BankScreen(),
@@ -56,14 +57,6 @@ class MainScreen extends StatelessWidget {
       'picknsave' => const PickNSaveScreen(),
       'credits' => const CreditsScreen(),
       'mud_fight' => const MudFightScreen(),
-      'hospital' ||
-      'police' ||
-      'store' ||
-      'gym' ||
-      'warehouse' ||
-      'hideout' ||
-      'house' =>
-        GenericLocationScreen(locationType: screen),
       _ => const MainMenuScreen(),
     };
   }

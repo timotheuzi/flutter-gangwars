@@ -7,7 +7,7 @@ project(runner LANGUAGES CXX)
 set(BINARY_NAME "gangwar")
 # The unique GTK application identifier for this application. See:
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
-set(APPLICATION_ID "com.main.gangwar")
+set(APPLICATION_ID "com.example.gangwar")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
@@ -40,22 +40,19 @@ add_library(runner INTERFACE)
 
 # Source files common to all platforms.
 set(COMMON_SOURCES
-  runner/my_application.cc
-  flutter/generated_plugin_registrant.cc
+  my_application.cc
 )
 
 # Define the application target. To change the name of the binary produced,
 # assign a new value to BINARY_NAME above.
 add_executable(${BINARY_NAME}
-  runner/main.cc
+  main.cc
   ${COMMON_SOURCES}
 )
 
 # Apply the standard set of build settings. This can be removed for applications
 # that need different build settings.
 target_link_libraries(${BINARY_NAME} PRIVATE flutter)
-target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/runner")
-target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/flutter")
 target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_definitions(${BINARY_NAME} PRIVATE
   $<$<BOOL:${FLUTTER_BUILD_NUMBER}>:FLUTTER_BUILD_NUMBER="${FLUTTER_BUILD_NUMBER}">

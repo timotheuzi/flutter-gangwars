@@ -64,9 +64,10 @@ class GameProvider with ChangeNotifier {
     await prefs.setString('game_state', json.encode(_gameState.toJson()));
   }
 
-  void startNewGame(String playerName, String gangName) {
+  void startNewGame(String playerName, String gangName, {String initialScreen = 'city'}) {
     _gameState = GameState(playerName: playerName, gangName: gangName);
-    _currentScreen = 'procedural_open_world';
+    _currentScreen = initialScreen;
+    _gameState.currentLocation = initialScreen;
     saveGameState();
     notifyListeners();
   }
@@ -211,79 +212,54 @@ class GameProvider with ChangeNotifier {
     switch (weaponType) {
       case 'pistol':
         _gameState.weapons.pistols += quantity;
-        break;
       case 'bullets':
         _gameState.weapons.bullets += quantity * 50;
-        break;
       case 'exploding_bullets':
         _gameState.weapons.explodingBullets += quantity * 20;
-        break;
       case 'hollow_point_bullets':
         _gameState.weapons.hollowPointBullets += quantity * 15;
-        break;
       case 'uzi':
         _gameState.weapons.uzis += quantity;
-        break;
       case 'ar15':
         _gameState.weapons.ar15 += quantity;
-        break;
       case 'ghost_gun':
         _gameState.weapons.ghostGuns += quantity;
-        break;
       case 'grenade':
         _gameState.weapons.grenades += quantity;
-        break;
       case 'barbed_wire_bat':
         _gameState.weapons.barbedWireBat += quantity;
-        break;
       case 'vampire_bat':
         _gameState.weapons.vampireBat += quantity;
-        break;
       case 'brass_knuckles':
         _gameState.weapons.brassKnuckles += quantity;
-        break;
       case 'knife':
         _gameState.weapons.knife += quantity;
-        break;
       case 'sword':
         _gameState.weapons.sword += quantity;
-        break;
       case 'axe':
         _gameState.weapons.axe += quantity;
-        break;
       case 'golden_gun':
         _gameState.weapons.goldenGun += quantity;
-        break;
       case 'poison_blowgun':
         _gameState.weapons.poisonBlowgun += quantity;
-        break;
       case 'missile_launcher':
         _gameState.weapons.missileLauncher += quantity;
-        break;
       case 'missile':
         _gameState.weapons.missiles += quantity;
-        break;
       case 'machine_gun':
         _gameState.weapons.machineGun += quantity;
-        break;
       case 'rocket_launcher':
         _gameState.weapons.rocketLauncher += quantity;
-        break;
       case 'submachine_gun':
         _gameState.weapons.submachineGun += quantity;
-        break;
       case 'flamethrower':
         _gameState.weapons.flamethrower += quantity;
-        break;
       case 'vest_light':
         _gameState.weapons.vest = 5;
-        break;
       case 'vest_medium':
         _gameState.weapons.vest = 10;
-        break;
       case 'vest_heavy':
         _gameState.weapons.vest = 15;
-        break;
     }
   }
 
@@ -371,22 +347,16 @@ class GameProvider with ChangeNotifier {
     switch (normalized) {
       case 'weed':
         _gameState.drugs.weed += quantity;
-        break;
       case 'crack':
         _gameState.drugs.crack += quantity;
-        break;
       case 'coke':
         _gameState.drugs.coke += quantity;
-        break;
       case 'ice':
         _gameState.drugs.ice += quantity;
-        break;
       case 'percs':
         _gameState.drugs.percs += quantity;
-        break;
       case 'pixie_dust':
         _gameState.drugs.pixieDust += quantity;
-        break;
     }
   }
 
@@ -395,27 +365,20 @@ class GameProvider with ChangeNotifier {
     switch (normalized) {
       case 'weed':
         _gameState.drugs.weed -= quantity;
-        break;
       case 'crack':
         _gameState.drugs.crack -= quantity;
-        break;
       case 'coke':
         _gameState.drugs.coke -= quantity;
-        break;
       case 'ice':
         _gameState.drugs.ice -= quantity;
-        break;
       case 'percs':
         _gameState.drugs.percs -= quantity;
-        break;
       case 'pixie_dust':
         _gameState.drugs.pixieDust -= quantity;
-        break;
     }
   }
 
   bool performCombat(String weapon, String enemyType, int enemyCount) {
-    // Use the stored enemy health from combat data to maintain scaling/power factor
     final perEnemyHealth =
         (_currentCombatData?.initialEnemyHealth ??
                 _calculateEnemyHealth(enemyType, enemyCount))
@@ -614,7 +577,7 @@ class GameProvider with ChangeNotifier {
       );
     }
 
-    if (event.options.isNotEmpty) {
+    if (event.type == EventType.npcEncounter && event.options.isNotEmpty) {
       return event;
     }
 
@@ -641,6 +604,7 @@ class GameProvider with ChangeNotifier {
 
   String _handleLoanSharkEncounter() {
     final repaymentAmount = (_gameState.loan * 1.5).toInt();
+
     startMudFight(200, 1, 'Loan Shark Enforcer', 'loan_shark_boss_fight');
     return 'A Loan Shark Enforcer corners you! "You owe us \$$repaymentAmount, punk!"';
   }
@@ -651,28 +615,14 @@ class GameProvider with ChangeNotifier {
     }
 
     final effects = event.optionEffects[option]!;
-    bool interactionSuccess = true;
 
     effects.forEach((key, value) {
       switch (key) {
         case 'damage':
-          if (option == 'Fight' || option == 'Challenge' || option == 'YES (FIGHT)') {
-             int enemyHealth = 100;
-             int enemyCount = 1;
-             String enemyName = event.title.replaceFirst('👤 DARK ENCOUNTER: ', '')
-                                         .replaceFirst('🩸 TERRITORY DISPUTE', 'Rival Gang')
-                                         .replaceFirst('🪤 THE SLAUGHTERHOUSE', 'Ambushers');
-             
-             if (event.type == EventType.gangFight) {
-               enemyCount = 3;
-             } else if (event.type == EventType.policeChase) {
-               enemyName = 'Police Officers';
-               enemyCount = 4;
-               enemyHealth = 150;
-             }
-             
-             startMudFight(enemyHealth, enemyCount, enemyName, event.id);
-             _gameMessage = 'You engaged the $enemyName!';
+          if (option == 'Fight' || option == 'Challenge') {
+            final enemyName = event.title.replaceFirst('👤 DARK ENCOUNTER: ', '');
+            startMudFight(100, 1, enemyName, event.id);
+            _gameMessage = 'You attacked the $enemyName!';
           } else {
             _gameMessage = 'You took $value damage.';
             _gameState.takeDamage(value);
@@ -687,36 +637,13 @@ class GameProvider with ChangeNotifier {
             _gameState.money += value;
             _gameMessage = 'You got \$$value.';
           } else {
-            if (!_gameState.spendMoney(-value)) {
-              _gameMessage = 'You didn\'t have enough money!';
-              interactionSuccess = false;
+            if (_gameState.spendMoney(-value)) {
+              _gameMessage = 'You spent \$${-value}.';
             }
           }
           break;
-        case 'drugs':
-           // Add a default drug if not specified, or just add crack
-           _addDrug('crack', value);
-           _gameMessage = 'You received $value kilos of crack.';
-           break;
-        case 'members':
-           _gameState.members = min(100, _gameState.members + value);
-           _gameMessage = 'You recruited $value new members.';
-           break;
       }
     });
-    
-    // Handle specific event type transitions if needed
-    if (interactionSuccess) {
-       if (event.type == EventType.weaponFound && option == 'YES') {
-          // Grant random weapon
-          final weapons = ['pistol', 'knife', 'brass_knuckles', 'uzi'];
-          final weapon = weapons[Random().nextInt(weapons.length)];
-          _addWeapon(weapon, 1);
-          _gameMessage = 'You found a $weapon!';
-       }
-    }
-    
-    saveGameState();
     notifyListeners();
     return _gameMessage;
   }

@@ -51,31 +51,18 @@ class CombatSystem {
         } else {
           weapon = 'fists';
         }
+      } else if (weapon == 'missile_launcher' || weapon == 'rocket_launcher') {
+        if (gameState.weapons.missiles > 0) {
+          gameState.weapons.missiles--;
+          if (availableWeapons.containsKey(weapon)) {
+            availableWeapons[weapon] = availableWeapons[weapon]! - 1;
+          }
+        } else {
+          weapon = 'fists';
+        }
       } else if (availableWeapons.containsKey(weapon) &&
           availableWeapons[weapon]! > 0) {
-        
-        // Consume ammo for firearms
-        if (_isFirearm(weapon)) {
-           if (gameState.weapons.bullets > 0) {
-             gameState.weapons.bullets--;
-           } else if (gameState.weapons.explodingBullets > 0) {
-             gameState.weapons.explodingBullets--;
-           } else if (gameState.weapons.hollowPointBullets > 0) {
-             gameState.weapons.hollowPointBullets--;
-           } else {
-             weapon = 'fists';
-           }
-        } else if (weapon == 'missile_launcher' || weapon == 'rocket_launcher') {
-           if (gameState.weapons.missiles > 0) {
-             gameState.weapons.missiles--;
-           } else {
-             weapon = 'fists';
-           }
-        }
-
-        if (weapon != 'fists') {
-          availableWeapons[weapon] = availableWeapons[weapon]! - 1;
-        }
+        availableWeapons[weapon] = availableWeapons[weapon]! - 1;
       } else if (weapon != 'fists') {
         weapon = 'fists';
       }
@@ -98,7 +85,8 @@ class CombatSystem {
           shots = 5 + random.nextInt(3); // 5-7
         } else if (weapon == 'ar15' ||
             weapon == 'machine_gun' ||
-            weapon == 'golden_gun') {
+            weapon == 'golden_gun' ||
+            weapon == 'flamethrower') {
           shots = 10 + random.nextInt(6); // 10-15
         } else if (weapon == 'pistol') {
           shots = 3 + random.nextInt(2); // 3-4
@@ -151,7 +139,7 @@ class CombatSystem {
         }
         result.remainingEnemyHealth = max(0, remainingEnemyHealth);
       } else {
-        // Other single use items like Grenades
+        // Other single use items like Grenades and Missiles
         if (random.nextDouble() > gameState.accuracy) {
           fightLog.add(_getMissDescription(weapon));
         } else {
@@ -175,53 +163,36 @@ class CombatSystem {
 
           final memberWeapon = _getStrongestFromMap(availableWeapons);
           if (memberWeapon != 'fists') {
-            
-            // Check ammo for gang members too
-            bool hasAmmo = true;
-            if (_isFirearm(memberWeapon)) {
-               if (gameState.weapons.bullets > 0) {
-                 gameState.weapons.bullets--;
-               } else if (gameState.weapons.explodingBullets > 0) {
-                 gameState.weapons.explodingBullets--;
-               } else if (gameState.weapons.hollowPointBullets > 0) {
-                 gameState.weapons.hollowPointBullets--;
-               } else {
-                 hasAmmo = false;
-               }
-            } else if (memberWeapon == 'grenade') {
-               if (gameState.weapons.grenades > 0) {
-                 gameState.weapons.grenades--;
-               } else {
-                 hasAmmo = false;
-               }
+            availableWeapons[memberWeapon] =
+                availableWeapons[memberWeapon]! - 1;
+            if (memberWeapon == 'grenade') {
+              gameState.weapons.grenades--;
             } else if (memberWeapon == 'missile_launcher' || memberWeapon == 'rocket_launcher') {
-               if (gameState.weapons.missiles > 0) {
-                 gameState.weapons.missiles--;
-               } else {
-                 hasAmmo = false;
-               }
-            }
-
-            if (hasAmmo) {
-              availableWeapons[memberWeapon] = availableWeapons[memberWeapon]! - 1;
-              
-              if (random.nextDouble() > (gameState.accuracy - 0.1)) {
-                continue;
+              if (gameState.weapons.missiles > 0) {
+                gameState.weapons.missiles--;
+              } else {
+                // If out of missiles, they actually use fists but we already subtracted weapon count
+                // In a round, they probably just punch.
+                // This is a simple logic, could be more robust.
               }
-
-              final memberDmg = _getWeaponDamage(memberWeapon, gameState);
-              final actualDmg = max(
-                2,
-                memberDmg + random.nextInt(max(1, memberDmg ~/ 3)),
-              );
-              remainingEnemyHealth -= actualDmg;
-              result.gangDamageDealt += actualDmg;
-
-              fightLog.add(
-                '[GANG MEMBER] Attacks with ${memberWeapon.toUpperCase()} for $actualDmg damage!',
-              );
             }
           }
+
+          if (random.nextDouble() > (gameState.accuracy - 0.1)) {
+            continue;
+          }
+
+          final memberDmg = _getWeaponDamage(memberWeapon, gameState);
+          final actualDmg = max(
+            2,
+            memberDmg + random.nextInt(max(1, memberDmg ~/ 3)),
+          );
+          remainingEnemyHealth -= actualDmg;
+          result.gangDamageDealt += actualDmg;
+
+          fightLog.add(
+            '[GANG MEMBER] Attacks with ${memberWeapon.toUpperCase()} for $actualDmg damage!',
+          );
         }
 
         result.remainingEnemyHealth = max(0, remainingEnemyHealth);
@@ -294,13 +265,19 @@ class CombatSystem {
       'brass_knuckles': w.brassKnuckles,
       'axe': w.axe,
       'poison_blowgun': w.poisonBlowgun,
+      'flamethrower': w.flamethrower,
+      'missile_launcher': w.missileLauncher,
+      'rocket_launcher': w.rocketLauncher,
     };
   }
 
   static String _getStrongestFromMap(Map<String, int> weapons) {
+    if ((weapons['rocket_launcher'] ?? 0) > 0) return 'rocket_launcher';
+    if ((weapons['missile_launcher'] ?? 0) > 0) return 'missile_launcher';
     if ((weapons['golden_gun'] ?? 0) > 0) return 'golden_gun';
     if ((weapons['machine_gun'] ?? 0) > 0) return 'machine_gun';
     if ((weapons['ar15'] ?? 0) > 0) return 'ar15';
+    if ((weapons['flamethrower'] ?? 0) > 0) return 'flamethrower';
     if ((weapons['submachine_gun'] ?? 0) > 0) return 'submachine_gun';
     if ((weapons['uzi'] ?? 0) > 0) return 'uzi';
     if ((weapons['pistol'] ?? 0) > 0) return 'pistol';
@@ -323,6 +300,9 @@ class CombatSystem {
         weapon == 'ghost_gun' ||
         weapon == 'machine_gun' ||
         weapon == 'submachine_gun' ||
+        weapon == 'flamethrower' ||
+        weapon == 'missile_launcher' ||
+        weapon == 'rocket_launcher' ||
         weapon == 'golden_gun';
   }
 
@@ -332,6 +312,7 @@ class CombatSystem {
         weapon == 'machine_gun' ||
         weapon == 'submachine_gun' ||
         weapon == 'ar15' ||
+        weapon == 'flamethrower' ||
         weapon == 'golden_gun';
   }
 
@@ -367,6 +348,26 @@ class CombatSystem {
   ) {
     final random = Random();
     final weapons = gameState.weapons;
+
+    if (weapon == 'flamethrower') {
+      final fireMsgs = [
+        "🔥 Liquid fire clings to the target's flesh! ($damage damage)",
+        "🔥 The roar of the flame drowns out their screams! ($damage damage)",
+        "🔥 A gout of napalm-like fuel turns a thug into a human torch! ($damage damage)",
+        "🔥 The air shimmers with heat as you incinerate the wretch! ($damage damage)",
+      ];
+      return fireMsgs[random.nextInt(fireMsgs.length)];
+    }
+
+    if (weapon == 'missile_launcher' || weapon == 'rocket_launcher') {
+      final explosionMsgs = [
+        "🚀 The missile detonates with a world-shattering roar! ($damage damage)",
+        "🚀 Shrapnel and fury erupt as the rocket finds its mark! ($damage damage)",
+        "🚀 A thunderous explosion turns the target into a crater of meat! ($damage damage)",
+        "🚀 The backblast of your weapon is nothing compared to the carnage ahead! ($damage damage)",
+      ];
+      return explosionMsgs[random.nextInt(explosionMsgs.length)];
+    }
 
     if (weapons.useExplodingBullets && weapons.explodingBullets > 0) {
       final explodingMsgs = [
@@ -406,6 +407,26 @@ class CombatSystem {
     final random = Random();
     final weapons = gameState.weapons;
     final isFirearm = _isFirearm(weapon);
+
+    if (weapon == 'flamethrower') {
+      final fireMsgs = [
+        "You squeeze the trigger and a dragon's breath of burning fuel erases your enemies! ($damage damage)",
+        "The smell of burning meat and ozone fills the air as you sweep the flames! ($damage damage)",
+        "A wall of fire turns the alley into an oven, melting the target where they stand! ($damage damage)",
+        "You unleash a torrential stream of liquid death, painting the dark with fire! ($damage damage)",
+      ];
+      return '🔥 ${fireMsgs[random.nextInt(fireMsgs.length)]}';
+    }
+
+    if (weapon == 'missile_launcher' || weapon == 'rocket_launcher') {
+      final explosionMsgs = [
+        "The heavy tube kicks against your shoulder as a missile streaks into the crowd! ($damage damage)",
+        "You unleash high-explosive ordinance, turning the enemy position into a burning graveyard! ($damage damage)",
+        "Death flies on wings of fire, a direct hit vaporizing the target! ($damage damage)",
+        "The thunder of your heavy weapon signals the end of the line for your foes! ($damage damage)",
+      ];
+      return '🚀 ${explosionMsgs[random.nextInt(explosionMsgs.length)]}';
+    }
 
     if (isFirearm &&
         weapons.useExplodingBullets &&
@@ -552,6 +573,9 @@ class CombatSystem {
       'vampire_bat' => 160, // Buffed melee
       'brass_knuckles' => 40,
       'poison_blowgun' => 80,
+      'flamethrower' => 250,
+      'missile_launcher' => 500,
+      'rocket_launcher' => 800,
       _ => 20,
     };
 
@@ -615,22 +639,16 @@ class CombatSystem {
     switch (drug) {
       case 'crack':
         gameState.drugs.crack--;
-        break;
       case 'coke':
         gameState.drugs.coke--;
-        break;
       case 'weed':
         gameState.drugs.weed--;
-        break;
       case 'ice':
         gameState.drugs.ice--;
-        break;
       case 'percs':
         gameState.drugs.percs--;
-        break;
       case 'pixie_dust':
         gameState.drugs.pixieDust--;
-        break;
     }
 
     return switch (drug) {

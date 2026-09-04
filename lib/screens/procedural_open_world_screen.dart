@@ -5,8 +5,6 @@ import '../widgets/isometric_world.dart';
 import '../widgets/advanced_animations.dart';
 import '../widgets/comprehensive_sprites.dart';
 import '../widgets/cut_scene_system.dart';
-import '../models/random_event.dart';
-import '../widgets/procedural_3d_terrain.dart';
 
 /// 3D Procedural Open World Screen
 /// Displays a fully generated isometric world with terrain, buildings, NPCs,
@@ -39,11 +37,7 @@ class ProceduralOpenWorldScreenState extends State<ProceduralOpenWorldScreen>
       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
     );
 
-    _game = IsometricOpenWorld(
-      onEnterBuilding: _onEnterBuilding,
-      onInteractNPC: _onInteractNPC,
-      onStep: _onStep,
-    );
+    _game = IsometricOpenWorld(onEnterBuilding: _onEnterBuilding);
 
     _simulateLoading();
   }
@@ -77,121 +71,6 @@ class ProceduralOpenWorldScreenState extends State<ProceduralOpenWorldScreen>
       setState(() => _showLoading = false);
       _fadeController.forward();
     }
-  }
-
-  void _onStep() {
-    final gameProvider = Provider.of<GameProvider>(context, listen: false);
-    final event = gameProvider.wanderWithEvent();
-
-    if (event != null && event.type != EventType.nothing) {
-      _showRandomEventDialog(event);
-    }
-  }
-
-  void _onInteractNPC(IsometricNPC npc) {
-    // Mapping NPC type to interaction
-    final npcNames = [
-      'Police Officer',
-      'Gangster',
-      'Civilian',
-      'Shady Dealer',
-      'Prostitute',
-      'Loan Shark'
-    ];
-    final name = npcNames[npc.type.clamp(0, 5)];
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.black,
-        title: Text(
-          'Interact with $name',
-          style: const TextStyle(color: Colors.white),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 50,
-              height: 50,
-              color: npc.color,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'What do you want to do with this $name?',
-              style: const TextStyle(color: Colors.white70),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Ignore', style: TextStyle(color: Colors.grey)),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _triggerNPCInteraction(npc);
-            },
-            child: const Text('Interact', style: TextStyle(color: Colors.blue)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _triggerNPCInteraction(IsometricNPC npc) {
-     final gameProvider = Provider.of<GameProvider>(context, listen: false);
-     // Generate a specific event based on NPC type
-     // For now, let's just trigger a wander event which might be an NPC encounter
-     final event = gameProvider.wanderWithEvent();
-     if (event != null) {
-       _showRandomEventDialog(event);
-     }
-  }
-
-  void _showRandomEventDialog(RandomEvent event) {
-    final gameProvider = Provider.of<GameProvider>(context, listen: false);
-    
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey.shade900,
-        title: Text(
-          event.title,
-          style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          event.description,
-          style: const TextStyle(color: Colors.white70),
-        ),
-        actions: event.options.isEmpty
-            ? [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK', style: TextStyle(color: Colors.white)),
-                )
-              ]
-            : event.options.map((option) {
-                return TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    gameProvider.handleNpcInteraction(event, option);
-                    
-                    // If the interaction led to combat, the provider will navigate
-                    // but we might need to show feedback if it didn't
-                    if (gameProvider.currentScreen != 'mud_fight' && gameProvider.gameMessage.isNotEmpty) {
-                       ScaffoldMessenger.of(context).showSnackBar(
-                         SnackBar(content: Text(gameProvider.gameMessage))
-                       );
-                    }
-                  },
-                  child: Text(option, style: const TextStyle(color: Colors.amberAccent)),
-                );
-              }).toList(),
-      ),
-    );
   }
 
   void _onEnterBuilding(String buildingType) {
@@ -241,17 +120,20 @@ class ProceduralOpenWorldScreenState extends State<ProceduralOpenWorldScreen>
   }
 
   BuildingType _mapToBuildingType(String type) {
-    return switch (type) {
-      'bank' => BuildingType.bank,
-      'bar' => BuildingType.bar,
-      'crackhouse' => BuildingType.crackhouse,
-      'gunshack' => BuildingType.gunshack,
-      'house' => BuildingType.house,
-      'hospital' => BuildingType.hospital,
-      'police' => BuildingType.police,
-      'store' || 'picknsave' => BuildingType.store,
-      _ => BuildingType.store,
-    };
+    switch (type) {
+      case 'bank':
+        return BuildingType.bank;
+      case 'bar':
+        return BuildingType.bar;
+      case 'crackhouse':
+        return BuildingType.crackhouse;
+      case 'gunshack':
+        return BuildingType.gunshack;
+      case 'house':
+        return BuildingType.house;
+      default:
+        return BuildingType.store;
+    }
   }
 
   void _navigateToBuilding(String buildingType) {
@@ -333,51 +215,13 @@ class ProceduralOpenWorldScreenState extends State<ProceduralOpenWorldScreen>
               opacity: _fadeAnimation,
               child: IsometricOpenWorldWidget(
                 onEnterBuilding: _onEnterBuilding,
-                onInteractNPC: _onInteractNPC,
-                onStep: _onStep,
                 onExit: () => _exitToMenu(),
               ),
             ),
 
           // Overlay controls
           if (!_showLoading) _buildOverlayControls(),
-          
-          // HUD Stats
-          if (!_showLoading) _buildHUD(),
         ],
-      ),
-    );
-  }
-  
-  Widget _buildHUD() {
-    final gameProvider = Provider.of<GameProvider>(context);
-    final gameState = gameProvider.gameState;
-    
-    return Positioned(
-      top: 40,
-      right: 70, // Offset from exit button
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.black54,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.redAccent.withValues(alpha: 0.5)),
-        ),
-        child: Row(
-          children: [
-             Icon(Icons.favorite, color: Colors.red, size: 16),
-             const SizedBox(width: 4),
-             Text('${gameState.health}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-             const SizedBox(width: 12),
-             Icon(Icons.attach_money, color: Colors.green, size: 16),
-             const SizedBox(width: 4),
-             Text('${gameState.money}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-             const SizedBox(width: 12),
-             Icon(Icons.calendar_today, color: Colors.orange, size: 16),
-             const SizedBox(width: 4),
-             Text('Day ${gameState.day}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          ],
-        ),
       ),
     );
   }
@@ -459,7 +303,7 @@ class ProceduralOpenWorldScreenState extends State<ProceduralOpenWorldScreen>
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Text(
-              'GANGWAR 3D',
+              '3D Open World',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,
@@ -570,8 +414,7 @@ class ProceduralOpenWorldScreenState extends State<ProceduralOpenWorldScreen>
           TextButton(
             onPressed: () {
               Navigator.pop(context); // close dialog
-              final gameProvider = Provider.of<GameProvider>(context, listen: false);
-              gameProvider.navigateToScreen('main_menu');
+              Navigator.of(context).pop(); // close screen
             },
             child: const Text('Exit', style: TextStyle(color: Colors.red)),
           ),

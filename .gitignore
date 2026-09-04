@@ -10,7 +10,6 @@
 .svn/
 gangwar_ref
 *.zip
-*.7z
 fgw.zip
 
 # IntelliJ related
@@ -33,12 +32,11 @@ fgw.zip
 .pub/
 __pycache__/
 build/
-*.lock
 
 # Android related
 **/android/app/debug/
 **/android/app/profile/
-**/anroid/app/release/
+**/android/app/release/
 /android/local.properties
 /android/key.properties
 /android/app/src/main/res/values/google-services.json

@@ -9,8 +9,8 @@ class ProceduralPixelArt {
   final int seed;
 
   ProceduralPixelArt({int? seed})
-    : seed = seed ?? DateTime.now().millisecondsSinceEpoch,
-      _random = Random(seed ?? DateTime.now().millisecondsSinceEpoch);
+      : seed = seed ?? DateTime.now().millisecondsSinceEpoch,
+        _random = Random(seed ?? DateTime.now().millisecondsSinceEpoch);
 
   /// Generate a procedural character with random but consistent features
   ProceduralCharacter generateCharacter({
@@ -397,6 +397,7 @@ class ProceduralPixelArt {
 
   void _drawPimp(List<List<Color>> pixels, int variant) {
     final purple = Colors.purple.shade700;
+    final darkPurple = Colors.purple.shade900;
     final yellow = Colors.yellow.shade600;
     final skin = Colors.brown.shade700;
     final hair = Colors.black87;
@@ -428,7 +429,7 @@ class ProceduralPixelArt {
 
     // Suit Jacket (Purple)
     _fillRect(pixels, ox + 4, oy + 12, 8, 10, purple);
-    _fillRect(pixels, ox + 3, oy + 14, 10, 6, purple);
+    _fillRect(pixels, ox + 3, oy + 14, 10, 6, darkPurple);
 
     // Shirt (Yellow/Gold)
     _fillRect(pixels, ox + 6, oy + 12, 4, 8, yellow);
@@ -935,10 +936,14 @@ class ProceduralPixelArt {
         final offset = (i % 2 == 0) ? 1 : -1;
         _fillRect(pixels, ox + 6, oy + 2, 4, 4, scheme.secondary);
         _fillRect(pixels, ox + 5, oy + 7, 6, 6, scheme.surface);
-        _drawLine(pixels, ox + 4, oy + 8, ox + 2 + offset, oy + 10, scheme.primary);
-        _drawLine(pixels, ox + 11, oy + 8, ox + 13 - offset, oy + 10, scheme.primary);
-        _drawLine(pixels, ox + 6, oy + 13, ox + 4 + offset * 2, oy + 15, scheme.primary);
-        _drawLine(pixels, ox + 9, oy + 13, ox + 11 - offset * 2, oy + 15, scheme.primary);
+        _drawLine(
+            pixels, ox + 4, oy + 8, ox + 2 + offset, oy + 10, scheme.primary);
+        _drawLine(
+            pixels, ox + 11, oy + 8, ox + 13 - offset, oy + 10, scheme.primary);
+        _drawLine(pixels, ox + 6, oy + 13, ox + 4 + offset * 2, oy + 15,
+            scheme.primary);
+        _drawLine(pixels, ox + 9, oy + 13, ox + 11 - offset * 2, oy + 15,
+            scheme.primary);
         frames.add(pixels);
       }
     }
@@ -1112,7 +1117,8 @@ class ProceduralPixelArt {
       final height = 10 + (variant + i) % 20;
       final width = 4 + (variant + i * 2) % 4;
       final x = i * 6 + (variant + i) % 3;
-      _fillRect(pixels, x, 32 - height, width, height, scheme.primary.withValues(alpha: 0.5));
+      _fillRect(pixels, x, 32 - height, width, height,
+          scheme.primary.withValues(alpha: 0.5));
     }
     return pixels;
   }

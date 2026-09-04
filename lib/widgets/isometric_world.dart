@@ -12,20 +12,8 @@ class IsometricOpenWorld extends FlameGame {
   late IsometricCamera _isoCamera;
 
   final Function(String)? onEnterBuilding;
-  final Function(IsometricNPC)? onInteractNPC;
-  final VoidCallback? onStep;
-  
   IsometricWorldData? worldData;
   Procedural3DTerrain? terrain;
-  
-  // Track the last building/NPC we were "near" to avoid spamming dialogs
-  String? _lastNearbyBuilding;
-  int? _lastNearbyNPCId;
-  double _interactionCooldown = 0;
-  
-  // Track distance for step counting
-  double _distanceTraveled = 0;
-  final double _stepThreshold = 100.0;
 
   /// Custom isometric camera (separate from Flame's CameraComponent)
   IsometricCamera get isoCamera => _isoCamera;
@@ -34,11 +22,7 @@ class IsometricOpenWorld extends FlameGame {
   Offset get cameraOffset => _isoCamera.offset;
   double get cameraZoom => _isoCamera.zoom;
 
-  IsometricOpenWorld({
-    this.onEnterBuilding,
-    this.onInteractNPC,
-    this.onStep,
-  });
+  IsometricOpenWorld({this.onEnterBuilding});
 
   @override
   Future<void> onLoad() async {
@@ -68,8 +52,10 @@ class IsometricOpenWorld extends FlameGame {
     await add(_isoCamera);
 
     // Joystick for movement
-    final knobPaint = Paint()..color = BasicPalette.blue.color.withValues(alpha: 0.78);
-    final backgroundPaint = Paint()..color = BasicPalette.blue.color.withValues(alpha: 0.39);
+    final knobPaint = Paint()
+      ..color = BasicPalette.blue.color.withValues(alpha: 0.78);
+    final backgroundPaint = Paint()
+      ..color = BasicPalette.blue.color.withValues(alpha: 0.39);
     _joystick = IsometricJoystickComponent(
       isometricCamera: _isoCamera,
       knob: CircleComponent(radius: 25, paint: knobPaint),
@@ -78,31 +64,12 @@ class IsometricOpenWorld extends FlameGame {
     );
     await add(_joystick);
 
-    _addWorldEntities();
-  }
-
-  void _addWorldEntities() {
-    if (worldData == null) return;
-
     // Add animated NPCs
-    for (int i = 0; i < worldData!.npcs.length; i++) {
-      final npc = worldData!.npcs[i];
-      add(
+    for (final npc in worldData!.npcs) {
+      await add(
         IsometricNPCComponent(
           npc: npc,
           worldData: worldData!,
-          tileWidth: 48.0,
-          tileHeight: 28.0,
-          id: i,
-        ),
-      );
-    }
-    
-    // Add Items
-    for (final item in worldData!.items) {
-       add(
-        IsometricItemComponent(
-          item: item,
           tileWidth: 48.0,
           tileHeight: 28.0,
         ),
@@ -114,82 +81,11 @@ class IsometricOpenWorld extends FlameGame {
   void update(double dt) {
     super.update(dt);
 
-    // Track movement for steps
-    if (!_joystick.relativeDelta.isZero()) {
-      _distanceTraveled += _joystick.relativeDelta.length * 600.0 * dt;
-      if (_distanceTraveled >= _stepThreshold) {
-        _distanceTraveled = 0;
-        onStep?.call();
-      }
-    }
-
     // Update camera
     _isoCamera.update(dt);
-    
-    if (_interactionCooldown > 0) {
-      _interactionCooldown -= dt;
-    } else {
-      _checkInteractions();
-    }
-  }
-  
-  void _checkInteractions() {
-    if (worldData == null) return;
-    
-    // The "player" position is the center of the screen relative to the world offset
-    final playerWorldX = size.x / 2 - _isoCamera.offset.dx;
-    final playerWorldY = size.y / 2 - _isoCamera.offset.dy;
-    
-    // Check Buildings
-    if (onEnterBuilding != null) {
-      String? currentNearbyBuilding;
-      for (final building in worldData!.buildings) {
-        final dx = playerWorldX - building.screenX;
-        final dy = playerWorldY - building.screenY;
-        final distance = math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < 40.0) {
-          currentNearbyBuilding = building.type;
-          break;
-        }
-      }
-      
-      if (currentNearbyBuilding != null && currentNearbyBuilding != _lastNearbyBuilding) {
-        _lastNearbyBuilding = currentNearbyBuilding;
-        _interactionCooldown = 2.0;
-        onEnterBuilding!(currentNearbyBuilding);
-        return;
-      } else if (currentNearbyBuilding == null) {
-        _lastNearbyBuilding = null;
-      }
-    }
 
-    // Check NPCs
-    if (onInteractNPC != null) {
-      int? currentNearbyNPCIndex;
-      IsometricNPC? nearbyNPC;
-      
-      final npcComponents = children.whereType<IsometricNPCComponent>().toList();
-      for (final comp in npcComponents) {
-        final dx = playerWorldX - comp.drawX;
-        final dy = playerWorldY - comp.drawY;
-        final distance = math.sqrt(dx * dx + dy * dy);
-        
-        if (distance < 30.0) {
-          currentNearbyNPCIndex = comp.id;
-          nearbyNPC = comp.npc;
-          break;
-        }
-      }
-
-      if (currentNearbyNPCIndex != null && currentNearbyNPCIndex != _lastNearbyNPCId) {
-        _lastNearbyNPCId = currentNearbyNPCIndex;
-        _interactionCooldown = 3.0;
-        onInteractNPC!(nearbyNPC!);
-      } else if (currentNearbyNPCIndex == null) {
-        _lastNearbyNPCId = null;
-      }
-    }
+    // Update NPC animations
+    // (handled in individual components)
   }
 
   /// Regenerate the world with a new seed
@@ -203,22 +99,13 @@ class IsometricOpenWorld extends FlameGame {
       baseHeight: 40.0,
     );
 
-    // Remove old components
-    children.whereType<IsometricNPCComponent>().forEach((c) => c.removeFromParent());
-    children.whereType<IsometricItemComponent>().forEach((c) => c.removeFromParent());
+    // Remove old components and re-add
     _worldPainter.removeFromParent();
-
-    // Re-add components
     _worldPainter = IsometricWorldPainterComponent(
       worldData: worldData!,
       size: size,
     );
     add(_worldPainter);
-    _addWorldEntities();
-    
-    _lastNearbyBuilding = null;
-    _lastNearbyNPCId = null;
-    _interactionCooldown = 0;
   }
 }
 
@@ -242,20 +129,20 @@ class IsometricWorldPainterComponent extends PositionComponent {
     _drawTiles(canvas);
     _drawProps(canvas);
     _drawBuildings(canvas);
+    _drawNPCs(canvas);
   }
 
   void _drawTiles(Canvas canvas) {
     // Sort tiles by depth (painter's algorithm - back to front)
     final sortedTiles = List<IsometricTile>.from(worldData.tiles)
       ..sort(
-        (a, b) =>
-            Procedural3DTerrain.depthSortKey(
-              a.gridX,
-              a.gridY,
-              a.elevation,
-            ).compareTo(
-              Procedural3DTerrain.depthSortKey(b.gridX, b.gridY, b.elevation),
-            ),
+        (a, b) => Procedural3DTerrain.depthSortKey(
+          a.gridX,
+          a.gridY,
+          a.elevation,
+        ).compareTo(
+          Procedural3DTerrain.depthSortKey(b.gridX, b.gridY, b.elevation),
+        ),
       );
 
     for (final tile in sortedTiles) {
@@ -403,6 +290,50 @@ class IsometricWorldPainterComponent extends PositionComponent {
       }
     }
   }
+
+  void _drawNPCs(Canvas canvas) {
+    for (final npc in worldData.npcs) {
+      final nx = npc.screenX;
+      final ny = npc.screenY;
+
+      // Shadow
+      _shadowPaint.color = Colors.black.withValues(alpha: 0.12);
+      canvas.drawOval(
+        Rect.fromCenter(center: Offset(nx + 1, ny + 1), width: 10, height: 4),
+        _shadowPaint,
+      );
+
+      // Legs
+      _paint.color = Color.fromARGB(
+        255,
+        (npc.color.r * 255 * 0.7).round().clamp(0, 255),
+        (npc.color.g * 255 * 0.7).round().clamp(0, 255),
+        (npc.color.b * 255 * 0.7).round().clamp(0, 255),
+      );
+      canvas.drawRect(
+        Rect.fromCenter(center: Offset(nx - 2, ny), width: 3, height: 4),
+        _paint,
+      );
+      canvas.drawRect(
+        Rect.fromCenter(center: Offset(nx + 2, ny), width: 3, height: 4),
+        _paint,
+      );
+
+      // Body
+      _paint.color = npc.color;
+      canvas.drawRect(
+        Rect.fromCenter(center: Offset(nx, ny - 5), width: 6, height: 7),
+        _paint,
+      );
+
+      // Head
+      _paint.color = const Color(0xFFDCB48C); // Skin color
+      canvas.drawRect(
+        Rect.fromCenter(center: Offset(nx, ny - 11), width: 5, height: 5),
+        _paint,
+      );
+    }
+  }
 }
 
 /// Isometric Camera component for pan and zoom
@@ -441,12 +372,12 @@ class IsometricCamera extends Component {
   void update(double dt) {
     // Smooth lerp for offset
     _offset = Offset(
-      _offset.dx + (_targetOffset.dx - _offset.dx) * 8.0 * dt,
-      _offset.dy + (_targetOffset.dy - _offset.dy) * 8.0 * dt,
+      _offset.dx + (_targetOffset.dx - _offset.dx) * 5.0 * dt,
+      _offset.dy + (_targetOffset.dy - _offset.dy) * 5.0 * dt,
     );
 
     // Smooth lerp for zoom
-    _zoom += (_targetZoom - _zoom) * 6.0 * dt;
+    _zoom += (_targetZoom - _zoom) * 4.0 * dt;
   }
 }
 
@@ -465,11 +396,10 @@ class IsometricJoystickComponent extends JoystickComponent {
   void update(double dt) {
     super.update(dt);
 
-    if (!relativeDelta.isZero()) {
-      // Increased sensitivity and using relativeDelta for smoother response
-      const panSpeed = 600.0;
+    if (!delta.isZero()) {
+      const panSpeed = 200.0;
       isometricCamera.panBy(
-        Offset(-relativeDelta.x * panSpeed * dt, -relativeDelta.y * panSpeed * dt),
+        Offset(-delta.x * panSpeed * dt, -delta.y * panSpeed * dt),
       );
     }
   }
@@ -481,7 +411,6 @@ class IsometricNPCComponent extends PositionComponent {
   final IsometricWorldData worldData;
   final double tileWidth;
   final double tileHeight;
-  final int id;
   final math.Random _random = math.Random();
   double _moveTimer = 0;
   Offset _moveDirection = Offset.zero;
@@ -489,10 +418,6 @@ class IsometricNPCComponent extends PositionComponent {
   bool _isMoving = false;
   double _drawX;
   double _drawY;
-  
-  double get drawX => _drawX;
-  double get drawY => _drawY;
-
   final Paint _bodyPaint = Paint()..style = PaintingStyle.fill;
   final Paint _skinPaint = Paint()..style = PaintingStyle.fill;
   final Paint _shadowPaint = Paint();
@@ -503,9 +428,8 @@ class IsometricNPCComponent extends PositionComponent {
     required this.worldData,
     required this.tileWidth,
     required this.tileHeight,
-    required this.id,
-  }) : _drawX = npc.screenX,
-       _drawY = npc.screenY;
+  })  : _drawX = npc.screenX,
+        _drawY = npc.screenY;
 
   @override
   void update(double dt) {
@@ -594,62 +518,14 @@ class IsometricNPCComponent extends PositionComponent {
   }
 }
 
-/// Item component for the isometric world
-class IsometricItemComponent extends PositionComponent {
-  final IsometricItem item;
-  final double tileWidth;
-  final double tileHeight;
-  double _hoverTimer = 0;
-  final Paint _paint = Paint()..style = PaintingStyle.fill;
-
-  IsometricItemComponent({
-    required this.item,
-    required this.tileWidth,
-    required this.tileHeight,
-  });
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-    _hoverTimer += dt;
-  }
-
-  @override
-  void render(Canvas canvas) {
-    final ix = item.screenX;
-    final iy = item.screenY + math.sin(_hoverTimer * 4) * 3;
-
-    _paint.color = item.color;
-    // Draw a small diamond for items
-    final path = Path();
-    const double s = 6.0;
-    path.moveTo(ix, iy - s);
-    path.lineTo(ix + s, iy);
-    path.lineTo(ix, iy + s);
-    path.lineTo(ix - s, iy);
-    path.close();
-    canvas.drawPath(path, _paint);
-
-    // Add a glow
-    final glowPaint = Paint()
-      ..color = item.color.withValues(alpha: 0.3)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
-    canvas.drawCircle(Offset(ix, iy), s * 1.5, glowPaint);
-  }
-}
-
 /// Widget wrapper for the isometric open world Flame game
 class IsometricOpenWorldWidget extends StatelessWidget {
   final Function(String)? onEnterBuilding;
-  final Function(IsometricNPC)? onInteractNPC;
-  final VoidCallback? onStep;
   final VoidCallback? onExit;
 
   const IsometricOpenWorldWidget({
     super.key,
     this.onEnterBuilding,
-    this.onInteractNPC,
-    this.onStep,
     this.onExit,
   });
 
@@ -661,12 +537,6 @@ class IsometricOpenWorldWidget extends StatelessWidget {
           game: IsometricOpenWorld(
             onEnterBuilding: (buildingType) {
               onEnterBuilding?.call(buildingType);
-            },
-            onInteractNPC: (npc) {
-              onInteractNPC?.call(npc);
-            },
-            onStep: () {
-              onStep?.call();
             },
           ),
         ),

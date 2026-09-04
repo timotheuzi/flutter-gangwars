@@ -71,16 +71,9 @@ class MainMenuScreen extends StatelessWidget {
                     const SizedBox(height: 50),
                     _buildMenuButton(
                       context,
-                      'START GAME',
-                      () => _startNewGame(context),
-                      Icons.play_arrow,
-                    ),
-                    const SizedBox(height: 15),
-                    _buildMenuButton(
-                      context,
-                      'CONTINUE',
-                      () => _continueGame(context),
-                      Icons.history,
+                      'ENTER 3D WORLD',
+                      () => _handleEnter3DWorld(context),
+                      Icons.terrain,
                     ),
                     const SizedBox(height: 15),
                     _buildMenuButton(
@@ -134,7 +127,16 @@ class MainMenuScreen extends StatelessWidget {
     );
   }
 
-  void _startNewGame(BuildContext context) {
+  void _handleEnter3DWorld(BuildContext context) {
+    final gameProvider = Provider.of<GameProvider>(context, listen: false);
+    if (gameProvider.gameState.playerName.isEmpty) {
+      _showNewGameDialog(context);
+    } else {
+      gameProvider.navigateToScreen('procedural_open_world');
+    }
+  }
+
+  void _showNewGameDialog(BuildContext context) {
     final playerNameController = TextEditingController();
     final gangNameController = TextEditingController();
 
@@ -194,6 +196,7 @@ class MainMenuScreen extends StatelessWidget {
                 gameProvider.startNewGame(
                   playerNameController.text,
                   gangNameController.text,
+                  initialScreen: 'procedural_open_world',
                 );
                 Navigator.pop(context);
               }
@@ -209,17 +212,6 @@ class MainMenuScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  void _continueGame(BuildContext context) {
-    final gameProvider = Provider.of<GameProvider>(context, listen: false);
-    if (gameProvider.gameState.playerName.isNotEmpty) {
-      gameProvider.navigateToScreen('procedural_open_world');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No saved data on these streets.')),
-      );
-    }
   }
 
   void _showCredits(BuildContext context) {
