@@ -12,6 +12,12 @@ JAVA_HOME_DIR := /home/bimo/.sdkman/candidates/java/current
 # Platform targets
 PLATFORMS := linux android ios
 
+# Android SDK location used by the android build/run targets.
+# This is pinned here so the recipes always pass a real value to Flutter --
+# an unset/empty ANDROID_HOME makes Flutter fall back to the wrong SDK and
+# write a bogus sdk.dir into android/local.properties.
+ANDROID_SDK_DIR ?= $(HOME)/Android/Sdk
+
 # Colors for output
 RED := \033[0;31m
 GREEN := \033[0;32m
@@ -148,7 +154,8 @@ run:
 		echo "Successfully running on web!"; \
 	elif $(FLUTTER) devices | grep -q "Android"; then \
 		echo "Web failed, trying Android..."; \
-		$(FLUTTER) run -v -d android; \
+		rm -f android/local.properties; \
+		ANDROID_HOME=$(ANDROID_SDK_DIR) ANDROID_SDK_ROOT=$(ANDROID_SDK_DIR) $(FLUTTER) run -v -d android; \
 	elif $(FLUTTER) devices | grep -q "Linux"; then \
 		echo "Android failed, trying Linux..."; \
 		$(FLUTTER) run -v -d linux; \
@@ -180,7 +187,9 @@ run-linux:
 
 run-android:
 	@echo -e "${BLUE}Running Android version...${NC}"
-	$(FLUTTER) run -v -d android
+	# Remove stale local.properties so Flutter regenerates a correct sdk.dir.
+	rm -f android/local.properties
+	ANDROID_HOME=$(ANDROID_SDK_DIR) ANDROID_SDK_ROOT=$(ANDROID_SDK_DIR) $(FLUTTER) run -v -d android
 	@echo -e "${GREEN}Android app running!${NC}"
 
 run-ios:
@@ -206,12 +215,22 @@ build-windows: clean
 
 build-android: clean
 	@echo -e "${BLUE}Building Android APK...${NC}"
+<<<<<<< HEAD
 	JAVA_HOME=$(JAVA_HOME_DIR) ANDROID_HOME=$(ANDROID_SDK_DIR) ANDROID_SDK_ROOT=$(ANDROID_SDK_DIR) $(FLUTTER) build apk --debug --android-skip-build-dependency-validation -v
+=======
+	@echo "Using Android SDK: $(ANDROID_SDK_DIR)"
+	# Remove any stale android/local.properties -- 'flutter clean' does not delete it,
+	# and a leftover sdk.dir makes AGP/Gradle target the wrong SDK (licences/NDK errors).
+	rm -f android/local.properties
+	ANDROID_HOME=$(ANDROID_SDK_DIR) ANDROID_SDK_ROOT=$(ANDROID_SDK_DIR) $(FLUTTER) build apk --debug --android-skip-build-dependency-validation -v
+>>>>>>> 46e2088 (latest)
 	@echo -e "${GREEN}Android APK build complete! Output: build/app/outputs/flutter-apk/app-debug.apk${NC}"
 
 build-android-bundle: clean
 	@echo -e "${BLUE}Building Android App Bundle...${NC}"
-	$(FLUTTER) build appbundle --release -v
+	# Remove stale local.properties so Flutter regenerates a correct sdk.dir.
+	rm -f android/local.properties
+	ANDROID_HOME=$(ANDROID_SDK_DIR) ANDROID_SDK_ROOT=$(ANDROID_SDK_DIR) $(FLUTTER) build appbundle --release -v
 	@echo -e "${GREEN}Android App Bundle build complete! Output: build/app/outputs/bundle/release/app-release.aab${NC}"
 
 build-ios: clean
