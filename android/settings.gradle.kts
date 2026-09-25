@@ -23,18 +23,10 @@ pluginManagement {
 
 plugins {
     id("dev.flutter.flutter-plugin-loader")
-    id("com.android.application") version "8.13.0" apply false
-    id("com.android.library") version "8.13.0" apply false
-    id("org.jetbrains.kotlin.android") version "2.2.21" apply false
-}
-
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
-    repositories {
-        google()
-        mavenCentral()
-        maven(url = "https://storage.googleapis.com/download.flutter.io")
-    }
+    // Keep in sync with the Flutter 3.47.x Android template versions.
+    id("com.android.application") version "9.1.0" apply false
+    id("com.android.library") version "9.1.0" apply false
+    id("org.jetbrains.kotlin.android") version "2.4.0" apply false
 }
 
 include(":app")
